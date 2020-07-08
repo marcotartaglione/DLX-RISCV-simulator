@@ -1,16 +1,17 @@
-import { Device } from "./device";
+import {Device} from './device';
+
 /**
  * standard logical network
- */ 
+ */
 export class LogicalNetwork extends Device {
 
-    ffd: boolean;
+  ffd: boolean;
 
-    public a_set() {
-        this.ffd = true;
-    }
+  public a_set() {
+    this.ffd = true;
+  }
 
-    public a_reset() {
-        this.ffd = false;
-    }
+  public a_reset() {
+    this.ffd = false;
+  }
 }
