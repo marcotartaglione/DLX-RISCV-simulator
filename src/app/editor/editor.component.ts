@@ -12,6 +12,7 @@ import { CodeService } from '../services/code.service.js';
 import { MemoryService } from '../services/memory.service.js';
 import './modes/dlx.js';
 import './modes/rv32i.js';
+import { LedLogicalNetwork } from '../memory/model/led.logical-network.js';
 
 @Component({
   selector: 'app-editor',
@@ -63,6 +64,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   errorMessage: string;
   start: string = 'main';
   interval: number = 1000;
+  isLedOn: Boolean;
 
   get options() {
     return {
@@ -184,6 +186,9 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       this.codeService.interpreter.parseTags(this.codeService.content, this.start);
       if (this.codeService.editorMode === 'dlx') {
         (this.memoryService.memory.devices.find(v => v.name == 'Start') as StartLogicalNetwork).a_set();
+        let ledMemory = (this.memoryService.memory.devices.find(v => v.name == 'Led'));
+        if(ledMemory) 
+          this.isLedOn =  (ledMemory as LedLogicalNetwork).led;
       } else {
         this._pc = this.codeService.interpreter.getTag('start_tag');
       }
@@ -227,6 +232,15 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     if (this.formStatusChangeSub) this.formStatusChangeSub.unsubscribe();
+  }
+
+  onActivateLed = () => {
+    let ledMemory = (this.memoryService.memory.devices.find(v => v.name == 'Led'));
+    if(ledMemory) 
+      this.errorMessage = "E' già presente una rete logica di un led";
+    else {
+      this.memoryService.add(LedLogicalNetwork,0x24000000,0x24000001);
+    }
   }
 
 }
