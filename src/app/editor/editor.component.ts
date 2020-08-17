@@ -180,15 +180,15 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   }
 
   onRun() {
+    let ledMemory = (this.memoryService.memory.devices.find(v => v.name == 'CS_LED'));
+    if(ledMemory) 
+      this.isLedOn =  (ledMemory as LedLogicalNetwork).led;
     if (!this.running) {
       this.doc.removeLineClass(this.runnedLine, 'wrap', 'error');
       this.errorMessage = undefined;
       this.codeService.interpreter.parseTags(this.codeService.content, this.start);
       if (this.codeService.editorMode === 'dlx') {
         (this.memoryService.memory.devices.find(v => v.name == 'Start') as StartLogicalNetwork).a_set();
-        let ledMemory = (this.memoryService.memory.devices.find(v => v.name == 'Led'));
-        if(ledMemory) 
-          this.isLedOn =  (ledMemory as LedLogicalNetwork).led;
       } else {
         this._pc = this.codeService.interpreter.getTag('start_tag');
       }
@@ -235,7 +235,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   }
 
   onActivateLed = () => {
-    let ledMemory = (this.memoryService.memory.devices.find(v => v.name == 'Led'));
+    let ledMemory = (this.memoryService.memory.devices.find(v => v.name == 'CS_LED'));
     if(ledMemory) 
       this.errorMessage = "E' già presente una rete logica di un led";
     else {

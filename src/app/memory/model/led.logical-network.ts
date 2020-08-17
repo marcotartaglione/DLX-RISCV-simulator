@@ -10,7 +10,7 @@ export class LedLogicalNetwork extends LogicalNetwork {
   led: boolean;
 
   constructor(cs_read: number, cs_write: number, injector: Injector) {
-    super('Led', cs_read, cs_write);
+    super('CS_LED', cs_read, cs_write);
     this.a_set();
   }
 
