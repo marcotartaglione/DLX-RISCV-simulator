@@ -9,6 +9,7 @@ export class Device {
   private memory: number[];
   min_address: number;
   max_address: number;
+  cs: Array<{id: string, address: number, hexAddress: string}>;
 
   public get min_address_hex(): string {
     return ((this.min_address << 2) >>> 0).toString(16).toUpperCase().padStart(8, '0');
@@ -47,6 +48,19 @@ export class Device {
     this.memory = [];
     this.min_address = min_address;
     this.max_address = max_address;
+    this.cs = [];
+  }
+
+  public getAddressHex = (addr) => {
+    return ((addr << 2) >>> 0).toString(16).toUpperCase().padStart(8, '0');
+  }
+  
+  public setCS = (name,addr,value) => {
+    let val = this.cs.find(el => el.id == name);
+    if(val) val.address = addr;
+    else this.cs.push({id:name,address:addr,hexAddress: this.getAddressHex(addr)});
+    console.log(this.cs);
+    this.store(addr,value);
   }
 
   public checkAddress(address: number): boolean {

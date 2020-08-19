@@ -29,7 +29,6 @@ export class MemoryService {
   public add(name: string | IDevice, min_address: number, max_address: number, injector?: Injector): void {
     this.memory.add(name, min_address, max_address, injector);
   }
-
   public remove(dev: Device): void {
     this.memory.remove(dev);
   }

@@ -58,6 +58,24 @@ export class MemoryComponent implements OnInit {
     this.memoryService.save();
   }
 
+  
+
+  onChangeCS(newValue : string, id: string) {
+    let devices = this.memoryService.memory.devices;
+    let indexSelectedDevice = this.memoryService.memory.devices.indexOf(this.selected);
+    let cs = devices[indexSelectedDevice].cs.find(el => el.id == id);
+    console.log(id);
+    if(cs==null) return;
+    if (newValue.length == 8) {
+      let iv = parseInt(newValue, 16);
+      if (iv || iv === 0) {
+        cs.address = iv >>> 2;
+      }
+    }
+    cs.hexAddress = newValue;
+    console.log(cs);
+  }
+
   onChange(event: any, side: string) {
     let devices = this.memoryService.memory.devices;
     let indexSelectedDevice = this.memoryService.memory.devices.indexOf(this.selected);
@@ -130,4 +148,5 @@ export class MemoryComponent implements OnInit {
   isLN(dev: Device) {
     return dev instanceof LogicalNetwork;
   }
+  
 }

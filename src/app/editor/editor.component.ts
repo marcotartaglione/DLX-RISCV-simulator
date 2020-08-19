@@ -64,7 +64,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   errorMessage: string;
   start: string = 'main';
   interval: number = 1000;
-  isLedOn: Boolean;
+  isLedOn: boolean;
 
   get options() {
     return {
@@ -180,9 +180,6 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   }
 
   onRun() {
-    let ledMemory = (this.memoryService.memory.devices.find(v => v.name == 'CS_LED'));
-    if(ledMemory) 
-      this.isLedOn =  (ledMemory as LedLogicalNetwork).led;
     if (!this.running) {
       this.doc.removeLineClass(this.runnedLine, 'wrap', 'error');
       this.errorMessage = undefined;
@@ -235,11 +232,15 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   }
 
   onActivateLed = () => {
-    let ledMemory = (this.memoryService.memory.devices.find(v => v.name == 'CS_LED'));
-    if(ledMemory) 
-      this.errorMessage = "E' già presente una rete logica di un led";
+    let ledMemory = (this.memoryService.memory.devices.find(v => v.name == 'LED')) as LedLogicalNetwork;
+    if(ledMemory) {
+      this.errorMessage = "CLK";
+      ledMemory.clk();
+      this.isLedOn = ledMemory.getLedStatus();
+    }
     else {
-      this.memoryService.add(LedLogicalNetwork,0x24000000,0x24000001);
+      this.memoryService.add(LedLogicalNetwork,0x24000000,0x24000008);
+      let ledMemory = (this.memoryService.memory.devices.find(v => v.name == 'LED')) as LedLogicalNetwork;
     }
   }
 

@@ -41,7 +41,6 @@ export class Memory {
   }
 
   public add(name: string | IDevice, min_address: number, max_address: number, injector?: Injector): void {
-    console.log("ADD MEMORY");
     if (this.devices.every(dev => !(dev.checkAddress(min_address) || dev.checkAddress(max_address)))) {
       if (typeof name == 'string') {
         this.devices.push(new Device(name, min_address, max_address));

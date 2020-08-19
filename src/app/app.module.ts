@@ -18,6 +18,7 @@ import { MaterialModule } from './material.module';
 import { MemoryComponent } from './memory/memory.component';
 import { FormatPipe } from './pipes/format.pipe';
 import { RegistersComponent } from './registers/registers.component';
+import {MatSelectModule} from '@angular/material';
 
 
 
@@ -43,7 +44,8 @@ import { RegistersComponent } from './registers/registers.component';
       ReactiveFormsModule,
       MatNativeDateModule,
       HttpClientModule,
-      MaterialModule
+      MaterialModule,
+      MatSelectModule
    ],
    entryComponents: [
       MessageDialogComponent,
