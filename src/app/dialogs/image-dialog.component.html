@@ -1,0 +1,15 @@
+<mat-dialog-content>
+    <img src="{{data.network.image}}" witdh="100"/>
+    <br />
+    <br />
+    <br />
+    <div *ngIf="data.network.cs.length > 0">
+        <b>Chip-Select</b><br />
+        <span *ngFor="let cs of data.network.cs">
+            {{cs.id}} - {{cs.hexAddress}}<br />
+        </span>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Ok</button>
+</mat-dialog-actions>

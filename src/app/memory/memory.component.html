@@ -1,4 +1,6 @@
-<span>Memory</span>
+<button *ngIf="selected!=null && selected.cs.length>0" mat-raised-button class="mr" (click)="openDialogImage(selected)">
+  <span class="btn">Visualizza rete logica <i class="fa fa-code-branch"></i></span>
+</button>
 <div class="main-container">
   <div class="memory">
     <ng-container *ngFor="let device of memoryService.memory.devices">
@@ -74,3 +76,4 @@
           [disabled]="selected.name == 'EPROM' || selected.name =='Start'" @showHideTrigger><i class="fas fa-trash"></i>
   </button>
 </div>
+

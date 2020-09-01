@@ -19,6 +19,7 @@ import { MemoryComponent } from './memory/memory.component';
 import { FormatPipe } from './pipes/format.pipe';
 import { RegistersComponent } from './registers/registers.component';
 import {MatSelectModule} from '@angular/material';
+import { ImageDialogComponent } from './dialogs/image-dialog.component';
 
 
 
@@ -32,6 +33,7 @@ import {MatSelectModule} from '@angular/material';
       MemoryComponent,
       DocumentationComponent,
       MessageDialogComponent,
+      ImageDialogComponent,
       ConfirmDialogComponent,
       AboutPageComponent
    ],
@@ -49,7 +51,8 @@ import {MatSelectModule} from '@angular/material';
    ],
    entryComponents: [
       MessageDialogComponent,
-      ConfirmDialogComponent
+      ConfirmDialogComponent,
+      ImageDialogComponent,
    ],
    providers: [],
    bootstrap: [

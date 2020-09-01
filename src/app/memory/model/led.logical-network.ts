@@ -13,18 +13,18 @@ export class LedLogicalNetwork extends LogicalNetwork {
     super('LED', min_address, max_address);
     this.ffd_a_res = false;
     this.ffd_a_set = true;
+    this.image = "assets/img/rete-led.png";
     this.cs = [];
     this.a_reset();
     
-    this.setCS("mux_en",0x24000001,1);
-    this.setCS("read_out",0x24000003,1);
+    this.setCS("cs_inverti_led",0x24000001,1);
+    this.setCS("cs_read_led",0x24000003,1);
   }
 
   public load(address: number): number {
     let cs = this.cs.find(el => el.address == address);
     if(cs==null) return super.load(address);
     else {
-      console.log("ACCESS CS -> " + cs.id);
       switch(cs.id) {
         case "read_out":
           return this.getLedStatus() ? 1 : 0;

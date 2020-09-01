@@ -12,6 +12,7 @@ export class LogicalNetwork extends Device {
   ffd: boolean;
   ffd_a_set: boolean;
   ffd_a_res: boolean;
+  image: String;
 
   public a_set() {
     this.ffd = this.ffd_a_set;
