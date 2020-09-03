@@ -6,6 +6,7 @@ import { Interpreter } from '../interpreter';
 import { NotExistingInstructionError, WrongArgumentsError } from '../interpreter-errors';
 import { encoder, inputs_encoder } from './dlx.encoder';
 import { instructions, InstructionType, signExtend, specialRegisters } from './dlx.instructions';
+
 export class DLXInterpreter extends Interpreter{
 
     private readonly process_instruction: {
