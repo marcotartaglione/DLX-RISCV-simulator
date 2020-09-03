@@ -5,7 +5,7 @@ import {MessageDialogComponent} from '../dialogs/message-dialog.component';
 import {MemoryService} from '../services/memory.service';
 import {Device} from './model/device';
 import {LogicalNetwork} from './model/logical-network';
-import {ImageDialogComponent} from '../dialogs/image-dialog.component';
+import {LogicalNetworkDialogComponent} from '../dialogs/logical-network-dialog.component';
 
 @Component({
   selector: 'app-memory',
@@ -50,7 +50,7 @@ export class MemoryComponent implements OnInit {
 
   openDialogImage(n) {
     console.log(n);
-    this.dialog.open(ImageDialogComponent, {
+    this.dialog.open(LogicalNetworkDialogComponent, {
       data: {network : n}
     });
   }
