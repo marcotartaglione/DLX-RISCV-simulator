@@ -90,11 +90,11 @@ export class MemoryComponent implements OnInit {
     let indexSelectedDevice = this.memoryService.memory.devices.indexOf(this.selected);
     if (side == 'min') {
       if (this.selected.min_address <= devices[indexSelectedDevice - 1].max_address) {
-        this.selected.min_address = devices[indexSelectedDevice - 1].max_address + 1;
+        this.selected.setMinAddress(devices[indexSelectedDevice - 1].max_address + 1);
       }
     } else if (side == 'max') {
       if (this.selected.max_address >= devices[indexSelectedDevice + 1].min_address) {
-        this.selected.max_address = devices[indexSelectedDevice + 1].min_address - 1;
+        this.selected.setMaxAddress(devices[indexSelectedDevice + 1].min_address - 1);
       }
     }
     if (parseInt(this.selected.size) >= 128 || this.selected instanceof LogicalNetwork) {
@@ -112,12 +112,13 @@ export class MemoryComponent implements OnInit {
     let sizeOfSelected = this.selected.max_address - this.selected.min_address;
     let spaceBeforeFirstDevice = this.memoryService.memory.devices[indexSelectedDevice].min_address - this.memoryService.memory.devices[indexSelectedDevice - 1].max_address;
     if (spaceBeforeFirstDevice >= 33554432) {
-      this.selected.max_address -= 33554432;
-      this.selected.min_address -= 33554432;
+      this.selected.setMaxAddress(this.selected.max_address - 33554432);
+      this.selected.setMinAddress(this.selected.min_address - 33554432);
     } else if ((endAddress = this.spaceBetweenDevices(indexSelectedDevice, sizeOfSelected, 'left')) != 0) {
-      this.selected.max_address = endAddress - 1;
-      this.selected.min_address = this.selected.max_address - sizeOfSelected;
+      this.selected.setMaxAddress(endAddress - 1);
+      this.selected.setMinAddress(this.selected.max_address - sizeOfSelected);
     }
+
     this.memoryService.memory.devices = this.memoryService.memory.devices.sort((a, b) => a.min_address - b.min_address);
     this.memoryService.save();
   }
@@ -129,12 +130,11 @@ export class MemoryComponent implements OnInit {
     let lastDevice = this.memoryService.memory.devices[this.memoryService.memory.devices.length - 1];
     let spaceBeforeFirstDevice = this.memoryService.memory.devices[indexSelectedDevice + 1].min_address - this.memoryService.memory.devices[indexSelectedDevice].max_address;
     if (spaceBeforeFirstDevice >= 33554432) {                                                            // Muovi avanti 128Mb se c'è abbastanza spazio
-      this.selected.max_address += 33554432;
-      this.selected.min_address += 33554432;
+      this.selected.setMaxAddress(this.selected.max_address + 33554432);
+      this.selected.setMinAddress(this.selected.min_address + 33554432);
     } else if ((startAddress = this.spaceBetweenDevices(indexSelectedDevice, sizeOfSelected, 'right')) != 0) {   // Muovi tra due device avanti a me
-      console.log(startAddress);
-      this.selected.min_address = startAddress + 1;
-      this.selected.max_address = this.selected.min_address + sizeOfSelected;
+      this.selected.setMinAddress(startAddress + 1);
+      this.selected.setMaxAddress(this.selected.min_address + sizeOfSelected);
     }
     this.memoryService.memory.devices = this.memoryService.memory.devices.sort((a, b) => a.min_address - b.min_address);
     this.memoryService.save();
