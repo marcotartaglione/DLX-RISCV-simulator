@@ -3,6 +3,7 @@ import {Device, IDevice} from '../memory/model/device';
 import {Eprom} from '../memory/model/eprom';
 import {Memory} from '../memory/model/memory';
 import {StartLogicalNetwork} from '../memory/model/start.logical-network';
+import {LedLogicalNetwork} from '../memory/model/led.logical-network';
 
 @Injectable({
   providedIn: 'root'
@@ -28,9 +29,12 @@ export class MemoryService {
   public add(name: string | IDevice, min_address: number, max_address: number, injector?: Injector): void {
     this.memory.add(name, min_address, max_address, injector);
   }
-
   public remove(dev: Device): void {
     this.memory.remove(dev);
+  }
+
+  public clearMemory = () => {
+    window.localStorage.removeItem('memory');
   }
 
   save() {

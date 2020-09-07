@@ -9,6 +9,8 @@ export class StartLogicalNetwork extends LogicalNetwork {
 
   constructor(cs_read: number, cs_write: number, injector: Injector) {
     super('Start', cs_read, cs_write);
+    this.ffd_a_res = false;
+    this.ffd_a_set = true;
   }
 
   public load(address: number): number {

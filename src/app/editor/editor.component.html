@@ -9,6 +9,9 @@
     </div>
     <div class="btn-container">
         <div class="right">
+            <button  mat-raised-button class="mr"  [ngClass]="{'amber': isLedOn}" (click)="onActivateLed()">
+                <span class="btn">LED <i class="fas fa-lightbulb"></i></span>
+            </button>
             <button mat-raised-button class="mr" (click)="onInterrupt()">
                 <span class="btn">Interrupt <i class="fas fa-bolt amber"></i></span>
             </button>

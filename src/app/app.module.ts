@@ -18,6 +18,8 @@ import { MaterialModule } from './material.module';
 import { MemoryComponent } from './memory/memory.component';
 import { FormatPipe } from './pipes/format.pipe';
 import { RegistersComponent } from './registers/registers.component';
+import {MatSelectModule} from '@angular/material';
+import { ImageDialogComponent } from './dialogs/image-dialog.component';
 
 
 
@@ -31,6 +33,7 @@ import { RegistersComponent } from './registers/registers.component';
       MemoryComponent,
       DocumentationComponent,
       MessageDialogComponent,
+      ImageDialogComponent,
       ConfirmDialogComponent,
       AboutPageComponent
    ],
@@ -43,11 +46,13 @@ import { RegistersComponent } from './registers/registers.component';
       ReactiveFormsModule,
       MatNativeDateModule,
       HttpClientModule,
-      MaterialModule
+      MaterialModule,
+      MatSelectModule
    ],
    entryComponents: [
       MessageDialogComponent,
-      ConfirmDialogComponent
+      ConfirmDialogComponent,
+      ImageDialogComponent,
    ],
    providers: [],
    bootstrap: [
