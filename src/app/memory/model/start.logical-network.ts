@@ -11,6 +11,10 @@ export class StartLogicalNetwork extends LogicalNetwork {
     super('Start', cs_read, cs_write);
     this.ffd_a_res = false;
     this.ffd_a_set = true;
+    
+    this.cs = [];
+    this.setCS("cs_set_start",0x24000001,1);
+    this.setCS("cs_read_start",0x24000002,1);
   }
 
   public load(address: number): number {

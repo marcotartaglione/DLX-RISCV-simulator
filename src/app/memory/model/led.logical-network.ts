@@ -8,6 +8,7 @@ export class LedLogicalNetwork extends LogicalNetwork {
   //bd0 = tri( ffd( start, mux( start.q, bd0, cs_write ), reset, null, memwr* ), cs_read )";
 
   led: boolean;
+  mux_status: number;
 
   constructor(min_address: number, max_address: number, injector: Injector) {
     super('LED', min_address, max_address);
@@ -15,7 +16,7 @@ export class LedLogicalNetwork extends LogicalNetwork {
     this.ffd_a_set = true;
     this.image = "assets/img/rete-led.png";
     this.cs = [];
-    this.a_reset();
+    this.a_set();
     
     this.setCS("cs_inverti_led",0x24000001,1);
     this.setCS("cs_read_led",0x24000003,1);
@@ -26,26 +27,40 @@ export class LedLogicalNetwork extends LogicalNetwork {
     if(cs==null) return super.load(address);
     else {
       switch(cs.id) {
-        case "read_out":
+        case "cs_read_led":
           return this.getLedStatus() ? 1 : 0;
+        case "cs_inverti_led":
+          return this.mux_status ? 1 : 0;
       }
       return super.load(address);
     }
   }
 
   public store(address: number, word: number): void {
-    if (address == this.max_address) {
-      this.ffd = (word & 0x1) == 0x1;
+    let cs = this.cs.find(el => el.address == address);
+    if(cs==null) return super.store(address,word);
+    else {
+      switch(cs.id) {
+        case "cs_inverti_led":
+          this.mux_status = word&0x01;
+          console.log("MUX_STATUS -> " + this.mux_status);
+          break;
+      }
+      return super.store(address,word);
     }
   }
 
   public clk = () => { // EXECUTE THE LOGICAL NETWORK CLK
-    let cs_mux = this.cs.find(el => el.id=="mux_en");
-    if(cs_mux==null) return;
-    else this.ffd = this.mux(this.ffd, !this.ffd, this.load(cs_mux.address));
-    let cs_read_out = this.cs.find(el => el.id=="read_out");
-    if(cs_read_out!=null)
-      this.store(cs_read_out.address,this.ffd ? 1 : 0);
+    let cs_inverti_led = this.cs.find(el => el.id=="cs_inverti_led");
+    if(cs_inverti_led==null) return;
+    else {
+      let cs_mux = this.load(cs_inverti_led.address);
+      console.log("STATO MUX -> " + 1);
+      this.ffd = this.mux(this.ffd, !this.ffd, cs_mux);
+    }
+    let cs_read_led = this.cs.find(el => el.id=="cs_read_led");
+    if(cs_read_led!=null)
+      this.store(cs_read_led.address,this.ffd ? 1 : 0);
 
     console.log("LED STATUS -> " + this.getLedStatus());
   }

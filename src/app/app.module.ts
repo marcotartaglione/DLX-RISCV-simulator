@@ -19,7 +19,7 @@ import { MemoryComponent } from './memory/memory.component';
 import { FormatPipe } from './pipes/format.pipe';
 import { RegistersComponent } from './registers/registers.component';
 import {MatSelectModule} from '@angular/material';
-import { ImageDialogComponent } from './dialogs/image-dialog.component';
+import { LogicalNetworkDialogComponent } from './dialogs/logical-network-dialog.component';
 
 
 
@@ -33,7 +33,7 @@ import { ImageDialogComponent } from './dialogs/image-dialog.component';
       MemoryComponent,
       DocumentationComponent,
       MessageDialogComponent,
-      ImageDialogComponent,
+      LogicalNetworkDialogComponent,
       ConfirmDialogComponent,
       AboutPageComponent
    ],
@@ -52,7 +52,7 @@ import { ImageDialogComponent } from './dialogs/image-dialog.component';
    entryComponents: [
       MessageDialogComponent,
       ConfirmDialogComponent,
-      ImageDialogComponent,
+      LogicalNetworkDialogComponent,
    ],
    providers: [],
    bootstrap: [
