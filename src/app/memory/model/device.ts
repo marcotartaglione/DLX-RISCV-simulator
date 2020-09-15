@@ -1,4 +1,4 @@
-import {Injector} from '@angular/core';
+import {Injector, Input} from '@angular/core';
 
 export interface IDevice {
   new(min_address: number, max_address: number, injector: Injector): Device;
@@ -107,7 +107,9 @@ export class Device {
   }
 
   public load(address: number): number {
-    return this.memory[address - this.min_address];
+    console.log("OK");
+    let res = this.memory[address-this.min_address];
+    return res;
   }
 
   public store(address: number, word: number): void {

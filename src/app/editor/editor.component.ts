@@ -241,6 +241,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     else {
       this.memoryService.add(LedLogicalNetwork,0x24000000,0x24000008);
       let ledMemory = (this.memoryService.memory.devices.find(v => v.name == 'LED')) as LedLogicalNetwork;
+      this.isLedOn = ledMemory.getLedStatus();
     }
   }
 

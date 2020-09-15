@@ -1,32 +1,47 @@
-import {Injector} from '@angular/core';
+import {Injector, Input, Inject, Injectable} from '@angular/core';
 import {LogicalNetwork} from './logical-network';
 
+@Injectable()
 export class StartLogicalNetwork extends LogicalNetwork {
   //ffd( name, d, a_res, a_set, clk)
   //mux( zero, one, sel)
   //tri( in, en )
   //bd0 = tri( ffd( start, mux( start.q, bd0, cs_write ), reset, null, memwr* ), cs_read )";
 
+
   constructor(cs_read: number, cs_write: number, injector: Injector) {
     super('Start', cs_read, cs_write);
+
     this.ffd_a_res = false;
     this.ffd_a_set = true;
-    
     this.cs = [];
-    this.setCS("cs_set_start",0x24000001,1);
-    this.setCS("cs_read_start",0x24000002,1);
+    this.setCS("cs_read_start",this.min_address,1);
+    this.setCS("cs_set_start",this.min_address + 0x00000001,1);
   }
 
   public load(address: number): number {
-    if (address == this.min_address) {
-      return this.ffd ? 1 : 0;
+    let res = 0;
+    let cs = this.cs.find(el => el.address == address);
+    if(cs==null) res = super.load(address);
+    else {
+      switch(cs.id) {
+        case "cs_read_start":
+          res = this.ffd ? 1 : 0;
+      }
     }
-    return 0;
+    
+    return res;
   }
 
   public store(address: number, word: number): void {
-    if (address == this.max_address) {
-      this.ffd = (word & 0x1) == 0x1;
+    let cs = this.cs.find(el => el.address == address);
+    if(cs==null) return super.store(address,word);
+    else {
+      switch(cs.id) {
+        case "cs_set_start":
+          this.ffd = (word & 0x1) == 0x1;
+          break;
+      }
     }
   }
 }
