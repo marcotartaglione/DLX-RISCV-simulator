@@ -67,8 +67,6 @@ export class MemoryComponent implements OnInit {
     this.memoryService.save();
   }
 
-  
-
   onChangeCS(newValue : string, id: string) {
     let devices = this.memoryService.memory.devices;
     let indexSelectedDevice = this.memoryService.memory.devices.indexOf(this.selected);

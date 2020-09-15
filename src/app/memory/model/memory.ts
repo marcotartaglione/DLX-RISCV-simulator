@@ -1,8 +1,8 @@
-import {Injector} from '@angular/core';
-import {Device, IDevice} from './device';
-import {Eprom} from './eprom';
-import {StartLogicalNetwork} from './start.logical-network';
-import {LedLogicalNetwork} from './led.logical-network';
+import { Injector, Inject } from '@angular/core';
+import { Device, IDevice } from './device';
+import { Eprom } from './eprom';
+import { StartLogicalNetwork } from './start.logical-network';
+import { LedLogicalNetwork } from './led.logical-network';
 
 export class Memory {
   devices: Device[] = [];
@@ -24,14 +24,14 @@ export class Memory {
           case Eprom.name:
             this.add(Eprom, el.min_address, el.max_address, injector);
             break;
-            case StartLogicalNetwork.name:
-              this.add(StartLogicalNetwork, el.min_address, el.max_address, injector);
-              break;
+          case StartLogicalNetwork.name:
+            this.add(StartLogicalNetwork, el.min_address, el.max_address, injector);
+            break;
 
-            case LedLogicalNetwork.name:
-              this.add(LedLogicalNetwork, el.min_address, el.max_address, injector);
-              break;
-          
+          case LedLogicalNetwork.name:
+            this.add(LedLogicalNetwork, el.min_address, el.max_address, injector);
+            break;
+
           default:
             this.add(el.name, el.min_address, el.max_address);
             break;
@@ -62,8 +62,8 @@ export class Memory {
   public load(address: number): number {
     let device = this.devices.find(dev => dev.checkAddress(address));
     if (device) {
-      console.log('Device trovato LOAD ' + address + ' Dev ' + device.name);
-      return device.load(address);
+      let res = device.load(address);
+      return res;
     } else {
       throw new Error('Device not found');
     }
@@ -72,7 +72,6 @@ export class Memory {
   public store(address: number, word: number): number {
     let device = this.devices.find(dev => dev.checkAddress(address));
     if (device) {
-      console.log('Device trovato STORE ' + address + ' number: ' + word + ' Dev ' + device.name);
       device.store(address, word);
     } else {
       throw new Error('Device not found');

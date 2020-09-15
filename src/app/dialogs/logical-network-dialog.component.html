@@ -9,6 +9,12 @@
             {{cs.id}} - {{cs.hexAddress}}<br />
         </span>
     </div>
+    <br />
+    <div *ngIf="null != data.network.led">
+        <b>LED</b><br />
+        <span *ngIf="data.network.led">ACCESO</span>
+        <span *ngIf="!data.network.led">SPENTO</span>
+    </div>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
     <button mat-button mat-dialog-close>Ok</button>
