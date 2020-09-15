@@ -4,24 +4,21 @@
 <div class="main-container">
   <div class="memory">
     <ng-container *ngFor="let device of memoryService.memory.devices">
+      <mat-icon *ngIf="device.isALedNetwork()" [style.left]="((device.min_address/1073741824)*100).toFixed(2)-1+'%'"
+        aria-hidden="false" [ngClass]="{'amber': device.getCsValue('cs_read_led')}" class="icon_absolute" aria-label="Example home icon">
+        highlight
+      </mat-icon>
       <div class="dev" matRipple *ngIf="!isLN(device)"
-           [style.left]="((device.min_address/1073741824)*100).toFixed(2)+'%'"
-           [style.right]="(100 - (device.max_address/1073741824)*100).toFixed(2)+'%'"
-           (click)="selected == device ? selected = null : selected = device"
-           [class.selected]="selected == device"
-           [matTooltip]="device.size"
-           matTooltipPosition="above"
-           matTooltipClass="device-size"
-      >
+        [style.left]="((device.min_address/1073741824)*100).toFixed(2)+'%'"
+        [style.right]="(100 - (device.max_address/1073741824)*100).toFixed(2)+'%'"
+        (click)="selected == device ? selected = null : selected = device" [class.selected]="selected == device"
+        [matTooltip]="device.size" matTooltipPosition="above" matTooltipClass="device-size">
+
         <span>{{ device.name }}</span>
       </div>
-      <div class="ln" *ngIf="isLN(device)"
-           [style.left]="((device.min_address/1073741824)*100).toFixed(2)+'%'"
-           (click)="selected == device ? selected = null : selected = device"
-           [class.selected]="selected == device"
-           [matTooltip]="device.name+' '+(device.ffd?'1':'0')"
-           matTooltipPosition="above"
-           matTooltipClass="device-size">
+      <div class="ln" *ngIf="isLN(device)" [style.left]="((device.min_address/1073741824)*100).toFixed(2)+'%'"
+        (click)="selected == device ? selected = null : selected = device" [class.selected]="selected == device"
+        [matTooltip]="device.name +' '+(device.ffd_q?'1':'0')" matTooltipPosition="above" matTooltipClass="device-size">
       </div>
     </ng-container>
     <div class="gig-overlay">
@@ -31,23 +28,23 @@
       <div class="gig"></div>
     </div>
   </div>
-  <button mat-raised-button id="add" (click)="onAdd()"><i class="fas fa-plus"></i></button>
+  <button mat-raised-button id="add"[matMenuTriggerFor]="menuAdd"><i class="fas fa-plus"></i></button>
   <div class="container" *ngIf="selected" @showHideTrigger>
     <div class="group">
-      <button class="standard_margin_hor" mat-raised-button id="move-left" (click)="moveSelectedLeft()" [disabled]="!canMoveSelectedLeft"><i
-        class="fas fa-caret-left"></i></button>
+      <button class="standard_margin_hor" mat-raised-button id="move-left" (click)="moveSelectedLeft()"
+        [disabled]="!canMoveSelectedLeft"><i class="fas fa-caret-left"></i></button>
       <mat-form-field id="min" appearance="fill">
         <mat-label>min</mat-label>
         <input matInput (change)="onChange($event, 'min')" [(ngModel)]="selected.min_address_hex" minlength="8"
-               maxlength="8" [disabled]="selected.name == 'EPROM'"/>
+          maxlength="8" [disabled]="selected.name == 'EPROM'" />
       </mat-form-field>
       <mat-form-field class="standard_margin_hor" id="name" appearance="fill">
         <mat-label>name</mat-label>
         <input matInput (change)="onChange($event, 'name')" [(ngModel)]="selected.name"
-               [disabled]="selected.name == 'EPROM'"/>
+          [disabled]="selected.name == 'EPROM'" />
       </mat-form-field>
     </div>
-    
+
     <div class="group" *ngIf="selected.cs.length > 0">
       <mat-form-field appearance="fill">
         <mat-label>Chip-Select</mat-label>
@@ -57,24 +54,35 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
-      <mat-form-field class="standard_margin_hor" id="csAddr" appearance="fill" *ngIf="selectedCS!=null && selectedCS.id.length>0" >
+      <mat-form-field class="standard_margin_hor" id="csAddr" appearance="fill"
+        *ngIf="selectedCS!=null && selectedCS.id.length>0">
         <mat-label>address</mat-label>
-        <input matInput (change)="onChangeCS($event.target.value, selectedCS.id)" minlength="8" [(value)]="selectedCS.hexAddress"
-               maxlength="8" />
+        <input matInput (change)="onChangeCS($event.target.value, selectedCS.id)" minlength="8"
+          [(value)]="selectedCS.hexAddress" maxlength="8" />
       </mat-form-field>
     </div>
     <div class="group">
       <mat-form-field id="max" appearance="fill">
         <mat-label>max</mat-label>
         <input matInput (change)="onChange($event, 'max')" [(ngModel)]="selected.max_address_hex" minlength="8"
-               maxlength="8"/>
+          maxlength="8" />
       </mat-form-field>
       <button mat-raised-button id="move-right" (click)="moveSelectedRight()" [disabled]="!canMoveSelectedRight"><i
-        class="fas fa-caret-right"></i></button>
+          class="fas fa-caret-right"></i></button>
     </div>
   </div>
   <button mat-raised-button *ngIf="selected" id="del" (click)="onDelete(selected)"
-          [disabled]="selected.name == 'EPROM' || selected.name =='Start'" @showHideTrigger><i class="fas fa-trash"></i>
+    [disabled]="selected.name == 'EPROM' || selected.name =='Start'" @showHideTrigger><i class="fas fa-trash"></i>
   </button>
 </div>
-
+<mat-menu #menuAdd="matMenu">
+  <button (click)="onAdd()" mat-menu-item>
+    <span>Memory</span>
+  </button>
+  <button mat-menu-item (click)="onAddStart()">
+    <span>Start network</span>
+  </button>
+  <button mat-menu-item (click)="onAddLed()">
+    <span>Led network</span>
+  </button>
+</mat-menu>

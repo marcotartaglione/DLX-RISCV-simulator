@@ -1,4 +1,4 @@
-import {Injector, Input} from '@angular/core';
+import {Injector} from '@angular/core';
 
 export interface IDevice {
   new(min_address: number, max_address: number, injector: Injector): Device;
@@ -10,9 +10,21 @@ export class Device {
   min_address: number;
   max_address: number;
   cs: Array<{id: string, address: number, hexAddress: string}>;
+  clkType: string;
 
   public get min_address_hex(): string {
     return ((this.min_address << 2) >>> 0).toString(16).toUpperCase().padStart(8, '0');
+  }
+
+  getCsValue(csId) {
+    if(null==this.cs) return 0;
+    let cs = this.cs.find(el => el.id == csId);
+
+    return cs ? this.load(cs.address) : 0;
+  }
+
+  public isALedNetwork() {
+    return null != this.cs.find(el => el.id == "cs_read_led");
   }
 
   public set min_address_hex(v: string) {
@@ -55,7 +67,6 @@ export class Device {
     this.min_address = min_address;
     this.max_address = max_address;
     this.cs = [];
-    console.log("CONSTRUCTOR");
   }
 
   public setMaxAddress(v: number) {
@@ -107,7 +118,6 @@ export class Device {
   }
 
   public load(address: number): number {
-    console.log("OK");
     let res = this.memory[address-this.min_address];
     return res;
   }

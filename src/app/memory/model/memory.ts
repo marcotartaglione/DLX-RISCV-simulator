@@ -3,14 +3,15 @@ import { Device, IDevice } from './device';
 import { Eprom } from './eprom';
 import { StartLogicalNetwork } from './start.logical-network';
 import { LedLogicalNetwork } from './led.logical-network';
+import { callbackify } from 'util';
 
 export class Memory {
   devices: Device[] = [];
 
-  public firstFreeAddr(): number {
+  public firstFreeAddr(startAddr): number {
     for (let i = 0; i < this.devices.length - 1; i++) {
-      if ((this.devices[i + 1].min_address - this.devices[i].max_address) >= 33554432) {
-        return this.devices[i].max_address;
+      if ((this.devices[i + 1].min_address - this.devices[i].max_address) >= 33554432 && this.devices[i + 1].max_address > startAddr) {
+        return this.devices[i].max_address + (33554432 / 2);
       }
     }
     return 0;
@@ -74,8 +75,21 @@ export class Memory {
     if (device) {
       device.store(address, word);
     } else {
+      this.startClk();
       throw new Error('Device not found');
     }
+    this.startClk();
     return word;
+  }
+
+  private startClk() {
+    this.devices.forEach(device => {
+      try {
+        if (device instanceof LedLogicalNetwork)
+          (device as LedLogicalNetwork).clk();
+      } catch (e) {
+        console.log(e);
+      }
+    })
   }
 }

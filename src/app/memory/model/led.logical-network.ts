@@ -1,5 +1,5 @@
-import {Injector, Input, Inject, Injectable} from '@angular/core';
-import {LogicalNetwork} from './logical-network';
+import { Injector, Input, Inject, Injectable } from '@angular/core';
+import { LogicalNetwork } from './logical-network';
 
 @Injectable()
 export class LedLogicalNetwork extends LogicalNetwork {
@@ -12,22 +12,25 @@ export class LedLogicalNetwork extends LogicalNetwork {
 
   constructor(min_address: number, max_address: number, injector: Injector) {
     super('LED', min_address, max_address);
-    this.ffd_a_res = true;
-    this.ffd_a_set = false;
+    this.clkType = "MEMRD";
     this.image = "assets/img/rete-led.png";
     this.cs = [];
     this.a_set();
-    this.led = this.ffd;
-    this.setCS("cs_inverti_led",this.min_address,1);
-    this.setCS("cs_read_led",this.min_address + 0x00000001,1);
+    this.led = this.ffd_q;
+    this.setCS("cs_inverti_led", this.min_address, 1);
+    this.setCS("cs_read_led", this.min_address + 0x00000001, 1);
+  }
 
+  public a_set() {
+    this.ffd_q = true;
+    this.ffd_d = true;
   }
 
   public load(address: number): number {
     let cs = this.cs.find(el => el.address == address);
-    if(cs==null) return super.load(address);
+    if (cs == null) return super.load(address);
     else {
-      switch(cs.id) {
+      switch (cs.id) {
         case "cs_read_led":
           return this.led ? 1 : 0;
         case "cs_inverti_led":
@@ -38,29 +41,32 @@ export class LedLogicalNetwork extends LogicalNetwork {
 
   public store(address: number, word: number): void {
     let cs = this.cs.find(el => el.address == address);
-    if(cs==null) return super.store(address,word);
+    if (cs == null) return super.store(address, word);
     else {
-      switch(cs.id) {
+      switch (cs.id) {
         case "cs_inverti_led":
-          this.mux_status = word&0x01;
+          this.mux_status = word & 0x01;
           break;
       }
     }
   }
 
   public clk = () => { // EXECUTE THE LOGICAL NETWORK CLK
-    let cs_inverti_led = this.cs.find(el => el.id=="cs_inverti_led");
-    if(cs_inverti_led==null) return;
+    let cs_inverti_led = this.cs.find(el => el.id == "cs_inverti_led");
+    this.ffd_q = this.ffd_d;
+    if (cs_inverti_led == null) return;
     else {
       let cs_mux = this.load(cs_inverti_led.address);
-      this.ffd = this.mux(this.ffd, !this.ffd, cs_mux);
-      console.log(this.ffd);
+      console.log("CS_INVERTI_LED -> " + cs_mux);
+      this.ffd_d = this.mux(this.ffd_q, !this.ffd_q, cs_mux);
     }
-    let cs_read_led = this.cs.find(el => el.id=="cs_read_led");
-    if(cs_read_led!=null)
-      this.store(cs_read_led.address,this.ffd ? 1 : 0);
+    let cs_read_led = this.cs.find(el => el.id == "cs_read_led");
+    this.led = this.ffd_q;
+    if (cs_read_led != null)
+      this.store(cs_read_led.address, this.led ? 1 : 0);
 
-    this.led = this.ffd;
+    console.log("NEW D -> " + this.ffd_d);
+    console.log("NEW Q -> " + this.ffd_q);
   }
 
   public getLedStatus = () => {

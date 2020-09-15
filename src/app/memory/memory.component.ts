@@ -6,6 +6,8 @@ import {MemoryService} from '../services/memory.service';
 import {Device} from './model/device';
 import {LogicalNetwork} from './model/logical-network';
 import {LogicalNetworkDialogComponent} from '../dialogs/logical-network-dialog.component';
+import { StartLogicalNetwork } from './model/start.logical-network';
+import { LedLogicalNetwork } from './model/led.logical-network';
 
 @Component({
   selector: 'app-memory',
@@ -49,17 +51,29 @@ export class MemoryComponent implements OnInit {
   }
 
   openDialogImage(n) {
-    console.log(n);
     this.dialog.open(LogicalNetworkDialogComponent, {
       data: {network : n}
     });
   }
 
   onAdd() {
-    let firstAdd = this.memoryService.memory.firstFreeAddr() + 1;
+    let firstAdd = this.memoryService.memory.firstFreeAddr(0) + 1;
     this.memoryService.add('New', firstAdd, firstAdd + 0x01FFFFFF);
     this.memoryService.save();
   }
+
+  onAddStart() {
+    let firstAdd = this.memoryService.memory.firstFreeAddr(0x20000000) + 1;
+    this.memoryService.add(StartLogicalNetwork, firstAdd, firstAdd + 0x00000001);
+    this.memoryService.save();
+  }
+  
+  onAddLed() {
+    let firstAdd = this.memoryService.memory.firstFreeAddr(0x20000000) + 1;
+    this.memoryService.add(LedLogicalNetwork,firstAdd,firstAdd + 0x00000008);
+    this.memoryService.save();
+  }
+
 
   onDelete(dev: Device) {
     this.memoryService.remove(dev);
@@ -71,7 +85,6 @@ export class MemoryComponent implements OnInit {
     let devices = this.memoryService.memory.devices;
     let indexSelectedDevice = this.memoryService.memory.devices.indexOf(this.selected);
     let cs = devices[indexSelectedDevice].cs.find(el => el.id == id);
-    console.log(id);
     if(cs==null) return;
     if (newValue.length == 8) {
       let iv = parseInt(newValue, 16);
@@ -125,7 +138,6 @@ export class MemoryComponent implements OnInit {
     let startAddress = 0;
     let indexSelectedDevice = this.memoryService.memory.devices.indexOf(this.selected);
     let sizeOfSelected = this.selected.max_address - this.selected.min_address;
-    let lastDevice = this.memoryService.memory.devices[this.memoryService.memory.devices.length - 1];
     let spaceBeforeFirstDevice = this.memoryService.memory.devices[indexSelectedDevice + 1].min_address - this.memoryService.memory.devices[indexSelectedDevice].max_address;
     if (spaceBeforeFirstDevice >= 33554432) {                                                            // Muovi avanti 128Mb se c'è abbastanza spazio
       this.selected.setMaxAddress(this.selected.max_address + 33554432);

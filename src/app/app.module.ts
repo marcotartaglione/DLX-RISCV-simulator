@@ -18,10 +18,11 @@ import { MaterialModule } from './material.module';
 import { MemoryComponent } from './memory/memory.component';
 import { FormatPipe } from './pipes/format.pipe';
 import { RegistersComponent } from './registers/registers.component';
-import {MatSelectModule} from '@angular/material';
+import { MatSelectModule, MatIconModule } from '@angular/material';
 import { LogicalNetworkDialogComponent } from './dialogs/logical-network-dialog.component';
 
 
+import { MatMenuModule } from '@angular/material/menu';
 
 @NgModule({
    declarations: [
@@ -46,8 +47,10 @@ import { LogicalNetworkDialogComponent } from './dialogs/logical-network-dialog.
       ReactiveFormsModule,
       MatNativeDateModule,
       HttpClientModule,
+      MatMenuModule,
       MaterialModule,
-      MatSelectModule
+      MatSelectModule,
+      MatIconModule
    ],
    entryComponents: [
       MessageDialogComponent,

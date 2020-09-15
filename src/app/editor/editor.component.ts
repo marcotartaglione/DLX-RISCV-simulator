@@ -12,7 +12,6 @@ import { CodeService } from '../services/code.service.js';
 import { MemoryService } from '../services/memory.service.js';
 import './modes/dlx.js';
 import './modes/rv32i.js';
-import { LedLogicalNetwork } from '../memory/model/led.logical-network.js';
 
 @Component({
   selector: 'app-editor',
@@ -22,7 +21,7 @@ import { LedLogicalNetwork } from '../memory/model/led.logical-network.js';
     trigger('showHideTrigger', [
       transition(':enter', [
         group([
-          style({ height: '0'}),
+          style({ height: '0' }),
           animate('200ms ease-out', style({ height: '*' })),
           query('mat-card', [
             style({ transform: 'translateY(-100%)' }),
@@ -45,7 +44,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('codeEditor', { static: false }) codeEditor: CodemirrorComponent;
   @ViewChild('form', { static: false }) form: NgForm;
-  
+
   @Input() public codeService: CodeService;
   @Input() memoryService: MemoryService;
   @Input() registers: Registers;
@@ -77,7 +76,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       viewportMargin: Infinity,
       extraKeys: {
         // associa allo shortcut Ctrl + S la funzione onSave e forza un refresh della view ad Angular.
-        "Ctrl-S": cm => {this.onSave(); this.appRef.tick()}
+        "Ctrl-S": cm => { this.onSave(); this.appRef.tick() }
       }
     };
   }
@@ -90,7 +89,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     return this._pc;
   }
 
-  @Input() 
+  @Input()
   set pc(val: number) {
     if (this.doc && (val != this._pc || !this.running)) {
       let pre = Math.floor(this._pc / 4);
@@ -111,7 +110,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     }
     this._pc = val;
   }
-  
+
   get currentLine(): number {
     return this.pc / 4;
   }
@@ -122,14 +121,14 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   }
 
   get isContinuousRunDisabled(): boolean {
-    if(this.doc)
+    if (this.doc)
       return (this.currentLine >= this.doc.lineCount());
     else
       return false;
   }
 
   get isRunDisabled(): boolean {
-    if(this.doc)
+    if (this.doc)
       return (this.currentLine >= this.doc.lineCount()) || this.continuousRunning;
     else
       return false;
@@ -157,7 +156,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     this.doc.on("change", (event) => {
       if (this.running) this.onStop();
-      if (this.errorMessage) { this.doc.removeLineClass(this.runnedLine, 'wrap', 'error'); this.errorMessage = undefined;}
+      if (this.errorMessage) { this.doc.removeLineClass(this.runnedLine, 'wrap', 'error'); this.errorMessage = undefined; }
     });
     this.formStatusChangeSub = this.form.statusChanges.subscribe(v => this.formDirtyChange.emit(this.form.dirty));
   }
@@ -167,7 +166,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     if (this.timeout) clearTimeout(this.timeout);
     this.onRun();
     this.timeout = setInterval(() => {
-      if(this._pc >= this.codeService.content.split('\n').length * 4) {
+      if (this._pc >= this.codeService.content.split('\n').length * 4) {
         clearTimeout(this.timeout);
       }
       this.onRun();
@@ -185,7 +184,10 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       this.errorMessage = undefined;
       this.codeService.interpreter.parseTags(this.codeService.content, this.start);
       if (this.codeService.editorMode === 'dlx') {
-        (this.memoryService.memory.devices.find(v => v.name == 'Start') as StartLogicalNetwork).a_set();
+        this.memoryService.memory.devices.forEach(el => {
+          if(el.name.includes("Start"))
+            (el as StartLogicalNetwork).a_set();
+        });
       } else {
         this._pc = this.codeService.interpreter.getTag('start_tag');
       }
@@ -216,33 +218,24 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     this.form.form.markAsPristine();
   }
 
+  onClear() {
+    this.memoryService.clearMemory();
+  }
+
   onInterrupt() {
     this.codeService.interpreter.interrupt(this.registers);
   }
 
   @HostListener('window:beforeunload', ['$event'])
   unloadNotification($event: any) {
-      if (this.form.dirty) {
-          $event.returnValue = true;
-      }
+    if (this.form.dirty) {
+      $event.returnValue = true;
+    }
   }
 
   ngOnDestroy() {
     if (this.formStatusChangeSub) this.formStatusChangeSub.unsubscribe();
   }
 
-  onActivateLed = () => {
-    let ledMemory = (this.memoryService.memory.devices.find(v => v.name == 'LED')) as LedLogicalNetwork;
-    if(ledMemory) {
-      this.errorMessage = "CLK";
-      ledMemory.clk();
-      this.isLedOn = ledMemory.getLedStatus();
-    }
-    else {
-      this.memoryService.add(LedLogicalNetwork,0x24000000,0x24000008);
-      let ledMemory = (this.memoryService.memory.devices.find(v => v.name == 'LED')) as LedLogicalNetwork;
-      this.isLedOn = ledMemory.getLedStatus();
-    }
-  }
 
 }
