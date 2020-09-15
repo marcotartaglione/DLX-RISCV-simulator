@@ -109,6 +109,7 @@ export class MemoryComponent implements OnInit {
         this.selected.setMaxAddress(devices[indexSelectedDevice + 1].min_address - 1);
       }
     }
+    console.log("aggiornato");
     if (parseInt(this.selected.size) >= 128 || this.selected instanceof LogicalNetwork) {
       this.memoryService.save();
     } else {

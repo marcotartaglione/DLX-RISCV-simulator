@@ -19,6 +19,7 @@ export class MemoryService {
 
   public setMemory() {
     let tmp = window.localStorage.getItem('memory');
+    console.log(tmp);
     if (tmp) {
       this.memory = new Memory(tmp, this.injector);
     } else {

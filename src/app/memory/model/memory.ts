@@ -4,6 +4,7 @@ import { Eprom } from './eprom';
 import { StartLogicalNetwork } from './start.logical-network';
 import { LedLogicalNetwork } from './led.logical-network';
 import { callbackify } from 'util';
+import { FFDLogicalNetwork } from './ffd-logical-network';
 
 export class Memory {
   devices: Device[] = [];
@@ -33,6 +34,11 @@ export class Memory {
             this.add(LedLogicalNetwork, el.min_address, el.max_address, injector);
             break;
 
+
+            case FFDLogicalNetwork.name:
+              this.add(FFDLogicalNetwork, el.min_address, el.max_address, injector);
+              break;
+  
           default:
             this.add(el.name, el.min_address, el.max_address);
             break;

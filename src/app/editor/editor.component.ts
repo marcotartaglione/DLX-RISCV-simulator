@@ -6,6 +6,7 @@ import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
 import { EditorFromTextArea } from 'codemirror';
 import 'codemirror/addon/selection/active-line';
 import { Subscription } from 'rxjs';
+import { FFDLogicalNetwork } from '../memory/model/ffd-logical-network.js';
 import { LedLogicalNetwork } from '../memory/model/led.logical-network.js';
 import { StartLogicalNetwork } from '../memory/model/start.logical-network.js';
 import { Registers } from '../registers/registers.js';
@@ -189,8 +190,10 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
           if(el.devType.includes("Start"))
             (el as StartLogicalNetwork).a_set();
 
-          if(el.devType.includes("Led"))
+            if(el.devType.includes("Led"))
             (el as LedLogicalNetwork).a_set();
+            if(el.devType.includes("FF-D"))
+              (el as FFDLogicalNetwork).a_set();
         });
       } else {
         this._pc = this.codeService.interpreter.getTag('start_tag');

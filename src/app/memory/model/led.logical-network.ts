@@ -56,7 +56,6 @@ export class LedLogicalNetwork extends LogicalNetwork {
   }
 
   public clk = () => { // EXECUTE THE LOGICAL NETWORK CLK
-    console.log("MUX STATUS -> " + this.mux_status);
     this.ffd_q = this.mux(this.ffd_d, !this.ffd_q, this.mux_status);
     this.ffd_d = this.mux(this.ffd_q, !this.ffd_q, this.mux_status);
     let cs_read_led = this.cs.find(el => el.id == "cs_read_led");
