@@ -8,6 +8,7 @@ import {LogicalNetwork} from './model/logical-network';
 import {LogicalNetworkDialogComponent} from '../dialogs/logical-network-dialog.component';
 import { StartLogicalNetwork } from './model/start.logical-network';
 import { LedLogicalNetwork } from './model/led.logical-network';
+import { FFDLogicalNetwork } from './model/ffd-logical-network';
 
 @Component({
   selector: 'app-memory',
@@ -62,9 +63,9 @@ export class MemoryComponent implements OnInit {
     this.memoryService.save();
   }
 
-  onAddStart() {
+  onAddFFD() {
     let firstAdd = this.memoryService.memory.firstFreeAddr(0x20000000) + 1;
-    this.memoryService.add(StartLogicalNetwork, firstAdd, firstAdd + 0x00000001);
+    this.memoryService.add(FFDLogicalNetwork, firstAdd, firstAdd + 0x00000001);
     this.memoryService.save();
   }
   

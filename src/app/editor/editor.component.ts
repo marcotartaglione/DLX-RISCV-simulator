@@ -6,6 +6,7 @@ import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
 import { EditorFromTextArea } from 'codemirror';
 import 'codemirror/addon/selection/active-line';
 import { Subscription } from 'rxjs';
+import { LedLogicalNetwork } from '../memory/model/led.logical-network.js';
 import { StartLogicalNetwork } from '../memory/model/start.logical-network.js';
 import { Registers } from '../registers/registers.js';
 import { CodeService } from '../services/code.service.js';
@@ -185,8 +186,11 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       this.codeService.interpreter.parseTags(this.codeService.content, this.start);
       if (this.codeService.editorMode === 'dlx') {
         this.memoryService.memory.devices.forEach(el => {
-          if(el.name.includes("Start"))
+          if(el.devType.includes("Start"))
             (el as StartLogicalNetwork).a_set();
+
+          if(el.devType.includes("Led"))
+            (el as LedLogicalNetwork).a_set();
         });
       } else {
         this._pc = this.codeService.interpreter.getTag('start_tag');
@@ -220,6 +224,9 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
 
   onClear() {
     this.memoryService.clearMemory();
+    this.codeService.clear();
+    this.memoryService.setMemory();
+    this.codeService.load();
   }
 
   onInterrupt() {

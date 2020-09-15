@@ -10,7 +10,7 @@ export class Device {
   min_address: number;
   max_address: number;
   cs: Array<{id: string, address: number, hexAddress: string}>;
-  clkType: string;
+  devType: string;
 
   public get min_address_hex(): string {
     return ((this.min_address << 2) >>> 0).toString(16).toUpperCase().padStart(8, '0');
@@ -67,6 +67,7 @@ export class Device {
     this.min_address = min_address;
     this.max_address = max_address;
     this.cs = [];
+    this.devType = "Unknown";
   }
 
   public setMaxAddress(v: number) {

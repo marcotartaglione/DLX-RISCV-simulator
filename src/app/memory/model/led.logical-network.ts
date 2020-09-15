@@ -12,18 +12,21 @@ export class LedLogicalNetwork extends LogicalNetwork {
 
   constructor(min_address: number, max_address: number, injector: Injector) {
     super('LED', min_address, max_address);
-    this.clkType = "MEMRD";
+    super.devType = "Led";
     this.image = "assets/img/rete-led.png";
     this.cs = [];
+    this.mux_status=0;
     this.a_set();
-    this.led = this.ffd_q;
-    this.setCS("cs_inverti_led", this.min_address, 1);
-    this.setCS("cs_read_led", this.min_address + 0x00000001, 1);
+    this.setCS("cs_inverti_led", this.min_address, this.mux_status);
+    this.setCS("cs_read_led", this.min_address + 0x00000001, this.led);
   }
 
+
   public a_set() {
-    this.ffd_q = true;
-    this.ffd_d = true;
+    this.ffd_q = false;
+    this.ffd_d = this.mux(this.ffd_q, !this.ffd_q, this.mux_status);
+    this.led = this.ffd_q;
+    console.log("MUX SET -> " + this.mux_status);
   }
 
   public load(address: number): number {
@@ -46,27 +49,20 @@ export class LedLogicalNetwork extends LogicalNetwork {
       switch (cs.id) {
         case "cs_inverti_led":
           this.mux_status = word & 0x01;
+          console.log("AGGIORNATO MUX -> " + this.mux_status);
           break;
       }
     }
   }
 
   public clk = () => { // EXECUTE THE LOGICAL NETWORK CLK
-    let cs_inverti_led = this.cs.find(el => el.id == "cs_inverti_led");
-    this.ffd_q = this.ffd_d;
-    if (cs_inverti_led == null) return;
-    else {
-      let cs_mux = this.load(cs_inverti_led.address);
-      console.log("CS_INVERTI_LED -> " + cs_mux);
-      this.ffd_d = this.mux(this.ffd_q, !this.ffd_q, cs_mux);
-    }
+    console.log("MUX STATUS -> " + this.mux_status);
+    this.ffd_q = this.mux(this.ffd_d, !this.ffd_q, this.mux_status);
+    this.ffd_d = this.mux(this.ffd_q, !this.ffd_q, this.mux_status);
     let cs_read_led = this.cs.find(el => el.id == "cs_read_led");
     this.led = this.ffd_q;
     if (cs_read_led != null)
       this.store(cs_read_led.address, this.led ? 1 : 0);
-
-    console.log("NEW D -> " + this.ffd_d);
-    console.log("NEW Q -> " + this.ffd_q);
   }
 
   public getLedStatus = () => {

@@ -83,6 +83,7 @@ export class Memory {
   }
 
   private startClk() {
+    console.log("CLK()");
     this.devices.forEach(device => {
       try {
         if (device instanceof LedLogicalNetwork)

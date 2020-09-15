@@ -15,6 +15,7 @@ export class Eprom extends Device {
   constructor(min_address: number, max_address: number, injector: Injector) {
     super('EPROM', min_address, max_address);
     this.codeService = injector.get(CodeService);
+    super.devType = "EPROM";
   }
 
   public load(address: number): number {

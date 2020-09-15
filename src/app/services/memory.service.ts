@@ -1,6 +1,7 @@
 import { Injectable, Injector } from '@angular/core';
 import { Device, IDevice } from '../memory/model/device';
 import { Eprom } from '../memory/model/eprom';
+import { LedLogicalNetwork } from '../memory/model/led.logical-network';
 import { Memory } from '../memory/model/memory';
 import { StartLogicalNetwork } from '../memory/model/start.logical-network';
 
@@ -10,17 +11,22 @@ import { StartLogicalNetwork } from '../memory/model/start.logical-network';
 export class MemoryService {
 
   memory: Memory;
-
+  injector: Injector;
   constructor(injector: Injector) {
-    let tmp = window.localStorage.getItem('memory');
+    this.injector = injector;
+    this.setMemory();
+  }
 
+  public setMemory() {
+    let tmp = window.localStorage.getItem('memory');
     if (tmp) {
-      this.memory = new Memory(tmp, injector);
+      this.memory = new Memory(tmp, this.injector);
     } else {
       this.memory = new Memory();
-      this.memory.add(Eprom, 0x00000000, 0x07FFFFFF, injector);
+      this.memory.add(Eprom, 0x00000000, 0x07FFFFFF, this.injector);
       this.memory.add('RAM A', 0x10000000, 0x1FFFFFFF);
-      this.memory.add(StartLogicalNetwork, 0x30000000, 0x30000001, injector);
+      this.memory.add(StartLogicalNetwork, 0x30000000, 0x30000001, this.injector);
+      this.memory.add(LedLogicalNetwork, 0x24000000, 0x24000002, this.injector);
       this.memory.add('RAM B', 0x38000000, 0x3FFFFFFF);
     }
   }

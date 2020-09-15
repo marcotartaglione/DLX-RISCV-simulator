@@ -12,11 +12,11 @@
             <button mat-raised-button class="mr" (click)="onInterrupt()">
                 <span class="btn">Interrupt <i class="fas fa-bolt amber"></i></span>
             </button>
-            <button mat-raised-button (click)="onSave()" [disabled]="form.pristine">
+            <button mat-raised-button class="mr" (click)="onSave()" [disabled]="form.pristine">
                 <span class="btn">Save <i class="fas fa-save"></i></span>
             </button>
-            <button mat-raised-button (click)="onClear()">
-                <span class="btn">Clear memory <i class="fas fa-delete"></i></span>
+            <button mat-raised-button class="mr" (click)="onClear()">
+                <span class="btn">Clear<i class="fas fa-trash"></i></span>
             </button>
         </div>
         <button mat-raised-button class="mr" (click)="onRun()" [disabled]="isRunDisabled">
