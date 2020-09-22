@@ -13,14 +13,17 @@ export class LedLogicalNetwork extends LogicalNetwork {
   constructor(min_address: number, max_address: number, injector: Injector) {
     super('LED', min_address, max_address);
     super.devType = "Led";
-    this.image = "assets/img/rete-led.png";
+    this.clkType = "MEMWR*";
     this.cs = [];
     this.mux_status = 1;
-    this.clkType = "MEMWR*";
     this.a_set();
     this.setCS("cs_read_led", this.min_address, this.led);
     this.setCS("cs_inverti_led", this.min_address + 0x00000001, this.mux_status);
     this.setCS("cs_reset", this.min_address + 0x00000002, 0);
+  }
+
+  public getImageName() {
+    return "assets/img/rete-led-" + (this.clkType=="MEMWR*" ? "memwr":"memrd") + ".png"
   }
 
   public a_set() {
