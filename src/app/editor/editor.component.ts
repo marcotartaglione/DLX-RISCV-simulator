@@ -65,7 +65,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   errorMessage: string;
   start: string = 'main';
   interval: number = 1000;
-  isLedOn: boolean;
+  isInterruptDisabled: boolean = true;
 
   get options() {
     return {
@@ -210,6 +210,13 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       this.errorMessage = error.message;
       console.error(error);
     }
+
+
+    
+    this.memoryService.memory.devices.forEach(el => {
+      if(el.devType.includes("Start"))
+        this.isInterruptDisabled = (el as StartLogicalNetwork).ffd_q;
+    });
   }
 
   onStop() {

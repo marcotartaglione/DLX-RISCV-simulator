@@ -20,8 +20,6 @@ import { FormatPipe } from './pipes/format.pipe';
 import { RegistersComponent } from './registers/registers.component';
 import { MatSelectModule, MatIconModule } from '@angular/material';
 import { LogicalNetworkDialogComponent } from './dialogs/logical-network-dialog.component';
-
-
 import { MatMenuModule } from '@angular/material/menu';
 
 @NgModule({

@@ -12,8 +12,6 @@ export class FFDLogicalNetwork extends LogicalNetwork {
   constructor(cs_read: number, cs_write: number, injector: Injector) {
     super('FF-D', cs_read, cs_write);
     super.devType = "FF-D";
-    this.ffd_a_res = false;
-    this.ffd_a_set = true;
     this.cs = [];
     this.setCS("cs_read_ff",this.min_address,1);
     this.setCS("cs_set_ff",this.min_address + 0x00000001,1);

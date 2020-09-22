@@ -80,23 +80,12 @@ export class Memory {
     let device = this.devices.find(dev => dev.checkAddress(address));
     if (device) {
       device.store(address, word);
+      // if (device instanceof LedLogicalNetwork)
+      //   (device as LedLogicalNetwork).clk();
     } else {
-      this.startClk();
       throw new Error('Device not found');
     }
-    this.startClk();
     return word;
   }
-
-  private startClk() {
-    console.log("CLK()");
-    this.devices.forEach(device => {
-      try {
-        if (device instanceof LedLogicalNetwork)
-          (device as LedLogicalNetwork).clk();
-      } catch (e) {
-        console.log(e);
-      }
-    })
-  }
+  
 }

@@ -12,8 +12,6 @@ export class StartLogicalNetwork extends LogicalNetwork {
   constructor(cs_read: number, cs_write: number, injector: Injector) {
     super('Start', cs_read, cs_write);
     super.devType = "Start";
-    this.ffd_a_res = false;
-    this.ffd_a_set = true;
     this.cs = [];
     this.setCS("cs_read_start",this.min_address,1);
     this.setCS("cs_set_start",this.min_address + 0x00000001,1);

@@ -1,7 +1,14 @@
 <mat-dialog-content>
     <img src="assets/img/rete-led.png" witdh="100"/>
-    <br />
-    <br />
+    <div *ngIf="data.network.clkType">    
+        <mat-form-field appearance="fill">
+            <mat-label>Clock Type</mat-label>
+            <mat-select [(value)]="data.network.clkType">
+                <mat-option value="MEMWR*">MEMWR*</mat-option>
+                <mat-option value="MEMRD*">MEMRD*</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
     <br />
     <div *ngIf="data.network.cs.length > 0">
         <b>Chip-Select</b><br />

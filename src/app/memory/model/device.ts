@@ -20,7 +20,7 @@ export class Device {
     if(null==this.cs) return 0;
     let cs = this.cs.find(el => el.id == csId);
 
-    return cs ? this.load(cs.address) : 0;
+    return cs ? this.memory[cs.address-this.min_address] : 0;
   }
 
   public isALedNetwork() {
@@ -111,7 +111,7 @@ export class Device {
     let val = this.cs.find(el => el.id == name);
     if(val) val.address = addr;
     else this.cs.push({id:name,address:addr,hexAddress: this.getAddressHex(addr)});
-    this.store(addr,value);
+    this.memory[addr - this.min_address] = value;
   }
 
   public checkAddress(address: number): boolean {
