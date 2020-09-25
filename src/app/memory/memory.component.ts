@@ -71,7 +71,7 @@ export class MemoryComponent implements OnInit {
   
   onAddLed() {
     let firstAdd = this.memoryService.memory.firstFreeAddr(0x20000000) + 1;
-    this.memoryService.add(LedLogicalNetwork,firstAdd,firstAdd + 0x00000008);
+    this.memoryService.add(LedLogicalNetwork,firstAdd,firstAdd + 0x0000000C);
     this.memoryService.save();
   }
 

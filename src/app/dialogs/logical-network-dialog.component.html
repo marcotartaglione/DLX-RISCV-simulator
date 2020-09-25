@@ -1,15 +1,36 @@
 <mat-dialog-content>
     <img style="background-color:white" src="{{data.network.getImageName()}}" width="750px"/>
     <br />
-    <div *ngIf="data.network.clkType">    
-        <mat-form-field appearance="fill">
-            <mat-label>Clock Type</mat-label>
-            <mat-select [(value)]="data.network.clkType">
-                <mat-option value="MEMWR*">MEMWR*</mat-option>
-                <mat-option value="MEMRD*">MEMRD*</mat-option>
-            </mat-select>
-        </mat-form-field>
+    <div>
+        <div style="display:inline-block; margin:10px;" *ngIf="data.network.clkType">    
+            <mat-form-field appearance="fill">
+                <mat-label>Clock Type</mat-label>
+                <mat-select [(value)]="data.network.clkType">
+                    <mat-option value="MEMWR*">MEMWR*</mat-option>
+                    <mat-option value="MEMRD*">MEMRD*</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div style="display:inline-block; margin:10px;" *ngIf="data.network.a_set_value">    
+            <mat-form-field appearance="fill">
+                <mat-label>A_SET*</mat-label>
+                <mat-select [(value)]="data.network.a_set_value">
+                    <mat-option value="1">1</mat-option>
+                    <mat-option value="0">0</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div style="display:inline-block; margin:10px;" *ngIf="data.network.a_reset_value">    
+            <mat-form-field appearance="fill">
+                <mat-label>A_RES*</mat-label>
+                <mat-select [(value)]="data.network.a_reset_value">
+                    <mat-option value="1">1</mat-option>
+                    <mat-option value="0">0</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
     </div>
+
     <br />
     <div *ngIf="data.network.cs.length > 0">
         <b>Chip-Select</b><br />

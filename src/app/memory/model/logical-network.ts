@@ -11,6 +11,8 @@ export class LogicalNetwork extends Device {
 
   ffd_d: boolean;
   ffd_q: boolean;
+  a_set_value: string;
+  a_reset_value: string;
   image: String;
   led: boolean;
   clkType: string = null;
@@ -20,7 +22,7 @@ export class LogicalNetwork extends Device {
   }
 
   public a_reset() {
-    this.ffd_q = false;
+    this.ffd_q = true;
   }
 
   public mux = (zero,one,sel) => {

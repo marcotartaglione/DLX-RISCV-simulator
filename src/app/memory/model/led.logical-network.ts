@@ -16,31 +16,33 @@ export class LedLogicalNetwork extends LogicalNetwork {
     this.clkType = "MEMWR*";
     this.cs = [];
     this.mux_status = 1;
+    this.a_set_value = "1";
+    this.a_reset_value = "0";
     this.a_set();
     this.setCS("cs_read_led", this.min_address, this.led);
     this.setCS("cs_inverti_led", this.min_address + 0x00000001, this.mux_status);
     this.setCS("cs_reset", this.min_address + 0x00000002, 0);
+    this.setCS("cs_set", this.min_address + 0x00000003, 0);
   }
 
   public getImageName() {
-    return "assets/img/rete-led-" + (this.clkType=="MEMWR*" ? "memwr":"memrd") + ".png"
+    return "assets/img/rete-led-" + (this.clkType == "MEMWR*" ? "memwr" : "memrd") + ".png"
   }
 
   public a_set() {
+    console.log("LED A_SET()");
     this.ffd_q = true;
     this.ffd_d = this.mux_status ? !this.ffd_q : this.ffd_q;
     this.led = this.ffd_q;
+    this.setCS("cs_read_led", this.min_address, this.led);
   }
 
   public a_reset() {
-    console.log("A_RESET LED");
+    console.log("LED A_RESET()");
     this.ffd_q = false;
     this.ffd_d = this.mux_status ? !this.ffd_q : this.ffd_q;
     this.led = this.ffd_q;
-
-    let cs_read_led = this.cs.find(el => el.id == "cs_read_led");
-    if (cs_read_led != null)
-      this.store(cs_read_led.address, this.led ? 1 : 0);
+    this.setCS("cs_read_led", this.min_address, this.led);
   }
 
   public load(address: number): number {
@@ -64,22 +66,24 @@ export class LedLogicalNetwork extends LogicalNetwork {
     if (cs == null) return super.store(address, word);
     else {
       switch (cs.id) {
-        case "cs_reset":
-          if (word)
-            this.a_reset();
-          break;
         case "cs_inverti_led":
           this.mux_status = word & 0x01;
           if ("MEMWR*" == this.clkType)
             this.clk();
+          break;
+        case "cs_set":
+          if (word & 0x01)
+            this.a_set();
+          break;
+        case "cs_reset":
+          if (word & 0x01)
+            this.a_reset();
           break;
       }
     }
   }
 
   public clk = () => { // EXECUTE THE LOGICAL NETWORK CLK
-    console.log("CLK LED()");
-    console.log("MUX_STATUS _> " + this.mux_status);
     this.ffd_q = this.mux(this.ffd_d, !this.ffd_q, this.mux_status);
     this.ffd_d = this.mux(this.ffd_q, !this.ffd_q, this.mux_status);
     let cs_read_led = this.cs.find(el => el.id == "cs_read_led");
