@@ -16,8 +16,8 @@ export class LedLogicalNetwork extends LogicalNetwork {
     this.clkType = "MEMWR*";
     this.cs = [];
     this.mux_status = 1;
-    this.a_set_value = "1";
-    this.a_reset_value = "0";
+    this.a_set_value = "CS_SET";
+    this.a_reset_value = "CS_RESET";
     this.a_set();
     this.setCS("cs_read_led", this.min_address, this.led);
     this.setCS("cs_inverti_led", this.min_address + 0x00000001, this.mux_status);
