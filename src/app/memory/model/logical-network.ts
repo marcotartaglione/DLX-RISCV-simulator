@@ -33,7 +33,7 @@ export class LogicalNetwork extends Device {
     return input && en;
   }
 
-  getImagename() {
+  getImageName() {
     return this.image;
   }
 

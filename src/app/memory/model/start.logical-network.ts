@@ -12,10 +12,10 @@ export class StartLogicalNetwork extends LogicalNetwork {
   constructor(cs_read: number, cs_write: number, injector: Injector) {
     super('Start', cs_read, cs_write);
     super.devType = "Start";
+    this.image = "assets/img/rete-start.png"
     this.cs = [];
     this.a_set_value="RESET";
     this.a_reset_value="0";
-    this.startOp();
     this.setCS("cs_read_start",this.min_address,1);
     this.setCS("cs_set_start",this.min_address + 0x00000001,1);
   }

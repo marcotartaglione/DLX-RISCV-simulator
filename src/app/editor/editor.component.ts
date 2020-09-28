@@ -180,21 +180,25 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     this.continuousRunning = false;
   }
 
+  startResetSignal() {
+    // WHEN THE APPLICATION START SEND THE RESET SIGNAL TO THE LOGICAL NETWORKS
+    this.memoryService.memory.devices.forEach(el => {
+      if(el.devType.includes("Start"))
+        (el as StartLogicalNetwork).startOp();
+        if(el.devType.includes("Led"))
+        (el as LedLogicalNetwork).startOp();
+        if(el.devType.includes("FF-D"))
+          (el as FFDLogicalNetwork).startOp();
+    });
+  }
+
   onRun() {
     if (!this.running) {
       this.doc.removeLineClass(this.runnedLine, 'wrap', 'error');
       this.errorMessage = undefined;
       this.codeService.interpreter.parseTags(this.codeService.content, this.start);
       if (this.codeService.editorMode === 'dlx') {
-        this.memoryService.memory.devices.forEach(el => {
-          if(el.devType.includes("Start"))
-            (el as StartLogicalNetwork).a_set();
-
-            if(el.devType.includes("Led"))
-            (el as LedLogicalNetwork).startOp();
-            if(el.devType.includes("FF-D"))
-              (el as FFDLogicalNetwork).startOp();
-        });
+        this.startResetSignal();
       } else {
         this._pc = this.codeService.interpreter.getTag('start_tag');
       }
