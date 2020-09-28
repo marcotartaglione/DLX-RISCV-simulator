@@ -13,10 +13,21 @@ export class StartLogicalNetwork extends LogicalNetwork {
     super('Start', cs_read, cs_write);
     super.devType = "Start";
     this.cs = [];
+    this.a_set_value="RESET";
+    this.a_reset_value="0";
+    this.startOp();
     this.setCS("cs_read_start",this.min_address,1);
     this.setCS("cs_set_start",this.min_address + 0x00000001,1);
   }
 
+  public startOp() {
+    if(this.a_set_value == "RESET")
+      this.a_set();
+    
+    if(this.a_reset_value == "RESET")
+      this.a_reset();
+  }
+  
   public load(address: number): number {
     let res = 0;
     let cs = this.cs.find(el => el.address == address);

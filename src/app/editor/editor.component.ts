@@ -191,9 +191,9 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
             (el as StartLogicalNetwork).a_set();
 
             if(el.devType.includes("Led"))
-            (el as LedLogicalNetwork).a_set();
+            (el as LedLogicalNetwork).startOp();
             if(el.devType.includes("FF-D"))
-              (el as FFDLogicalNetwork).a_set();
+              (el as FFDLogicalNetwork).startOp();
         });
       } else {
         this._pc = this.codeService.interpreter.getTag('start_tag');

@@ -13,8 +13,22 @@ export class FFDLogicalNetwork extends LogicalNetwork {
     super('FF-D', cs_read, cs_write);
     super.devType = "FF-D";
     this.cs = [];
+    this.a_set_value = "RESET";
+    this.a_reset_value = "0";
+    this.startOp();
     this.setCS("cs_read_ff",this.min_address,1);
     this.setCS("cs_set_ff",this.min_address + 0x00000001,1);
+    this.setCS("cs_reset", this.min_address + 0x00000002, 0);
+    this.setCS("cs_set", this.min_address + 0x00000003, 0);
+  }
+
+  
+  public startOp() {
+    if(this.a_set_value == "RESET")
+      this.a_set();
+    
+    if(this.a_reset_value == "RESET")
+      this.a_reset();
   }
 
   public load(address: number): number {

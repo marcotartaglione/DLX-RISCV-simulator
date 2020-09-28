@@ -14,9 +14,9 @@
         <div style="display:inline-block; margin:10px;" *ngIf="data.network.a_set_value">    
             <mat-form-field appearance="fill">
                 <mat-label>A_SET*</mat-label>
-                <mat-select [(value)]="data.network.a_set_value">
+                <mat-select [disabled]="data.isReadOnly" [(value)]="data.network.a_set_value">
+                    <mat-option value="RESET">RESET</mat-option>
                     <mat-option value="CS_SET">CS_SET</mat-option>
-                    <mat-option value="1">1</mat-option>
                     <mat-option value="0">0</mat-option>
                 </mat-select>
             </mat-form-field>
@@ -24,9 +24,9 @@
         <div style="display:inline-block; margin:10px;" *ngIf="data.network.a_reset_value">    
             <mat-form-field appearance="fill">
                 <mat-label>A_RES*</mat-label>
-                <mat-select [(value)]="data.network.a_reset_value">
+                <mat-select [disabled]="data.isReadOnly" [(value)]="data.network.a_reset_value">
+                    <mat-option value="RESET">RESET</mat-option>
                     <mat-option value="CS_RESET">CS_RESET</mat-option>
-                    <mat-option value="1">1</mat-option>
                     <mat-option value="0">0</mat-option>
                 </mat-select>
             </mat-form-field>

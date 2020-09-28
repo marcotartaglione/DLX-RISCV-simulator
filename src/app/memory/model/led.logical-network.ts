@@ -16,9 +16,9 @@ export class LedLogicalNetwork extends LogicalNetwork {
     this.clkType = "MEMWR*";
     this.cs = [];
     this.mux_status = 1;
-    this.a_set_value = "CS_SET";
-    this.a_reset_value = "CS_RESET";
-    this.a_set();
+    this.a_set_value = "RESET";
+    this.a_reset_value = "0";
+    this.startOp();
     this.setCS("cs_read_led", this.min_address, this.led);
     this.setCS("cs_inverti_led", this.min_address + 0x00000001, this.mux_status);
     this.setCS("cs_reset", this.min_address + 0x00000002, 0);
@@ -27,6 +27,14 @@ export class LedLogicalNetwork extends LogicalNetwork {
 
   public getImageName() {
     return "assets/img/rete-led-" + (this.clkType == "MEMWR*" ? "memwr" : "memrd") + ".png"
+  }
+
+  public startOp() {
+    if(this.a_set_value == "RESET")
+      this.a_set();
+    
+    if(this.a_reset_value == "RESET")
+      this.a_reset();
   }
 
   public a_set() {
@@ -72,11 +80,11 @@ export class LedLogicalNetwork extends LogicalNetwork {
             this.clk();
           break;
         case "cs_set":
-          if (word & 0x01)
+          if (word & 0x01 && this.a_set_value=="CS_SET")
             this.a_set();
           break;
         case "cs_reset":
-          if (word & 0x01)
+          if (word & 0x01 && this.a_set_value=="CS_RESET")
             this.a_reset();
           break;
       }

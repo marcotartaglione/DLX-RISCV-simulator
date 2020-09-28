@@ -53,7 +53,7 @@ export class MemoryComponent implements OnInit {
 
   openDialogImage(n) {
     this.dialog.open(LogicalNetworkDialogComponent, {
-      data: {network : n}
+      data: {network : n, isReadOnly:n.devType=="Start"}
     });
   }
 
