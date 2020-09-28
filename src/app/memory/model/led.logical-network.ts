@@ -37,7 +37,6 @@ export class LedLogicalNetwork extends LogicalNetwork {
   }
 
   public a_set() {
-    console.log("LED A_SET()");
     this.ffd_q = true;
     this.ffd_d = this.mux_status ? !this.ffd_q : this.ffd_q;
     this.led = this.ffd_q;

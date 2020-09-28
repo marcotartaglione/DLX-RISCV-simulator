@@ -6,7 +6,7 @@ import {Device} from './device';
 export class LogicalNetwork extends Device {
 
   /**
-   * This logical network has a MUX, TRI-STATE and a FFD with SET and RESET Asynchronous func
+   * This logical network has a TRI-STATE and a FFD with SET and RESET Asynchronous func
    */
 
   ffd_d: boolean;

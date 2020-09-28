@@ -34,7 +34,6 @@ export class Memory {
             this.add(LedLogicalNetwork, el.min_address, el.max_address, injector);
             break;
 
-
             case FFDLogicalNetwork.name:
               this.add(FFDLogicalNetwork, el.min_address, el.max_address, injector);
               break;
