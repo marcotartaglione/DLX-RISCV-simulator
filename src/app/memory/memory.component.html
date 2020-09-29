@@ -5,7 +5,8 @@
   <div class="memory">
     <ng-container *ngFor="let device of memoryService.memory.devices">
       <mat-icon *ngIf="device.isALedNetwork()" [style.left]="((device.min_address/1073741824)*100).toFixed(2)-1+'%'"
-        aria-hidden="false" [ngClass]="{'amber': device.getCsValue('cs_read_led')}" class="icon_absolute" aria-label="Example home icon">
+        aria-hidden="false" [ngClass]="{'amber': device.getCsValue('cs_read_led')}" class="icon_absolute"
+        aria-label="Example home icon">
         highlight
       </mat-icon>
       <div class="dev" matRipple *ngIf="!isLN(device)"
@@ -28,7 +29,7 @@
       <div class="gig"></div>
     </div>
   </div>
-  <button mat-raised-button id="add"[matMenuTriggerFor]="menuAdd"><i class="fas fa-plus"></i></button>
+  <button mat-raised-button id="add" [matMenuTriggerFor]="menuAdd"><i class="fas fa-plus"></i></button>
   <div class="container" *ngIf="selected" @showHideTrigger>
     <div class="group">
       <button class="standard_margin_hor" mat-raised-button id="move-left" (click)="moveSelectedLeft()"
@@ -60,6 +61,15 @@
         <input matInput (change)="onChangeCS($event.target.value, selectedCS.id)" minlength="8"
           [(value)]="selectedCS.hexAddress" maxlength="8" />
       </mat-form-field>
+    </div>
+
+    <div *ngIf="selected.devType=='RAM'">
+      <mat-form-field appearance="fill">
+        <mat-label>Address Value</mat-label>
+        <input matInput [(ngModel)]="inputAddr" minlength="8" maxlength="8" />
+      </mat-form-field>
+      <button style="height:50px;position: relative;top: -10px;" mat-raised-button class="standard_margin_hor"
+        (click)="readMemoryAddressValues(inputAddr)">Visualizza</button>
     </div>
     <div class="group">
       <mat-form-field id="max" appearance="fill">

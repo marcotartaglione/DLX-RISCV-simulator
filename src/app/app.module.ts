@@ -21,7 +21,8 @@ import { RegistersComponent } from './registers/registers.component';
 import { MatSelectModule, MatIconModule } from '@angular/material';
 import { LogicalNetworkDialogComponent } from './dialogs/logical-network-dialog.component';
 import { MatMenuModule } from '@angular/material/menu';
-
+import { MemoryAddressDialogComponent } from './dialogs/memory-address-dialog.component';
+import { MatGridListModule } from '@angular/material/grid-list';
 @NgModule({
    declarations: [
       AppComponent,
@@ -33,6 +34,7 @@ import { MatMenuModule } from '@angular/material/menu';
       DocumentationComponent,
       MessageDialogComponent,
       LogicalNetworkDialogComponent,
+      MemoryAddressDialogComponent,
       ConfirmDialogComponent,
       AboutPageComponent
    ],
@@ -48,11 +50,13 @@ import { MatMenuModule } from '@angular/material/menu';
       MatMenuModule,
       MaterialModule,
       MatSelectModule,
-      MatIconModule
+      MatIconModule,
+      MatGridListModule
    ],
    entryComponents: [
       MessageDialogComponent,
       ConfirmDialogComponent,
+      MemoryAddressDialogComponent,
       LogicalNetworkDialogComponent,
    ],
    providers: [],

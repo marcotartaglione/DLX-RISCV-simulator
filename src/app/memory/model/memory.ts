@@ -79,6 +79,7 @@ export class Memory {
     let device = this.devices.find(dev => dev.checkAddress(address));
     if (device) {
       device.store(address, word);
+
       // if (device instanceof LedLogicalNetwork)
       //   (device as LedLogicalNetwork).clk();
     } else {

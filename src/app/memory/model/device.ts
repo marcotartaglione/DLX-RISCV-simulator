@@ -67,7 +67,7 @@ export class Device {
     this.min_address = min_address;
     this.max_address = max_address;
     this.cs = [];
-    this.devType = "Unknown";
+    this.devType = "RAM";
   }
 
   public setMaxAddress(v: number) {
@@ -106,7 +106,7 @@ export class Device {
   public getAddressHex = (addr) => {
     return ((addr << 2) >>> 0).toString(16).toUpperCase().padStart(8, '0');
   }
-  
+
   public setCS = (name,addr,value) => {
     let val = this.cs.find(el => el.id == name);
     if(val) val.address = addr;

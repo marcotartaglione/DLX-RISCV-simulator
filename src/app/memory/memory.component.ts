@@ -1,11 +1,12 @@
-import {animate, style, transition, trigger} from '@angular/animations';
-import {Component, Input, OnInit} from '@angular/core';
-import {MatDialog} from '@angular/material/dialog';
-import {MessageDialogComponent} from '../dialogs/message-dialog.component';
-import {MemoryService} from '../services/memory.service';
-import {Device} from './model/device';
-import {LogicalNetwork} from './model/logical-network';
-import {LogicalNetworkDialogComponent} from '../dialogs/logical-network-dialog.component';
+import { animate, style, transition, trigger } from '@angular/animations';
+import { Component, Input, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { MessageDialogComponent } from '../dialogs/message-dialog.component';
+import { MemoryService } from '../services/memory.service';
+import { Device } from './model/device';
+import { LogicalNetwork } from './model/logical-network';
+import { LogicalNetworkDialogComponent } from '../dialogs/logical-network-dialog.component';
+import { MemoryAddressDialogComponent } from '../dialogs/memory-address-dialog.component';
 import { StartLogicalNetwork } from './model/start.logical-network';
 import { LedLogicalNetwork } from './model/led.logical-network';
 import { FFDLogicalNetwork } from './model/ffd-logical-network';
@@ -17,11 +18,11 @@ import { FFDLogicalNetwork } from './model/ffd-logical-network';
   animations: [
     trigger('showHideTrigger', [
       transition(':enter', [
-        style({transform: 'translateY(-100%)'}),
-        animate('200ms ease-out', style({transform: 'translateY(0)'})),
+        style({ transform: 'translateY(-100%)' }),
+        animate('200ms ease-out', style({ transform: 'translateY(0)' })),
       ]),
       transition(':leave', [
-        animate('200ms ease-out', style({transform: 'translateY(-100%)'}))
+        animate('200ms ease-out', style({ transform: 'translateY(-100%)' }))
       ])
     ])
   ],
@@ -53,7 +54,7 @@ export class MemoryComponent implements OnInit {
 
   openDialogImage(n) {
     this.dialog.open(LogicalNetworkDialogComponent, {
-      data: {network : n, isReadOnly:n.devType=="Start"}
+      data: { network: n, isReadOnly: n.devType == "Start" }
     });
   }
 
@@ -68,10 +69,10 @@ export class MemoryComponent implements OnInit {
     this.memoryService.add(FFDLogicalNetwork, firstAdd, firstAdd + 0x00000001);
     this.memoryService.save();
   }
-  
+
   onAddLed() {
     let firstAdd = this.memoryService.memory.firstFreeAddr(0x20000000) + 1;
-    this.memoryService.add(LedLogicalNetwork,firstAdd,firstAdd + 0x0000000C);
+    this.memoryService.add(LedLogicalNetwork, firstAdd, firstAdd + 0x0000000C);
     this.memoryService.save();
   }
 
@@ -82,11 +83,11 @@ export class MemoryComponent implements OnInit {
     this.memoryService.save();
   }
 
-  onChangeCS(newValue : string, id: string) {
+  onChangeCS(newValue: string, id: string) {
     let devices = this.memoryService.memory.devices;
     let indexSelectedDevice = this.memoryService.memory.devices.indexOf(this.selected);
     let cs = devices[indexSelectedDevice].cs.find(el => el.id == id);
-    if(cs==null) return;
+    if (cs == null) return;
     if (newValue.length == 8) {
       let iv = parseInt(newValue, 16);
       if (iv || iv === 0) {
@@ -114,7 +115,7 @@ export class MemoryComponent implements OnInit {
       this.memoryService.save();
     } else {
       this.dialog.open(MessageDialogComponent, {
-        data: {message: 'Memory is less than 128MB'}
+        data: { message: 'Memory is less than 128MB' }
       });
     }
   }
@@ -166,8 +167,33 @@ export class MemoryComponent implements OnInit {
     return 0;
   }
 
+  readMemoryAddressValues(addr) {
+    let finalAddr;
+    let iv = parseInt(addr, 16);
+    if (iv || iv === 0) {
+      finalAddr = iv >>> 2;
+    }
+    let d = this.memoryService.memory.devices.find(el => el.min_address <= finalAddr && el.max_address >= finalAddr);
+    let arrData = [];
+    for (let i = 0; i < 10; i++) {
+      let v = d.load(finalAddr + (i * 0x00000001));
+      arrData.push(
+
+        {
+          value: v ? v : 0,
+          address: finalAddr + (i * 0x00000001),
+          hexAddress: d.getAddressHex(finalAddr + (i * 0x00000001))
+        });
+    }
+
+    console.log(arrData);
+    this.dialog.open(MemoryAddressDialogComponent, {
+      data: arrData
+    });
+  }
+
   isLN(dev: Device) {
     return dev instanceof LogicalNetwork;
   }
-  
+
 }
