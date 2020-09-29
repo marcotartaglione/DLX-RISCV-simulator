@@ -178,7 +178,6 @@ export class MemoryComponent implements OnInit {
     for (let i = 0; i < 10; i++) {
       let v = d.load(finalAddr + (i * 0x00000001));
       arrData.push(
-
         {
           value: v ? v : 0,
           address: finalAddr + (i * 0x00000001),
