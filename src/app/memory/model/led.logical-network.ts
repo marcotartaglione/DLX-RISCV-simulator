@@ -73,7 +73,6 @@ export class LedLogicalNetwork extends LogicalNetwork {
     else {
       switch (cs.id) {
         case "cs_inverti_led":
-          this.mux_status = word & 0x01;
           if ("MEMWR*" == this.clkType)
             this.clk();
           break;
