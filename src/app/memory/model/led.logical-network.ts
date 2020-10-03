@@ -77,11 +77,11 @@ export class LedLogicalNetwork extends LogicalNetwork {
             this.clk();
           break;
         case "cs_set":
-          if (word & 0x01 && this.a_set_value=="CS_SET")
+          if (this.a_set_value=="CS_SET")
             this.a_set();
           break;
         case "cs_reset":
-          if (word & 0x01 && this.a_set_value=="CS_RESET")
+          if (this.a_set_value=="CS_RESET")
             this.a_reset();
           break;
       }
