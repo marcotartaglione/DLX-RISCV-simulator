@@ -9,6 +9,7 @@ import { Subscription } from 'rxjs';
 import { FFDLogicalNetwork } from '../memory/model/ffd-logical-network.js';
 import { LedLogicalNetwork } from '../memory/model/led.logical-network.js';
 import { StartLogicalNetwork } from '../memory/model/start.logical-network.js';
+import { DLXRegisters } from '../registers/dlx.registers.js';
 import { Registers } from '../registers/registers.js';
 import { CodeService } from '../services/code.service.js';
 import { MemoryService } from '../services/memory.service.js';
@@ -206,16 +207,13 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     }
     this.runnedLine = this.currentLine;
     this.currentLine++;
-    try {
+    try {      
       this.codeService.interpreter.run(this.doc.getLine(this.runnedLine), this.registers, this.memoryService.memory);
     } catch (error) {
       this.onStop();
       this.doc.addLineClass(this.runnedLine, 'wrap', 'error');
       this.errorMessage = error.message;
-      console.error(error);
     }
-
-
     
     this.memoryService.memory.devices.forEach(el => {
       if(el.devType.includes("Start"))

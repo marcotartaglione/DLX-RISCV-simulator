@@ -21,7 +21,7 @@ export class CodeService {
         "BEQZ R30, handler\t\t\t\t\t; if STARTUP == 0 then jump to interrupt handler\n"+
         "SB 0x0004(R29), R0\t\t\t\t\t; set startup = 0\n"+
         "J main\t\t\t\t\t\t\t\t; jump to main\n"+
-        "handler:\tLHI R28, 0x9000\t\t\t; load address 90000000h in R27\n"+
+        "handler: LHI R28, 0x9000\t\t\t; load address 90000000h in R27\n"+
         "\t\tSB 0x0004(R28), R0\t\t\t; switch led state\n"+
         "\t\tRFE\n\n"+
         "main:\tADDI R1,R0,0x0000\t\t\t; set R1 = 0\n"+

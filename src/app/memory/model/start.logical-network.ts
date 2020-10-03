@@ -29,17 +29,16 @@ export class StartLogicalNetwork extends LogicalNetwork {
   }
   
   public load(address: number): number {
-    let res = 0;
     let cs = this.cs.find(el => el.address == address);
-    if(cs==null) res = super.load(address);
+    if(cs==null) return super.load(address);
     else {
       switch(cs.id) {
         case "cs_read_start":
-          res = this.ffd_q ? 1 : 0;
+          return this.ffd_q ? 1 : 0;
       }
     }
     
-    return res;
+    return 0;
   }
 
   public store(address: number, word: number): void {

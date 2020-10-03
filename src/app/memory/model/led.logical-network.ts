@@ -38,7 +38,6 @@ export class LedLogicalNetwork extends LogicalNetwork {
 
   public a_set() {
     this.ffd_q = true;
-    this.ffd_d = this.mux_status ? !this.ffd_q : this.ffd_q;
     this.led = this.ffd_q;
     this.setCS("cs_read_led", this.min_address, this.led);
   }
@@ -46,7 +45,6 @@ export class LedLogicalNetwork extends LogicalNetwork {
   public a_reset() {
     console.log("LED A_RESET()");
     this.ffd_q = false;
-    this.ffd_d = this.mux_status ? !this.ffd_q : this.ffd_q;
     this.led = this.ffd_q;
     this.setCS("cs_read_led", this.min_address, this.led);
   }
@@ -89,8 +87,7 @@ export class LedLogicalNetwork extends LogicalNetwork {
   }
 
   public clk = () => { // EXECUTE THE LOGICAL NETWORK CLK
-    this.ffd_q = this.mux(this.ffd_d, !this.ffd_q, this.mux_status);
-    this.ffd_d = this.mux(this.ffd_q, !this.ffd_q, this.mux_status);
+    this.ffd_q = this.mux(this.ffd_q, !this.ffd_q, this.mux_status);
     let cs_read_led = this.cs.find(el => el.id == "cs_read_led");
     this.led = this.ffd_q;
     if (cs_read_led != null)
