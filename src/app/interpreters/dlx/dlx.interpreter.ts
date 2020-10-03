@@ -96,7 +96,7 @@ export class DLXInterpreter extends Interpreter{
             if (args.length) throw new WrongArgumentsError(instruction, DLXDocumentation);
             func(registers);
             this.interruptEnabled = true;
-            registers.r = this.tmpReg;
+            // registers.r = this.tmpReg;
         }
     }
 
@@ -175,8 +175,8 @@ export class DLXInterpreter extends Interpreter{
             (registers as DLXRegisters).iar = registers.pc;
             registers.pc = 0;
             this.interruptEnabled = false;
-            this.tmpReg = (registers as DLXRegisters).r;
-            (registers as DLXRegisters).r = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            // this.tmpReg = (registers as DLXRegisters).r;
+            // (registers as DLXRegisters).r = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         
         }
     }

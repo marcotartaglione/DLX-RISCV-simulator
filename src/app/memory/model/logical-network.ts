@@ -21,7 +21,7 @@ export class LogicalNetwork extends Device {
   }
 
   public a_reset() {
-    this.ffd_q = true;
+    this.ffd_q = false;
   }
 
   public mux = (zero,one,sel) => {

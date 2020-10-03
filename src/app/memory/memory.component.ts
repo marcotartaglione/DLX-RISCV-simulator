@@ -185,7 +185,6 @@ export class MemoryComponent implements OnInit {
         });
     }
 
-    console.log(arrData);
     this.dialog.open(MemoryAddressDialogComponent, {
       data: arrData
     });

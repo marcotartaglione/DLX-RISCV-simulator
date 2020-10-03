@@ -372,7 +372,7 @@ export class RV32Interpreter extends Interpreter {
     try {
       this.run(line, this.tmpRegisters, this.myMem);
       this.tmpRegisters.instruction = this.tmpRegisters.opcode + this.tmpRegisters.rd + this.tmpRegisters.rs1 + this.tmpRegisters.rs2 + this.tmpRegisters.func3 + this.tmpRegisters.func7 + this.tmpRegisters.jumpOffset + +this.tmpRegisters.immediate;
-      console.log(this.tmpRegisters.instruction);
+      // console.log(this.tmpRegisters.instruction);
       return this.tmpRegisters.instruction;
     } catch (error) {
       return 0;

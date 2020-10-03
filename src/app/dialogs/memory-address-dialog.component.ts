@@ -5,7 +5,9 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
   templateUrl: './memory-address-dialog.component.html',
 })
 export class MemoryAddressDialogComponent {
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {}
+  fType : string;
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
+    this.fType = 'hex'
+  }
 
 }
