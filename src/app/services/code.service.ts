@@ -25,7 +25,7 @@ export class CodeService {
         "SB 0x0004(R29), R0\t\t\t\t\t; set startup = 0\n" +
         "J main\t\t\t\t\t\t\t\t; jump to main\n" +
         "handler:" +
-        " LHI R29, 0x9000\t\t\t\t; load address 90000000h in R29\n" +
+        " LHI R29, 0x9000\t\t\t; load address 90000000h in R29\n" +
         "\t\tSB 0x0004(R29), R0\t\t\t; switch led state\n" +
         "\t\tLW R28, 0x0004(R30)\t\t\t; restore R28 value\n" +
         "\t\tLW R29, 0x0000(R30)\t\t\t; restore R29 value\n" +
