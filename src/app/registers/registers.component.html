@@ -21,18 +21,14 @@
     <div class="register special">{{registers.pc | format: fType}}</div>
     <span>IAR</span>
     <div class="register special">{{dlxRegisters.iar | format: fType}}</div>
+    <span>IEN</span>
+    <div class="register special">{{dlxRegisters.ien | format: fType}}</div>
     <span>MAR</span>
     <div class="register special">{{dlxRegisters.mar | format: fType}}</div>
     <span>IR</span>
     <div class="register special">{{dlxRegisters.ir | format: fType}}</div>
     <span>MDR</span>
     <div class="register special">{{dlxRegisters.mdr | format: fType}}</div>
-    <span>A</span>
-    <div class="register special">{{dlxRegisters.a | format: fType}}</div>
-    <span>B</span>
-    <div class="register special">{{dlxRegisters.b | format: fType}}</div>
-    <span>C</span>
-    <div class="register special">{{dlxRegisters.c | format: fType}}</div>
   </div>
   <div *ngIf="isRV32I">
     <span>PC</span>

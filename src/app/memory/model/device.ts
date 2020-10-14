@@ -1,4 +1,4 @@
-import {Injector} from '@angular/core';
+import { Injector } from '@angular/core';
 
 export interface IDevice {
   new(min_address: number, max_address: number, injector: Injector): Device;
@@ -9,7 +9,7 @@ export class Device {
   private memory: number[];
   min_address: number;
   max_address: number;
-  cs: Array<{id: string, address: number, hexAddress: string}>;
+  cs: Array<{ id: string, address: number, hexAddress: string }>;
   devType: string;
 
   public get min_address_hex(): string {
@@ -17,10 +17,10 @@ export class Device {
   }
 
   getCsValue(csId) {
-    if(null==this.cs) return 0;
+    if (null == this.cs) return 0;
     let cs = this.cs.find(el => el.id == csId);
 
-    return cs ? this.memory[cs.address-this.min_address] : 0;
+    return cs ? this.memory[cs.address - this.min_address] : 0;
   }
 
   public isALedNetwork() {
@@ -35,12 +35,15 @@ export class Device {
         this.min_address = iv >>> 2;
       }
     }
-    if(last_min_address)
+    if (last_min_address)
       this.updateCsMin(last_min_address);
   }
 
   public get max_address_hex(): string {
-    return ((this.max_address << 2) >>> 0).toString(16).toUpperCase().padStart(8, '0');
+    if (this.max_address.toString(16).substring(4, 8) == "ffff" || this.max_address.toString(16).substring(4, 8) == "fff")
+      return ((this.max_address << 2) + 3 >>> 0).toString(16).toUpperCase().padStart(8, '0');
+    else
+      return ((this.max_address << 2) >>> 0).toString(16).toUpperCase().padStart(8, '0');
   }
 
   public set max_address_hex(v: string) {
@@ -51,7 +54,7 @@ export class Device {
         this.max_address = iv >>> 2;
       }
     }
-    if(last_max_address)
+    if (last_max_address)
       this.updateCsMax(last_max_address);
   }
 
@@ -83,9 +86,9 @@ export class Device {
   }
 
   private updateCsMax(last_max_address: number) {
-    if(this.cs) {
+    if (this.cs) {
       this.cs.forEach(el => {
-        if(el.address > this.max_address) {
+        if (el.address > this.max_address) {
           el.address = this.max_address - (last_max_address - el.address);
           el.hexAddress = this.getAddressHex(el.address);
         }
@@ -94,23 +97,23 @@ export class Device {
   }
 
   private updateCsMin(last_min_address: number) {
-    if(this.cs)
-    this.cs.forEach(el => {
-      if(el.address < this.min_address) {
-        el.address = this.min_address + (el.address - last_min_address);
-        el.hexAddress = this.getAddressHex(el.address);
-      }
-    })
-}
+    if (this.cs)
+      this.cs.forEach(el => {
+        if (el.address < this.min_address) {
+          el.address = this.min_address + (el.address - last_min_address);
+          el.hexAddress = this.getAddressHex(el.address);
+        }
+      })
+  }
 
   public getAddressHex = (addr) => {
     return ((addr << 2) >>> 0).toString(16).toUpperCase().padStart(8, '0');
   }
 
-  public setCS = (name,addr,value) => {
+  public setCS = (name, addr, value) => {
     let val = this.cs.find(el => el.id == name);
-    if(val) val.address = addr;
-    else this.cs.push({id:name,address:addr,hexAddress: this.getAddressHex(addr)});
+    if (val) val.address = addr;
+    else this.cs.push({ id: name, address: addr, hexAddress: this.getAddressHex(addr) });
     this.memory[addr - this.min_address] = value;
   }
 
@@ -119,7 +122,7 @@ export class Device {
   }
 
   public load(address: number): number {
-    let res = this.memory[address-this.min_address];
+    let res = this.memory[address - this.min_address];
     return res;
   }
 

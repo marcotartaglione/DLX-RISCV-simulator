@@ -12,6 +12,7 @@ export class DLXRegisters extends Registers {
   ir: number;
   temp: number;
   mdr: number;
+  ien: number;
   a: number;
   b: number;
   c: number;
@@ -26,5 +27,6 @@ export class DLXRegisters extends Registers {
     this.mdr = 0;
     this.a = 0;
     this.b = 0;
+    this.ien = 0;
   }
 }
