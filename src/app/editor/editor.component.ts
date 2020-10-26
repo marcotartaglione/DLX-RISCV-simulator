@@ -64,7 +64,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   private running: boolean = false;
   continuousRunning = false;
   errorMessage: string;
-  start: string = 'main';
+  start: string = 'init';
   interval: number = 1000;
   isInterruptDisabled: boolean = true;
 
@@ -198,11 +198,8 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       this.doc.removeLineClass(this.runnedLine, 'wrap', 'error');
       this.errorMessage = undefined;
       this.codeService.interpreter.parseTags(this.codeService.content, this.start);
-      if (this.codeService.editorMode === 'dlx') {
-        this.startResetSignal();
-      } else {
-        this._pc = this.codeService.interpreter.getTag('start_tag');
-      }
+      this.startResetSignal();
+      this._pc = this.codeService.interpreter.getTag('start_tag');
       this.running = true;
     }
     this.runnedLine = this.currentLine;

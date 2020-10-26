@@ -63,13 +63,13 @@
       </mat-form-field>
     </div>
 
-    <div *ngIf="selected.devType=='RAM'">
+    <div *ngIf="selected.devType=='RAM' || selected.devType=='EPROM'">
       <mat-form-field appearance="fill">
         <mat-label>Address Value</mat-label>
         <input matInput [(ngModel)]="inputAddr" minlength="8" maxlength="8" />
       </mat-form-field>
       <button style="height:50px;position: relative;top: -10px;" mat-raised-button class="standard_margin_hor"
-        (click)="readMemoryAddressValues(inputAddr)">Send</button>
+        (click)="readMemoryAddressValues(inputAddr)">Show</button>
     </div>
     <div class="group">
       <mat-form-field id="max" appearance="fill">

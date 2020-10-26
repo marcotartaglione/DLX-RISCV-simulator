@@ -16,14 +16,14 @@ export class CodeService {
   load() {
     this.content = window.localStorage.getItem(`code-${this.editorMode}`) ||
       (this.editorMode == 'dlx' ?
-        "LHI R30, 0x4000\t\t\t\t\t\t; set address 40000000h in R30\n" +
+        "init: LHI R30, 0x4000\t\t\t\t; set address 40000000h in R30\n" +
         "SW 0x0000(R30),R29\t\t\t\t\t; store R29 in 40000000h\n" +
         "SW 0x0004(R30),R28\t\t\t\t\t; store R28 in 40000004h\n" +
         "LHI R29, 0XC000\t\t\t\t\t\t; load STARTUP address C0000000h in R29\n" +
         "LBU R28, 0x0000(R29)\t\t\t\t; load STARTUP value in R28\n" +
         "BEQZ R28, handler\t\t\t\t\t; if STARTUP == 0 then jump to interrupt handler\n" +
         "SB 0x0004(R29), R0\t\t\t\t\t; set STARTUP = 0\n" +
-        "J start_tag\t\t\t\t\t\t\t; jump to Start tag\n" +
+        "J main\t\t\t\t\t\t\t\t; jump to Start tag\n" +
         "handler:" +
         " LHI R29, 0x9000\t\t\t; set address 90000000h in R29\n" +
         "\t\tSB 0x0004(R29), R0\t\t\t; switch led state\n" +

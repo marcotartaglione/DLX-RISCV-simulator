@@ -185,7 +185,7 @@ export class MemoryComponent implements OnInit {
     }
 
     this.dialog.open(MemoryAddressDialogComponent, {
-      data: arrData
+      data: {values: arrData, service:this.memoryService},
     });
   }
 
