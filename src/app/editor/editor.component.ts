@@ -1,11 +1,13 @@
 import { animate, group, query, style, transition, trigger } from "@angular/animations";
 import { AfterViewInit, ApplicationRef, Component, EventEmitter, HostListener, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { MatDialog } from '@angular/material';
 import { ActivatedRoute } from '@angular/router';
 import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
 import { EditorFromTextArea } from 'codemirror';
 import 'codemirror/addon/selection/active-line';
 import { Subscription } from 'rxjs';
+import { ImageDialogComponent } from '../dialogs/image-dialog.component';
 import { FFDLogicalNetwork } from '../memory/model/ffd-logical-network.js';
 import { LedLogicalNetwork } from '../memory/model/led.logical-network.js';
 import { StartLogicalNetwork } from '../memory/model/start.logical-network.js';
@@ -143,7 +145,8 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
 
   constructor(
     private appRef: ApplicationRef,
-    route: ActivatedRoute
+    route: ActivatedRoute,
+    private dialog: MatDialog
   ) {
     try {
       let editor_settings = JSON.parse(window.localStorage.getItem('editor_settings'));
@@ -252,6 +255,5 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   ngOnDestroy() {
     if (this.formStatusChangeSub) this.formStatusChangeSub.unsubscribe();
   }
-
 
 }

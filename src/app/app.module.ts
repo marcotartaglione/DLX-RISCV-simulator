@@ -23,6 +23,8 @@ import { LogicalNetworkDialogComponent } from './dialogs/logical-network-dialog.
 import { MatMenuModule } from '@angular/material/menu';
 import { MemoryAddressDialogComponent } from './dialogs/memory-address-dialog.component';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { ImageDialogComponent } from './dialogs/image-dialog.component';
+
 @NgModule({
    declarations: [
       AppComponent,
@@ -36,6 +38,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
       LogicalNetworkDialogComponent,
       MemoryAddressDialogComponent,
       ConfirmDialogComponent,
+      ImageDialogComponent,
       AboutPageComponent
    ],
    imports: [
@@ -57,6 +60,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
       MessageDialogComponent,
       ConfirmDialogComponent,
       MemoryAddressDialogComponent,
+      ImageDialogComponent,
       LogicalNetworkDialogComponent,
    ],
    providers: [],

@@ -16,8 +16,8 @@ export class StartLogicalNetwork extends LogicalNetwork {
     this.cs = [];
     this.a_set_value="RESET";
     this.a_reset_value="0";
-    this.setCS("cs_read_start",this.min_address,1);
-    this.setCS("cs_set_start",this.min_address + 0x00000001,1);
+    this.setCS("CS_READ_STARTUP",this.min_address,1);
+    this.setCS("CS_WRITE_STARTUP",this.min_address + 0x00000001,1);
   }
 
   public startOp() {
@@ -33,7 +33,7 @@ export class StartLogicalNetwork extends LogicalNetwork {
     if(cs==null) return super.load(address);
     else {
       switch(cs.id) {
-        case "cs_read_start":
+        case "CS_READ_STARTUP":
           return this.ffd_q ? 1 : 0;
       }
     }
@@ -46,8 +46,9 @@ export class StartLogicalNetwork extends LogicalNetwork {
     if(cs==null) return super.store(address,word);
     else {
       switch(cs.id) {
-        case "cs_set_start":
+        case "CS_WRITE_STARTUP":
           this.ffd_q = (word & 0x1) == 0x1;
+          super.store(this.cs.find(el => el.id == "CS_READ_STARTUP").address, this.ffd_q ? 1 : 0);
           break;
       }
     }

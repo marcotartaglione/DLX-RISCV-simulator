@@ -7,9 +7,9 @@ import { Device } from './model/device';
 import { LogicalNetwork } from './model/logical-network';
 import { LogicalNetworkDialogComponent } from '../dialogs/logical-network-dialog.component';
 import { MemoryAddressDialogComponent } from '../dialogs/memory-address-dialog.component';
-import { StartLogicalNetwork } from './model/start.logical-network';
 import { LedLogicalNetwork } from './model/led.logical-network';
 import { FFDLogicalNetwork } from './model/ffd-logical-network';
+import { ImageDialogComponent } from '../dialogs/image-dialog.component';
 
 @Component({
   selector: 'app-memory',
@@ -185,7 +185,7 @@ export class MemoryComponent implements OnInit {
     }
 
     this.dialog.open(MemoryAddressDialogComponent, {
-      data: {values: arrData, service:this.memoryService},
+      data: { values: arrData, service: this.memoryService },
     });
   }
 
@@ -193,4 +193,9 @@ export class MemoryComponent implements OnInit {
     return dev instanceof LogicalNetwork;
   }
 
+  openImageInterrupt() {
+    this.dialog.open(ImageDialogComponent, {
+      data: { src: "assets/img/rete-interrupt.jpg" }
+    });
+  }
 }

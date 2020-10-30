@@ -19,12 +19,15 @@ export class Device {
   getCsValue(csId) {
     if (null == this.cs) return 0;
     let cs = this.cs.find(el => el.id == csId);
-
     return cs ? this.memory[cs.address - this.min_address] : 0;
   }
 
   public isALedNetwork() {
-    return null != this.cs.find(el => el.id == "cs_read_led");
+    return null != this.cs.find(el => el.id == "CS_READ_LED");
+  }
+
+  public isAStartNetwork() {
+    return null != this.cs.find(el => el.id == "CS_READ_STARTUP");
   }
 
   public set min_address_hex(v: string) {

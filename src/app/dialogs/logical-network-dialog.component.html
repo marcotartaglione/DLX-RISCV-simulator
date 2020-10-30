@@ -15,8 +15,8 @@
             <mat-form-field appearance="fill">
                 <mat-label>A_SET</mat-label>
                 <mat-select [disabled]="data.isReadOnly" [(value)]="data.network.a_set_value">
-                    <mat-option value="RESET">RESET</mat-option>
-                    <mat-option value="CS_SET">CS_SET</mat-option>
+                    <mat-option *ngIf="data.network.a_reset_value != 'RESET'" value="RESET">RESET</mat-option>
+                    <mat-option value="CS_A_SET_LED">CS_A_SET_LED</mat-option>
                     <mat-option value="0">0</mat-option>
                 </mat-select>
             </mat-form-field>
@@ -25,8 +25,8 @@
             <mat-form-field appearance="fill">
                 <mat-label>A_RES</mat-label>
                 <mat-select [disabled]="data.isReadOnly" [(value)]="data.network.a_reset_value">
-                    <mat-option value="RESET">RESET</mat-option>
-                    <mat-option value="CS_RESET">CS_RESET</mat-option>
+                    <mat-option value="RESET" *ngIf="data.network.a_set_value != 'RESET'">RESET</mat-option>
+                    <mat-option value="CS_A_RES_LED">CS_A_RES_LED</mat-option>
                     <mat-option value="0">0</mat-option>
                 </mat-select>
             </mat-form-field>

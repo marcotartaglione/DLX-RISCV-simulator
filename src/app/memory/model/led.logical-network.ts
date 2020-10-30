@@ -18,14 +18,15 @@ export class LedLogicalNetwork extends LogicalNetwork {
     this.mux_status = 1;
     this.a_set_value = "RESET";
     this.a_reset_value = "0";
-    this.setCS("cs_read_led", this.min_address, this.led);
-    this.setCS("cs_inverti_led", this.min_address + 0x00000001, this.mux_status);
-    this.setCS("cs_reset", this.min_address + 0x00000002, 0);
-    this.setCS("cs_set", this.min_address + 0x00000003, 0);
+    this.setCS("CS_READ_LED", this.min_address, this.led);
+    this.setCS("CS_SWITCH_LED", this.min_address + 0x00000001, this.mux_status);
+    this.setCS("CS_A_RES_LED", this.min_address + 0x00000002, 0);
+    this.setCS("CS_A_SET_LED", this.min_address + 0x00000003, 0);
   }
 
   public getImageName() {
-    return "assets/img/rete-led-" + (this.clkType == "MEMWR*" ? "memwr" : "memrd") + ".png"
+    const folder = this.clkType=="MEMWR*" ? 'memwr':'memrd';
+    return ("assets/img/led/" + folder + "/" + this.a_set_value + "_" + this.a_reset_value + ".jpg").toLowerCase();
   }
 
   public startOp() {
@@ -39,14 +40,14 @@ export class LedLogicalNetwork extends LogicalNetwork {
   public a_set() {
     this.ffd_q = true;
     this.led = this.ffd_q;
-    this.setCS("cs_read_led", this.min_address, this.led);
+    this.setCS("CS_READ_LED", this.min_address, this.led);
   }
 
   public a_reset() {
-    console.log("LED A_RESET()");
+    
     this.ffd_q = false;
     this.led = this.ffd_q;
-    this.setCS("cs_read_led", this.min_address, this.led);
+    this.setCS("CS_READ_LED", this.min_address, this.led);
   }
 
   public load(address: number): number {
@@ -57,9 +58,9 @@ export class LedLogicalNetwork extends LogicalNetwork {
     if (cs == null) return super.load(address);
     else {
       switch (cs.id) {
-        case "cs_read_led":
+        case "CS_READ_LED":
           return this.led ? 1 : 0;
-        case "cs_inverti_led":
+        case "CS_SWITCH_LED":
           return this.mux_status;
       }
     }
@@ -70,16 +71,16 @@ export class LedLogicalNetwork extends LogicalNetwork {
     if (cs == null) return super.store(address, word);
     else {
       switch (cs.id) {
-        case "cs_inverti_led":
+        case "CS_SWITCH_LED":
           if ("MEMWR*" == this.clkType)
             this.clk();
           break;
-        case "cs_set":
-          if (this.a_set_value=="CS_SET")
+        case "CS_A_SET_LED":
+          if (this.a_set_value=="CS_A_SET_LED")
             this.a_set();
           break;
-        case "cs_reset":
-          if (this.a_set_value=="CS_RESET")
+        case "CS_A_RES_LED":
+          if (this.a_set_value=="CS_A_RES_LED")
             this.a_reset();
           break;
       }
@@ -88,10 +89,10 @@ export class LedLogicalNetwork extends LogicalNetwork {
 
   public clk = () => { // EXECUTE THE LOGICAL NETWORK CLK
     this.ffd_q = this.mux(this.ffd_q, !this.ffd_q, this.mux_status);
-    let cs_read_led = this.cs.find(el => el.id == "cs_read_led");
+    let CS_READ_LED = this.cs.find(el => el.id == "CS_READ_LED");
     this.led = this.ffd_q;
-    if (cs_read_led != null)
-      super.store(cs_read_led.address, this.led ? 1 : 0);
+    if (CS_READ_LED != null)
+      super.store(CS_READ_LED.address, this.led ? 1 : 0);
   }
 
   public getLedStatus = () => {
