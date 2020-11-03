@@ -21,9 +21,9 @@ export class CodeService {
         "SW 0x0004(R30),R28\t\t\t\t\t; save R28 in 0x40000004h (RAM)\n" +
         "LHI R29, 0XC000\t\t\t\t\t\t; set R29 = 0xC0000000h (STARTUP address)\n" +
         "LBU R28, 0x0000(R29)\t\t\t\t; read STARTUP signal into R28\n" +
-        "BEQZ R28, handler\t\t\t\t\t; if STARTUP == 0 then jump to interrupt handler\n" +
+        "BEQZ R28, handler\t\t\t\t\t; if STARTUP == 0 then jump to (interrupt) handler\n" +
         "SB 0x0004(R29), R0\t\t\t\t\t; set STARTUP = 0\n" +
-        "J main\t\t\t\t\t\t\t\t; jump to main:tag\n" +
+        "J main\t\t\t\t\t\t\t\t; jump to main:\n" +
         "handler:" +
         " LHI R29, 0x9000\t\t\t; set R29 = 0x90000000h\n" +
         "\t\tSB 0x0004(R29), R0\t\t\t; switch LED signal\n" +
@@ -40,7 +40,7 @@ export class CodeService {
         "\t\tADD R3,R2,R1\t\t\t\t; R3 = R2 + R1\n" +
         "\t\tSUBI R4,R4,0x0001\t\t\t; decrease R4 by 1\n" +
         "\t\tBEQZ R4,main\t\t\t\t; Jump to main if R4 == 0\n" +
-        "\t\tJ loop\t\t\t\t\t\t; Jump to loop:tag"
+        "\t\tJ loop\t\t\t\t\t\t; Jump to loop:"
         : 'main: ')
       ;
   }

@@ -9,7 +9,7 @@ export class LogicalNetwork extends Device {
    * This logical network has a TRI-STATE and a FFD with SET and RESET Asynchronous func
    */
 
-  ffd_q: boolean;
+  ffd: boolean;
   a_set_value: string;
   a_reset_value: string;
   image: String;
@@ -17,11 +17,11 @@ export class LogicalNetwork extends Device {
   clkType: string = null;
 
   public a_set() {
-    this.ffd_q = true;
+    this.ffd = true;
   }
 
   public a_reset() {
-    this.ffd_q = false;
+    this.ffd = false;
   }
 
   public mux = (zero,one,sel) => {
