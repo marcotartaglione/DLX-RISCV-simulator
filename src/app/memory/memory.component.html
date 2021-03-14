@@ -33,7 +33,7 @@
       </div>
       <div class="ln" *ngIf="isLN(device)" [style.left]="((device.min_address/1073741824)*100).toFixed(2)+'%'"
         (click)="selected == device ? selected = null : selected = device" [class.selected]="selected == device"
-        [matTooltip]="device.name +' '+(device.ffd_q?'1':'0')" matTooltipPosition="above" matTooltipClass="device-size">
+        [matTooltip]="device.name +' '+(device.ffd?'1':'0')" matTooltipPosition="above" matTooltipClass="device-size">
       </div>
     </ng-container>
     <div class="gig-overlay">
