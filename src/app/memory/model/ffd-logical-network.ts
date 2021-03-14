@@ -37,7 +37,7 @@ export class FFDLogicalNetwork extends LogicalNetwork {
     else {
       switch(cs.id) {
         case "cs_read_ff":
-          res = this.ffd_q ? 1 : 0;
+          res = this.ffd ? 1 : 0;
       }
     }
     
@@ -50,7 +50,7 @@ export class FFDLogicalNetwork extends LogicalNetwork {
     else {
       switch(cs.id) {
         case "cs_set_ff":
-          this.ffd_q = (word & 0x1) == 0x1;
+          this.ffd = (word & 0x1) == 0x1;
           break;
       }
     }

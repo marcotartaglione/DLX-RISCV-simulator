@@ -33,6 +33,7 @@ export class StartLogicalNetwork extends LogicalNetwork {
   }
 
   public startOp() {
+    console.log("STARTUP ->");
     if (this.a_set_value == "RESET")
       this.a_set();
 

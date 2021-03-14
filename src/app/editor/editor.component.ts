@@ -217,7 +217,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     
     this.memoryService.memory.devices.forEach(el => {
       if(el.devType.includes("Start"))
-        this.isInterruptDisabled = (el as StartLogicalNetwork).ffd_q;
+        this.isInterruptDisabled = (el as StartLogicalNetwork).startup;
     });
   }
 
