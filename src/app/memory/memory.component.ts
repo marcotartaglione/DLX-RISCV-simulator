@@ -30,6 +30,8 @@ import { ErrorDialogComponent } from '../dialogs/error-dialog.component';
 })
 
 export class MemoryComponent implements OnInit {
+  inputAddr: any;
+  selectedCS: { id: string, address: number, hexAddress: string }
   selected: Device;
   @Input() memoryService: MemoryService;
 
