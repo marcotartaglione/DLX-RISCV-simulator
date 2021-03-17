@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
+import { MatDialog } from '@angular/material';
 import { Interpreter } from '../interpreters/interpreter';
+import { ErrorDialogComponent } from '../dialogs/error-dialog.component';
 
 @Injectable({
   providedIn: 'root'
@@ -10,43 +12,59 @@ export class CodeService {
   public interpreter: Interpreter;
   public editorMode: string;
 
-  constructor() {
+  constructor(private dialog: MatDialog) {
   }
 
   load() {
     this.content = window.localStorage.getItem(`code-${this.editorMode}`) ||
       (this.editorMode == 'dlx' ?
-        "init: LHI R30, 0x4000\t\t\t\t; set R30 = 0x40000000h\n" +
-        "SW 0x0000(R30),R29\t\t\t\t\t; save R29 in 0x40000000h (RAM)\n" +
-        "SW 0x0004(R30),R28\t\t\t\t\t; save R28 in 0x40000004h (RAM)\n" +
-        "LHI R29, 0XC000\t\t\t\t\t\t; set R29 = 0xC0000000h (STARTUP address)\n" +
-        "LBU R28, 0x0000(R29)\t\t\t\t; read STARTUP signal into R28\n" +
-        "BEQZ R28, handler\t\t\t\t\t; if STARTUP == 0 then jump to (interrupt) handler\n" +
-        "SB 0x0004(R29), R0\t\t\t\t\t; set STARTUP = 0\n" +
-        "J main\t\t\t\t\t\t\t\t; jump to main:\n" +
+        "init: \t\tLHI R30, 0x4000\t\t\t\t; set R30 = 0x40000000h\n" +
+        "\t\t\tSW 0x0000(R30),R29\t\t\t; save R29 in 0x40000000h (RAM)\n" +
+        "\t\t\tSW 0x0004(R30),R28\t\t\t; save R28 in 0x40000004h (RAM)\n" +
+        "\t\t\tLHI R29, 0XC000\t\t\t\t; set R29 = 0xC0000000h (STARTUP address)\n" +
+        "\t\t\tLBU R28, 0x0000(R29)\t\t; read STARTUP signal into R28\n" +
+        "\t\t\tBEQZ R28, handler\t\t\t; if STARTUP == 0 then jump to (interrupt) handler\n" +
+        "\t\t\tSB 0x0004(R29), R0\t\t\t; set STARTUP = 0\n" +
+        "\t\t\tJ main\t\t\t\t\t\t; jump to main:\n" +
         "handler:" +
-        " LHI R29, 0x9000\t\t\t; set R29 = 0x90000000h\n" +
-        "\t\tSB 0x0004(R29), R0\t\t\t; switch LED signal\n" +
-        "\t\tLW R28, 0x0004(R30)\t\t\t; restore R28 value from memory (RAM)\n" +
-        "\t\tLW R29, 0x0000(R30)\t\t\t; restore R29 value from memory (RAM)\n" +
-        "\t\tRFE\n" +
-        "\n\t\t\t\t\t\t\t\t\t; Fibonacci sequence\n" +
-        "main:\tADDI R1,R0,0x0000\t\t\t; set R1 = 0\n" +
-        "\t\tADDI R2,R0,0x0001\t\t\t; set R2 = 1\n" +
-        "\t\tADDI R3,R0,0x0001\t\t\t; set R3 = 1\n" +
-        "\t\tADDI R4,R0,0x0014\t\t\t; set counter R4 = 0x14\n" +
-        "loop:\tADD R1,R2,R0\t\t\t\t; copy R2 into R1\n" +
-        "\t\tADD R2,R3,R0\t\t\t\t; copy R3 into R2\n" +
-        "\t\tADD R3,R2,R1\t\t\t\t; R3 = R2 + R1\n" +
-        "\t\tSUBI R4,R4,0x0001\t\t\t; decrease R4 by 1\n" +
-        "\t\tBEQZ R4,main\t\t\t\t; Jump to main if R4 == 0\n" +
-        "\t\tJ loop\t\t\t\t\t\t; Jump to loop:"
+        " \tLHI R29, 0x9000\t\t\t\t; set R29 = 0x90000000h\n" +
+        "\t\t\tSB 0x0004(R29), R0\t\t\t; switch LED signal\n" +
+        "\t\t\tLW R28, 0x0004(R30)\t\t\t; restore R28 value from memory (RAM)\n" +
+        "\t\t\tLW R29, 0x0000(R30)\t\t\t; restore R29 value from memory (RAM)\n" +
+        "\t\t\tRFE\n" +
+        "\n\t\t\t\t\t\t\t\t\t\t; Fibonacci sequence\n" +
+        "main:\t\tADDI R1,R0,0x0000\t\t\t; set R1 = 0\n" +
+        "\t\t\tADDI R2,R0,0x0001\t\t\t; set R2 = 1\n" +
+        "\t\t\tADDI R3,R0,0x0001\t\t\t; set R3 = 1\n" +
+        "\t\t\tADDI R4,R0,0x0014\t\t\t; set counter R4 = 0x14\n" +
+        "loop:\t\tADD R1,R2,R0\t\t\t\t; copy R2 into R1\n" +
+        "\t\t\tADD R2,R3,R0\t\t\t\t; copy R3 into R2\n" +
+        "\t\t\tADD R3,R2,R1\t\t\t\t; R3 = R2 + R1\n" +
+        "\t\t\tSUBI R4,R4,0x0001\t\t\t; decrease R4 by 1\n" +
+        "\t\t\tBEQZ R4,main\t\t\t\t; Jump to main if R4 == 0\n" +
+        "\t\t\tJ loop\t\t\t\t\t\t; Jump to loop:"
         : 'main: ')
       ;
   }
 
-  save() {
+  save(fileName: string) {
     window.localStorage.setItem(`code-${this.editorMode}`, this.content);
+    if(!fileName.endsWith(".txt")){
+      this.dialog.open(ErrorDialogComponent,{
+        data: { message: "Only .txt suffix" }
+      })
+      return;
+    }
+    var text = this.content;
+    var blob = new Blob([text], { type: "text/plain"});
+    var anchor = document.createElement("a");
+    anchor.download = fileName;
+    anchor.href = window.URL.createObjectURL(blob);
+    anchor.target ="_blank";
+    anchor.style.display = "none"; 
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
   }
 
   clear() {

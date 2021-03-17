@@ -25,6 +25,8 @@ import { MemoryAddressDialogComponent } from './dialogs/memory-address-dialog.co
 import { MatGridListModule } from '@angular/material/grid-list';
 import { ImageDialogComponent } from './dialogs/image-dialog.component';
 import { ErrorDialogComponent } from './dialogs/error-dialog.component';
+import { SaveDialogComponent } from './dialogs/save-dialog.component';
+import { MatInputModule } from '@angular/material/input';
 
 
 @NgModule({
@@ -42,7 +44,8 @@ import { ErrorDialogComponent } from './dialogs/error-dialog.component';
       ConfirmDialogComponent,
       ImageDialogComponent,
       AboutPageComponent,
-      ErrorDialogComponent
+      ErrorDialogComponent,
+      SaveDialogComponent
    ],
    imports: [
       BrowserModule,
@@ -57,7 +60,8 @@ import { ErrorDialogComponent } from './dialogs/error-dialog.component';
       MaterialModule,
       MatSelectModule,
       MatIconModule,
-      MatGridListModule
+      MatGridListModule,
+      MatInputModule
    ],
    entryComponents: [
       MessageDialogComponent,
@@ -65,7 +69,8 @@ import { ErrorDialogComponent } from './dialogs/error-dialog.component';
       MemoryAddressDialogComponent,
       ImageDialogComponent,
       LogicalNetworkDialogComponent,
-      ErrorDialogComponent
+      ErrorDialogComponent,
+      SaveDialogComponent
    ],
    providers: [],
    bootstrap: [

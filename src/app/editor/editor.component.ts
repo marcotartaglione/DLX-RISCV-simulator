@@ -8,6 +8,7 @@ import { EditorFromTextArea } from 'codemirror';
 import 'codemirror/addon/selection/active-line';
 import { Subscription } from 'rxjs';
 import { ImageDialogComponent } from '../dialogs/image-dialog.component';
+import { SaveDialogComponent } from "../dialogs/save-dialog.component";
 import { FFDLogicalNetwork } from '../memory/model/ffd-logical-network.js';
 import { LedLogicalNetwork } from '../memory/model/led.logical-network.js';
 import { StartLogicalNetwork } from '../memory/model/start.logical-network.js';
@@ -229,9 +230,8 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   }
 
   onSave() {
-    this.codeService.save();
+    this.dialog.open(SaveDialogComponent);
     window.localStorage.setItem('editor_settings', `{"start": "${this.start}", "interval": ${this.interval}}`);
-    this.form.form.markAsPristine();
   }
 
   onClear() {

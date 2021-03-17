@@ -1,0 +1,12 @@
+
+<mat-dialog-content  align="center">
+    <mat-form-field appearance="fill">
+        <mat-label>Choose a filename</mat-label>
+        <input matInput [(ngModel)]="fileName"  matTooltip=".txt" matTooltipPosition="below" matTooltipClass="device-size"/>
+    </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="center">
+    <button mat-button mat-dialog-close>Exit</button>
+    <button mat-button mat-dialog-close (click)="onSave()">Save</button>
+    
+</mat-dialog-actions>
