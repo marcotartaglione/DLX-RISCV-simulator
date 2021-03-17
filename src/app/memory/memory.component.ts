@@ -10,6 +10,7 @@ import { MemoryAddressDialogComponent } from '../dialogs/memory-address-dialog.c
 import { LedLogicalNetwork } from './model/led.logical-network';
 import { FFDLogicalNetwork } from './model/ffd-logical-network';
 import { ImageDialogComponent } from '../dialogs/image-dialog.component';
+import { ErrorDialogComponent } from '../dialogs/error-dialog.component';
 
 @Component({
   selector: 'app-memory',
@@ -168,12 +169,25 @@ export class MemoryComponent implements OnInit {
 
   readMemoryAddressValues(addr) {
     let finalAddr;
+    if(! addr.startsWith("0x") || addr.length !== 10 || isNaN(addr)) { 
+      this.dialog.open(ErrorDialogComponent,{
+        data: { message: "Format Error : only 0x format accepted" }
+      })
+      return;
+    }
+
     let iv = parseInt(addr, 16);
     if (iv || iv === 0) {
       finalAddr = iv >>> 2;
     }
     let d = this.memoryService.memory.devices.find(el => el.min_address <= finalAddr && el.max_address >= finalAddr);
     let arrData = [];
+    if(d==null){
+      this.dialog.open(ErrorDialogComponent,{
+        data: { message: "No memory allocated in this range" }
+      })
+      return;
+    }
     for (let i = 0; i < 10; i++) {
       let v = d.load(finalAddr + (i * 0x00000001));
       arrData.push(

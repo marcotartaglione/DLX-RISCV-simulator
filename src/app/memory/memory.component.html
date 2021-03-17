@@ -13,10 +13,10 @@
   <div class="memory">
     <ng-container *ngFor="let device of memoryService.memory.devices">
       <img *ngIf="device.isALedNetwork()" class=" icon_absolute" width="40px"
-        [style.left]="((device.min_address/1073741824)*100).toFixed(2)-1.5+'%'"
+        [style.left]="((device.min_address/1073741824)*100 -1.5).toFixed(2)+'%'"
         src="{{device.getCsValue('CS_READ_LED') ? 'assets/img/led_on.png':'assets/img/led_off.png'}}" />
         <img *ngIf="device.isAStartNetwork()" class=" icon_absolute" width="40px"
-          [style.left]="((device.min_address/1073741824)*100).toFixed(2)-1.5+'%'"
+          [style.left]="((device.min_address/1073741824)*100 -1.5).toFixed(2)+'%'"
           src="{{device.getCsValue('CS_READ_STARTUP') ? 'assets/img/led_on.png':'assets/img/led_off.png'}}" />
       <!-- <mat-icon *ngIf="device.isALedNetwork()" 
         aria-hidden="false" [ngClass]="{'amber': device.getCsValue('CS_READ_LED')}" class="icon_absolute"
@@ -80,7 +80,7 @@
     <div *ngIf="selected.devType=='RAM' || selected.devType=='EPROM'">
       <mat-form-field appearance="fill">
         <mat-label>Address Value</mat-label>
-        <input matInput [(ngModel)]="inputAddr" minlength="8" maxlength="8" />
+        <input matInput [(ngModel)]="inputAddr" minlength="10" maxlength="10" matTooltip="0x format" matTooltipPosition="below" matTooltipClass="device-size"/>
       </mat-form-field>
       <button style="height:50px;position: relative;top: -10px;" mat-raised-button class="standard_margin_hor"
         (click)="readMemoryAddressValues(inputAddr)">Show</button>
