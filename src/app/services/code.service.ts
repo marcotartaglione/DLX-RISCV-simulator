@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { Interpreter } from '../interpreters/interpreter';
 import { ErrorDialogComponent } from '../dialogs/error-dialog.component';
-
 @Injectable({
   providedIn: 'root'
 })
@@ -49,12 +48,6 @@ export class CodeService {
 
   save(fileName: string) {
     window.localStorage.setItem(`code-${this.editorMode}`, this.content);
-    if(!fileName.endsWith(".txt")){
-      this.dialog.open(ErrorDialogComponent,{
-        data: { message: "Only .txt suffix" }
-      })
-      return;
-    }
     var text = this.content;
     var blob = new Blob([text], { type: "text/plain"});
     var anchor = document.createElement("a");
