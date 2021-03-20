@@ -12,12 +12,16 @@
 <div class="main-container">
   <div class="memory">
     <ng-container *ngFor="let device of memoryService.memory.devices">
-      <img *ngIf="device.isALedNetwork()" class=" icon_absolute" width="40px"
-        [style.left]="((device.min_address/1073741824)*100 -1.5).toFixed(2)+'%'"
-        src="{{device.getCsValue('CS_READ_LED') ? 'assets/img/led_on.png':'assets/img/led_off.png'}}" />
-        <img *ngIf="device.isAStartNetwork()" class=" icon_absolute" width="40px"
-          [style.left]="((device.min_address/1073741824)*100 -1.5).toFixed(2)+'%'"
-          src="{{device.getCsValue('CS_READ_STARTUP') ? 'assets/img/led_on.png':'assets/img/led_off.png'}}" />
+      <img *ngIf="device.isALedNetwork()" class=" icon_absolute" width="70px"
+        [style.left]="((device.min_address/1073741824)*100 -3.5).toFixed(2)+'%'"
+        src="{{device.getCsValue('CS_READ_LED') ? 'assets/img/led_on.png':'assets/img/led_off.png'}}" 
+        (click)="selected == device ? selected = null : selected = device" [class.selected]="selected == device"
+        [matTooltip]="device.name +' '+(device.ffd?'1':'0')" matTooltipPosition="above" matTooltipClass="device-size"/>
+        <img *ngIf="device.isAStartNetwork()" class=" icon_absolute" width="70px"
+          [style.left]="((device.min_address/1073741824)*100 -3.5).toFixed(2)+'%'"
+          src="{{device.getCsValue('CS_READ_STARTUP') ? 'assets/img/led_on.png':'assets/img/led_off.png'}}" 
+          (click)="selected == device ? selected = null : selected = device" [class.selected]="selected == device"
+          [matTooltip]="device.name +' '+(device.ffd?'1':'0')" matTooltipPosition="above" matTooltipClass="device-size"/>
       <!-- <mat-icon *ngIf="device.isALedNetwork()" 
         aria-hidden="false" [ngClass]="{'amber': device.getCsValue('CS_READ_LED')}" class="icon_absolute"
         aria-label="Example home icon">
@@ -32,7 +36,6 @@
         <span>{{ device.name }}</span>
       </div>
       <div class="ln" *ngIf="isLN(device)" [style.left]="((device.min_address/1073741824)*100).toFixed(2)+'%'"
-        (click)="selected == device ? selected = null : selected = device" [class.selected]="selected == device"
         [matTooltip]="device.name +' '+(device.ffd?'1':'0')" matTooltipPosition="above" matTooltipClass="device-size">
       </div>
     </ng-container>
@@ -59,7 +62,7 @@
           [disabled]="selected.name == 'EPROM'" />
       </mat-form-field>
     </div>
-    &nbsp;
+    
     <div class="group" *ngIf="selected.cs.length > 0">
       <mat-form-field appearance="fill">
         <mat-label>Chip-Select</mat-label>
