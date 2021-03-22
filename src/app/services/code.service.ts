@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { Interpreter } from '../interpreters/interpreter';
-import { ErrorDialogComponent } from '../dialogs/error-dialog.component';
 @Injectable({
   providedIn: 'root'
 })
@@ -18,16 +17,16 @@ export class CodeService {
     this.content = window.localStorage.getItem(`code-${this.editorMode}`) ||
       (this.editorMode == 'dlx' ?
         "init: \t\tLHI R30, 0x4000\t\t\t\t; set R30 = 0x40000000h\n" +
-        "\t\t\tSW 0x0000(R30),R29\t\t\t; save R29 in 0x40000000h (RAM)\n" +
-        "\t\t\tSW 0x0004(R30),R28\t\t\t; save R28 in 0x40000004h (RAM)\n" +
+        "\t\t\tSW R29, 0x0000(R30)\t\t\t; save R29 in 0x40000000h (RAM)\n" +
+        "\t\t\tSW R28, 0x0004(R30)\t\t\t; save R28 in 0x40000004h (RAM)\n" +
         "\t\t\tLHI R29, 0XC000\t\t\t\t; set R29 = 0xC0000000h (STARTUP address)\n" +
         "\t\t\tLBU R28, 0x0000(R29)\t\t; read STARTUP signal into R28\n" +
         "\t\t\tBEQZ R28, handler\t\t\t; if STARTUP == 0 then jump to (interrupt) handler\n" +
-        "\t\t\tSB 0x0004(R29), R0\t\t\t; set STARTUP = 0\n" +
+        "\t\t\tSB R0, 0x0004(R29)\t\t\t; set STARTUP = 0\n" +
         "\t\t\tJ main\t\t\t\t\t\t; jump to main:\n" +
         "handler:" +
         " \tLHI R29, 0x9000\t\t\t\t; set R29 = 0x90000000h\n" +
-        "\t\t\tSB 0x0004(R29), R0\t\t\t; switch LED signal\n" +
+        "\t\t\tSB R0, 0x0004(R29)\t\t\t; switch LED signal\n" +
         "\t\t\tLW R28, 0x0004(R30)\t\t\t; restore R28 value from memory (RAM)\n" +
         "\t\t\tLW R29, 0x0000(R30)\t\t\t; restore R29 value from memory (RAM)\n" +
         "\t\t\tRFE\n" +

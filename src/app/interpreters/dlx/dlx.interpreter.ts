@@ -69,8 +69,8 @@ export class DLXInterpreter extends Interpreter{
                 registers.r[rd] = registers.c;
             }
         },
-        IS: (line, instruction, [offset, rs1, rd], func, registers, memory) => {
-            if (!(/\w+\s+0x([0-9A-F]{4})\s*\(\s*R[123]?\d\s*\)\s*,\s*R[123]?\d/i.test(line))) throw new WrongArgumentsError(instruction, DLXDocumentation);
+        IS: (line, instruction, [rd, offset, rs1], func, registers, memory) => {
+            if (!(/\w+\s+R[123]?\d\s*,\s*0x([0-9A-F]{4})\s*\(\s*R[123]?\d\s*\)\s*/i.test(line))) throw new WrongArgumentsError(instruction, DLXDocumentation);
             registers.a = registers.r[rs1];
             registers.mdr = registers.b = registers.r[rd];
             registers.mar = signExtend(offset) + registers.a;
