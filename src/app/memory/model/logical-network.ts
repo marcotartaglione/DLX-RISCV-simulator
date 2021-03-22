@@ -14,6 +14,7 @@ export class LogicalNetwork extends Device {
   a_reset_value: string;
   image: String;
   led: boolean;
+  startup: boolean;
   clkType: string = null;
 
   public a_set() {

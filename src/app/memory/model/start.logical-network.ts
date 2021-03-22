@@ -9,7 +9,6 @@ export class StartLogicalNetwork extends LogicalNetwork {
   //bd0 = tri( ffd( start, mux( start.q, bd0, cs_write ), reset, null, memwr* ), cs_read )";
 
   mux_status: number;
-  startup: boolean;
 
   constructor(cs_read: number, cs_write: number, injector: Injector) {
     super('Start', cs_read, cs_write);

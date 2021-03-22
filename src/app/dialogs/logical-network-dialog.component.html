@@ -14,7 +14,7 @@
         <div style="display:inline-block; margin:10px;" *ngIf="data.network.a_set_value">    
             <mat-form-field appearance="fill">
                 <mat-label>A_SET</mat-label>
-                <mat-select [disabled]="data.isReadOnly" [(value)]="data.network.a_set_value">
+                <mat-select  [(value)]="data.network.a_set_value"> <!-- [disabled]="data.isReadOnly" -->
                     <mat-option value="RESET">RESET</mat-option>
                     <mat-option *ngIf="null != data.network.led" value="CS_A_SET_LED">CS_A_SET_LED</mat-option>
                     <mat-option *ngIf="null != data.network.startup" value="CS_A_SET_STARTUP">CS_A_SET_STARTUP</mat-option>
@@ -25,7 +25,7 @@
         <div style="display:inline-block; margin:10px;" *ngIf="data.network.a_reset_value">    
             <mat-form-field appearance="fill">
                 <mat-label>A_RES</mat-label>
-                <mat-select [disabled]="data.isReadOnly" [(value)]="data.network.a_reset_value">
+                <mat-select [(value)]="data.network.a_reset_value"> <!--  [disabled]="data.isReadOnly" -->
                     <mat-option value="RESET">RESET</mat-option>
                     <mat-option *ngIf="null != data.network.led" value="CS_A_RES_LED">CS_A_RES_LED</mat-option>
                     <mat-option *ngIf="null != data.network.startup" value="CS_A_RES_STARTUP">CS_A_RES_STARTUP</mat-option>
