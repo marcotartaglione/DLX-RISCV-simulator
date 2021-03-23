@@ -59,6 +59,10 @@ export class CodeService {
     document.body.removeChild(anchor);
   }
 
+  browserSave(){
+    window.localStorage.setItem(`code-${this.editorMode}`, this.content);
+  }
+
   clear() {
     window.localStorage.removeItem(`code-${this.editorMode}`);
   }

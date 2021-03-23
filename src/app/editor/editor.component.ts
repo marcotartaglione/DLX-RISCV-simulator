@@ -234,6 +234,11 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     window.localStorage.setItem('editor_settings', `{"start": "${this.start}", "interval": ${this.interval}}`);
   }
 
+  browserSave() {
+    this.codeService.browserSave();
+    window.localStorage.setItem('editor_settings', `{"start": "${this.start}", "interval": ${this.interval}}`);
+  }
+
   onClear() {
     this.memoryService.clearMemory();
     this.codeService.clear();

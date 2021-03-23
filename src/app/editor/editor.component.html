@@ -8,9 +8,13 @@
       <button mat-raised-button class="mr" [disabled]="isInterruptDisabled" (click)="onInterrupt()">
         <span class="btn">Interrupt <i class="fas fa-bolt amber"></i></span>
       </button>
-      <button mat-raised-button class="mr" (click)="onSave()" >
+      <button mat-raised-button class="mr" [matMenuTriggerFor]="menu" >
         <span class="btn">Save code<i class="fas fa-save"></i></span>
       </button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item (click)="onSave()">Save As</button>
+          <button mat-menu-item (click)="browserSave()">Save</button>
+        </mat-menu>
       <button mat-raised-button class="mr" (click)="onClear()">
         <span class="btn">Restore default code<i class="fas fa-trash"></i></span>
       </button>
