@@ -15,7 +15,7 @@ export class CanDeactivateGuard implements CanDeactivate<MainPageComponent> {
       return this.dialog
         .open(ConfirmDialogComponent, {
           data: {
-            message: 'Do you have unsaved changes? If you leave, without saving, your changes will be lost',
+            message: 'Do you have unsaved changes ? If you leave, without saving, your changes will be lost',
             ok: 'Leave',
             ko: 'Cancel'
           }
