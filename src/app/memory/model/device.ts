@@ -132,8 +132,4 @@ export class Device {
   public store(address: number, word: number): void {
     this.memory[address - this.min_address] = word;
   }
-
-  public reset(): void {
-    this.memory = []; //fa sì che vengano immessi dei valori casuali
-  }
 }

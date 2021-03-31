@@ -255,7 +255,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   }
 
   // METODO CHE SALVA IL CODICE IN MEMORIA (nella EPROM)
-  // Pero ogni riga invoca il metodo encode che restituisce la codifica di quella riga di comando
+  // Per ogni riga invoca il metodo encode che restituisce la codifica di quella riga di comando
   
   storeCode() { 
     this.codeService.interpreter.parseTags(this.codeService.content, this.start);
@@ -263,7 +263,6 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     for(let i=0; i<lines.length;i++){
       this.memoryService.getEprom().store(i,this.codeService.encode(i));
     }
-
   }
 
   @HostListener('window:beforeunload', ['$event'])

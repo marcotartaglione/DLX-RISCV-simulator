@@ -183,18 +183,20 @@ export class MemoryComponent implements OnInit {
       finalAddr = iv >>> 2;
     }
     let d = this.memoryService.memory.devices.find(el => el.min_address <= finalAddr && el.max_address >= finalAddr);
-    let arrData = [];
     if(d==null){
       this.dialog.open(ErrorDialogComponent,{
         data: { message: "No memory allocated in this range" }
       })
       return;
     }
+    let arrData = [];
     for (let i = 0; i < 10; i++) {
       let v = d.load(finalAddr + (i * 0x00000001));
       arrData.push(
         {
-          value: v ? v : 0,
+          // nel caso la cella di memoria non contenga alcun valore visualizzo un valore casuale (4294...=2^32 cioè il valore massimo 
+          // rappresentabile con 32 bit) per simulare il fatto che le celle di memoria contengono valori casuali all'inizializzazione
+          value: v ? v : Math.floor(Math.random()*4294967296),  
           address: finalAddr + (i * 0x00000001),
           hexAddress: d.getAddressHex(finalAddr + (i * 0x00000001))
         });
