@@ -1,5 +1,5 @@
 import { animate, group, query, style, transition, trigger } from "@angular/animations";
-import { AfterViewInit, ApplicationRef, Component, EventEmitter, HostListener, Input, OnDestroy, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ApplicationRef, Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { MatDialog } from '@angular/material';
 import { ActivatedRoute } from '@angular/router';
@@ -161,6 +161,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
+    this.storeCode();
     this.doc.on("change", (event) => {
       if (this.running) this.onStop();
       if (this.errorMessage) { this.doc.removeLineClass(this.runnedLine, 'wrap', 'error'); this.errorMessage = undefined; }
@@ -208,7 +209,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     }
     this.runnedLine = this.currentLine;
     this.currentLine++;
-    try {      
+    try { 
       this.codeService.interpreter.run(this.doc.getLine(this.runnedLine), this.registers, this.memoryService.memory);
     } catch (error) {
       this.onStop();
@@ -231,10 +232,12 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
 
   onSave() {
     this.dialog.open(SaveDialogComponent);
+    this.storeCode();
     window.localStorage.setItem('editor_settings', `{"start": "${this.start}", "interval": ${this.interval}}`);
   }
 
   browserSave() {
+    this.storeCode();
     this.codeService.browserSave();
     window.localStorage.setItem('editor_settings', `{"start": "${this.start}", "interval": ${this.interval}}`);
   }
@@ -244,10 +247,23 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     this.codeService.clear();
     this.memoryService.setMemory();
     this.codeService.load();
+    this.storeCode();
   }
 
   onInterrupt() {
     this.codeService.interpreter.interrupt(this.registers);
+  }
+
+  // METODO CHE SALVA IL CODICE IN MEMORIA (nella EPROM)
+  // Pero ogni riga invoca il metodo encode che restituisce la codifica di quella riga di comando
+  
+  storeCode() { 
+    this.codeService.interpreter.parseTags(this.codeService.content, this.start);
+    let lines = this.codeService.content.split("\n");
+    for(let i=0; i<lines.length;i++){
+      this.memoryService.getEprom().store(i,this.codeService.encode(i));
+    }
+
   }
 
   @HostListener('window:beforeunload', ['$event'])

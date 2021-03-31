@@ -151,11 +151,9 @@ export class DLXInterpreter extends Interpreter{
 
     public run(line: string, registers: Registers, memory: Memory): void {
         let [instruction, argsFixed, lineFixed] = this.processLine(line);
-
         let inst = instructions[instruction];
         if(inst) {
             let [opcode, alucode] = encoder[instruction];
-
             (registers as DLXRegisters).ir = parseInt(opcode + inputs_encoder[inst.type](argsFixed) + alucode, 2);
             this.process_instruction[inst.type](lineFixed, instruction, argsFixed, inst.func, registers as DLXRegisters, memory, inst.unsigned);
         }
@@ -166,7 +164,7 @@ export class DLXInterpreter extends Interpreter{
             let [instruction, argsFixed] = this.processLine(line);
             let inst = instructions[instruction];
             let [opcode, alucode] = encoder[instruction];
-            return parseInt(opcode + inputs_encoder[inst.type](argsFixed) + alucode, 2)
+            return parseInt(opcode + inputs_encoder[inst.type](argsFixed) + alucode, 2);
         } catch(error) {
             return 0;
         }

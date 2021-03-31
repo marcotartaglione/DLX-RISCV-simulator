@@ -48,4 +48,8 @@ export class MemoryService {
       return { proto: dev.constructor.name, name: dev.name, min_address: dev.min_address, max_address: dev.max_address };
     })));
   }
+
+  getEprom(): Eprom {
+    return this.memory.get('EPROM') as Eprom;
+  }
 }

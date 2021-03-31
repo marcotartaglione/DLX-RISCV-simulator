@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { Interpreter } from '../interpreters/interpreter';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -11,6 +12,7 @@ export class CodeService {
   public editorMode: string;
 
   constructor(private dialog: MatDialog) {
+    
   }
 
   load() {
@@ -45,7 +47,7 @@ export class CodeService {
       ;
   }
 
-  save(fileName: string) {
+  save(fileName: string) { // saves the code locally on a file 
     window.localStorage.setItem(`code-${this.editorMode}`, this.content);
     var text = this.content;
     var blob = new Blob([text], { type: "text/plain"});
@@ -59,7 +61,7 @@ export class CodeService {
     document.body.removeChild(anchor);
   }
 
-  browserSave(){
+  browserSave(){  // saves the code in browser local storage
     window.localStorage.setItem(`code-${this.editorMode}`, this.content);
   }
 
