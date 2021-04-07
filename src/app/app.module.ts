@@ -27,8 +27,7 @@ import { ImageDialogComponent } from './dialogs/image-dialog.component';
 import { ErrorDialogComponent } from './dialogs/error-dialog.component';
 import { SaveDialogComponent } from './dialogs/save-dialog.component';
 import { MatInputModule } from '@angular/material/input';
-
-
+import { InstructionDialogComponent } from './dialogs/instruction-dialog.component';
 @NgModule({
    declarations: [
       AppComponent,
@@ -45,7 +44,8 @@ import { MatInputModule } from '@angular/material/input';
       ImageDialogComponent,
       AboutPageComponent,
       ErrorDialogComponent,
-      SaveDialogComponent
+      SaveDialogComponent,
+      InstructionDialogComponent
    ],
    imports: [
       BrowserModule,
@@ -70,7 +70,8 @@ import { MatInputModule } from '@angular/material/input';
       ImageDialogComponent,
       LogicalNetworkDialogComponent,
       ErrorDialogComponent,
-      SaveDialogComponent
+      SaveDialogComponent,
+      InstructionDialogComponent
    ],
    providers: [],
    bootstrap: [

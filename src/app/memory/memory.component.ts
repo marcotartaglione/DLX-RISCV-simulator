@@ -11,6 +11,8 @@ import { LedLogicalNetwork } from './model/led.logical-network';
 import { FFDLogicalNetwork } from './model/ffd-logical-network';
 import { ImageDialogComponent } from '../dialogs/image-dialog.component';
 import { ErrorDialogComponent } from '../dialogs/error-dialog.component';
+import { InstructionDialogComponent } from '../dialogs/instruction-dialog.component';
+import { isUndefined } from 'util';
 
 @Component({
   selector: 'app-memory',
@@ -182,29 +184,63 @@ export class MemoryComponent implements OnInit {
     if (iv || iv === 0) {
       finalAddr = iv >>> 2;
     }
-    let d = this.memoryService.memory.devices.find(el => el.min_address <= finalAddr && el.max_address >= finalAddr);
-    if(d==null){
-      this.dialog.open(ErrorDialogComponent,{
+    // Se l'utente clicca sulla EPROM allora il valore salvato in memoria all'indirizzo selezionato
+    // sarà visualizzato byte per byte in binario per permettere una maggiore comprensione di come 
+    // viene salvato in memoria il codice assembler 
+    if(this.selected.name === "EPROM"){
+
+      if(finalAddr < this.memoryService.getEprom().min_address || finalAddr > this.memoryService.getEprom().max_address){
+        this.dialog.open(ErrorDialogComponent,{
+          data: { message: "Address doesn't below to EPROM range" }
+        })
+        return;
+      }
+      let instr = this.memoryService.getEprom().load(finalAddr);
+      let bin=instr.toString(2).padStart(32, '0');
+      let arrData = [] ;
+      //Spezzo il valore a 32 bit in gruppi da un byte e inserisco ciascun byte nell'array 
+      //con il relativo indirizzo associato
+      for (let i=0 ; i<32 ; i+=8) {
+        arrData.push(
+          {
+            instruction : instr.toString(16).toUpperCase() ,
+            value: bin.slice(i,i+8) ,  
+            address: iv + (i/8),
+            hexAddress: this.memoryService.getEprom().getAddressHexInstr(iv + i/8)
+          })
+      }
+
+      this.dialog.open(InstructionDialogComponent, {
+        data: { values: arrData, service: this.memoryService },
+      });
+
+    } else {
+      let d = this.memoryService.memory.devices.find(el => el.min_address <= finalAddr && el.max_address >= finalAddr);
+      if(d==null){
+        this.dialog.open(ErrorDialogComponent,{
         data: { message: "No memory allocated in this range" }
       })
       return;
-    }
-    let arrData = [];
-    for (let i = 0; i < 10; i++) {
-      let v = d.load(finalAddr + (i * 0x00000001));
-      arrData.push(
-        {
-          // nel caso la cella di memoria non contenga alcun valore visualizzo un valore casuale (4294...=2^32 cioè il valore massimo 
-          // rappresentabile con 32 bit) per simulare il fatto che le celle di memoria contengono valori casuali all'inizializzazione
-          value: v ? v : Math.floor(Math.random()*4294967296),  
-          address: finalAddr + (i * 0x00000001),
-          hexAddress: d.getAddressHex(finalAddr + (i * 0x00000001))
-        });
-    }
+      }
+      let arrData = [];
+      for (let i = 0; i < 10; i++) {
+        let v = d.load(finalAddr + (i * 0x00000001));
+        if(isUndefined(v)) v= Math.floor(Math.random()*4294967296);
+        // nel caso la cella di memoria non contenga alcun valore visualizzo un valore casuale 
+        //(4294...=2^32 cioè il valore massimo rappresentabile con 32 bit) per simulare il fatto 
+        // che le celle di memoria contengono valori casuali all'inizializzazione
+        arrData.push(
+          {
+            value: v ,  
+            address: finalAddr + (i * 0x00000001),
+            hexAddress: d.getAddressHex(finalAddr + (i * 0x00000001))
+          });
+      }
 
-    this.dialog.open(MemoryAddressDialogComponent, {
-      data: { values: arrData, service: this.memoryService },
-    });
+      this.dialog.open(MemoryAddressDialogComponent, {
+        data: { values: arrData, service: this.memoryService },
+      });
+    }
   }
 
   isLN(dev: Device) {

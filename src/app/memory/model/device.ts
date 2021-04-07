@@ -113,6 +113,10 @@ export class Device {
     return ((addr << 2) >>> 0).toString(16).toUpperCase().padStart(8, '0');
   }
 
+  public getAddressHexInstr  = (addr) => {
+    return addr.toString(16).toUpperCase().padStart(8, '0');
+  }
+
   public setCS = (name, addr, value) => {
     let val = this.cs.find(el => el.id == name);
     if (val) val.address = addr;

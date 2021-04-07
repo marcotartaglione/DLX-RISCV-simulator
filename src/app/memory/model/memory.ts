@@ -3,7 +3,6 @@ import { Device, IDevice } from './device';
 import { Eprom } from './eprom';
 import { StartLogicalNetwork } from './start.logical-network';
 import { LedLogicalNetwork } from './led.logical-network';
-import { callbackify } from 'util';
 import { FFDLogicalNetwork } from './ffd-logical-network';
 
 export class Memory {

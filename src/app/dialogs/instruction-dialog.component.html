@@ -1,0 +1,14 @@
+<h1 style="width:900px" mat-dialog-title>Memory values</h1>
+<h2 align="center" mat-dialog-title>Instruction : {{ instruction }}</h2>
+<mat-dialog-content width="600px">
+  <mat-grid-list cols="4" rowHeight="150px">
+    <mat-grid-tile *ngFor="let el of data.values">
+      <mat-card><h4>0x{{el.hexAddress}}</h4>
+      <span>{{el.value}}<sub>2</sub></span>
+      </mat-card>
+    </mat-grid-tile>
+  </mat-grid-list>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Ok</button>
+</mat-dialog-actions>

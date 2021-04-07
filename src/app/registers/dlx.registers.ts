@@ -19,7 +19,17 @@ export class DLXRegisters extends Registers {
 
   constructor() {
     super();
-    this.r = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    this.r = [0, Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), 
+      Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296),
+      Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), 
+      Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), 
+      Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), 
+      Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), 
+      Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), 
+      Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), 
+      Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), 
+      Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), 
+      Math.floor(Math.random()*4294967296)];
     this.iar = 0;
     this.mar = 0;
     this.ir = 0;

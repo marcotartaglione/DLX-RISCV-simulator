@@ -21,7 +21,7 @@ export class SaveDialogComponent {
 
   
   onSave(){
-      this.service.save(this.fileName);
+    this.service.save(this.fileName);
   }
 
 }

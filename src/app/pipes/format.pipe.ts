@@ -5,7 +5,7 @@ import {Pipe, PipeTransform} from '@angular/core';
 })
 export class FormatPipe implements PipeTransform {
 
-  transform(n: number, type: 'dec' | 'bin' | 'hex' | 'oct', length: number = 32): any {
+  transform(n: number, type: 'dec' | 'bin' | 'hex' | 'oct' | string, length: number = 32): any {
     switch (type) {
       case 'dec':
         return (n > 268435455 || n<0) ? n >>> 4 : n;
