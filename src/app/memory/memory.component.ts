@@ -195,6 +195,10 @@ export class MemoryComponent implements OnInit {
         })
         return;
       }
+      // per visualizzare sempre il codice a partire sempre da multipli di 4, così da non avere disallineamento tra
+      // indirizzo e codifica istruzione
+      if(iv % 4 !== 0) iv = (Math.floor(iv/4))*4;
+      
       let instr = this.memoryService.getEprom().load(finalAddr);
       let bin=instr.toString(2).padStart(32, '0');
       let arrData = [] ;
