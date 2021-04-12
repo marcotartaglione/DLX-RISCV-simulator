@@ -1,14 +1,22 @@
 <h1 style="width:900px" mat-dialog-title>Memory values</h1>
 <h2 align="center" mat-dialog-title>Instruction : {{ instruction }}</h2>
-<mat-dialog-content width="600px">
-  <mat-grid-list cols="4" rowHeight="150px">
-    <mat-grid-tile *ngFor="let el of data.values">
-      <mat-card><h4>0x{{el.hexAddress}}</h4>
-      <span>{{el.value}}<sub>2</sub></span>
-      </mat-card>
-    </mat-grid-tile>
-  </mat-grid-list>
-</mat-dialog-content>
+    <mat-dialog-content width="1000px">
+          <mat-grid-list cols="4" rowHeight="150px">
+            <mat-grid-tile *ngFor="let el of data.values">
+              <mat-card><h4>0x{{el.hexAddress}}</h4>
+              <span>{{el.value}}<sub>2</sub></span>
+              </mat-card>
+            </mat-grid-tile>
+          </mat-grid-list>
+        <button mat-raised-button style="float: left;"id="pre" (click)="viewPreInstr()" 
+        [disabled]="isPreDisabled()" matTooltip="Previous instruction" matTooltipPosition="right">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <button style="float: right;" mat-raised-button id="next" (click)="viewNextInstr()" 
+        [disabled]="isNextDisabled()" matTooltip="Next instruction" matTooltipPosition="left">
+          <i class="fas fa-arrow-right"></i>
+        </button>
+    </mat-dialog-content>
 <mat-dialog-actions align="end">
     <button mat-button mat-dialog-close>Ok</button>
 </mat-dialog-actions>

@@ -172,14 +172,14 @@ export class MemoryComponent implements OnInit {
   }
 
   readMemoryAddressValues(addr) {
-    let finalAddr;
+    let finalAddr, preFinalAddr, nextFinalAddr;
     if(! addr.startsWith("0x") || addr.length !== 10 || isNaN(addr)) { 
       this.dialog.open(ErrorDialogComponent,{
         data: { message: "Format Error : only 0x format accepted" }
       })
       return;
     }
-
+    
     let iv = parseInt(addr, 16);
     if (iv || iv === 0) {
       finalAddr = iv >>> 2;
@@ -195,7 +195,7 @@ export class MemoryComponent implements OnInit {
         })
         return;
       }
-      // per visualizzare sempre il codice a partire sempre da multipli di 4, così da non avere disallineamento tra
+      // per visualizzare sempre il codice a partire da multipli di 4, così da non avere disallineamento tra
       // indirizzo e codifica istruzione
       if(iv % 4 !== 0) iv = (Math.floor(iv/4))*4;
       
@@ -207,6 +207,7 @@ export class MemoryComponent implements OnInit {
       for (let i=0 ; i<32 ; i+=8) {
         arrData.push(
           {
+            iv: iv,
             instruction : instr.toString(16).toUpperCase() ,
             value: bin.slice(i,i+8) ,  
             address: iv + (i/8),
