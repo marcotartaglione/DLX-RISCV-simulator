@@ -114,7 +114,7 @@ export class Device {
   }
 
   public getAddressHexInstr  = (addr) => {
-    return addr.toString(16).toUpperCase().padStart(8, '0');
+    return (addr >>> 0).toString(16).toUpperCase().padStart(8, '0');
   }
 
   public setCS = (name, addr, value) => {

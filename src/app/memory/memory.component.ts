@@ -171,8 +171,9 @@ export class MemoryComponent implements OnInit {
     return 0;
   }
 
-  readMemoryAddressValues(addr) {
-    let finalAddr, preFinalAddr, nextFinalAddr;
+  readMemoryDetail(addr){
+
+    let finalAddr;
     if(! addr.startsWith("0x") || addr.length !== 10 || isNaN(addr)) { 
       this.dialog.open(ErrorDialogComponent,{
         data: { message: "Format Error : only 0x format accepted" }
@@ -184,42 +185,54 @@ export class MemoryComponent implements OnInit {
     if (iv || iv === 0) {
       finalAddr = iv >>> 2;
     }
-    // Se l'utente clicca sulla EPROM allora il valore salvato in memoria all'indirizzo selezionato
-    // sarà visualizzato byte per byte in binario per permettere una maggiore comprensione di come 
-    // viene salvato in memoria il codice assembler 
-    if(this.selected.name === "EPROM"){
 
-      if(finalAddr < this.memoryService.getEprom().min_address || finalAddr > this.memoryService.getEprom().max_address){
+    let d = this.memoryService.memory.devices.find(el => el.min_address <= finalAddr && el.max_address >= finalAddr);
+      if(d==null){
         this.dialog.open(ErrorDialogComponent,{
-          data: { message: "Address doesn't below to EPROM range" }
+        data: { message: "No memory allocated in this range" }
+      })
+      return;
+      }
+    // per visualizzare sempre il codice a partire da multipli di 4, così da non avere disallineamento tra
+    // indirizzo e codifica 
+    if(iv % 4 !== 0) iv = (Math.floor(iv/4))*4;
+    let instr = d.load(finalAddr);
+    // se la memoria a quell'indirizzo non è ancora stata inizializzata , allora la load restituirà un valore undefined
+    // in tal caso visualizzerò un valore casuale scelto con la riga di codice seguente
+    if(isUndefined(instr)) instr= Math.floor(Math.random()*4294967296); 
+    let bin=instr.toString(2).padStart(32, '0');
+    let arrData = [] ;
+    //Spezzo il valore a 32 bit in gruppi da un byte e inserisco ciascun byte nell'array 
+    //con il relativo indirizzo associato
+    for (let i=0 ; i<32 ; i+=8) {
+      arrData.push(
+        {
+          iv: iv,
+          instruction : instr.toString(16).toUpperCase() ,
+          value: bin.slice(24-i,32-i) ,    // riempio l'array dalla fine per visualizzare in formato Little Endian
+          address: iv + (i/8),
+          hexAddress: d.getAddressHexInstr(iv + i/8)
         })
-        return;
-      }
-      // per visualizzare sempre il codice a partire da multipli di 4, così da non avere disallineamento tra
-      // indirizzo e codifica istruzione
-      if(iv % 4 !== 0) iv = (Math.floor(iv/4))*4;
-      
-      let instr = this.memoryService.getEprom().load(finalAddr);
-      let bin=instr.toString(2).padStart(32, '0');
-      let arrData = [] ;
-      //Spezzo il valore a 32 bit in gruppi da un byte e inserisco ciascun byte nell'array 
-      //con il relativo indirizzo associato
-      for (let i=0 ; i<32 ; i+=8) {
-        arrData.push(
-          {
-            iv: iv,
-            instruction : instr.toString(16).toUpperCase() ,
-            value: bin.slice(i,i+8) ,  
-            address: iv + (i/8),
-            hexAddress: this.memoryService.getEprom().getAddressHexInstr(iv + i/8)
-          })
-      }
+    }
 
-      this.dialog.open(InstructionDialogComponent, {
-        data: { values: arrData, service: this.memoryService },
-      });
+    this.dialog.open(InstructionDialogComponent, {
+      data: { values: arrData, service: this.memoryService },
+    });
+  }
 
-    } else {
+  readMemoryAddressValues(addr) {
+    let finalAddr;
+    if(! addr.startsWith("0x") || addr.length !== 10 || isNaN(addr)) { 
+      this.dialog.open(ErrorDialogComponent,{
+        data: { message: "Format Error : only 0x format accepted" }
+      })
+      return;
+    }
+    
+    let iv = parseInt(addr, 16);
+    if (iv || iv === 0) {
+      finalAddr = iv >>> 2;
+    }
       let d = this.memoryService.memory.devices.find(el => el.min_address <= finalAddr && el.max_address >= finalAddr);
       if(d==null){
         this.dialog.open(ErrorDialogComponent,{
@@ -245,7 +258,7 @@ export class MemoryComponent implements OnInit {
       this.dialog.open(MemoryAddressDialogComponent, {
         data: { values: arrData, service: this.memoryService },
       });
-    }
+    
   }
 
   isLN(dev: Device) {

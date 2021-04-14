@@ -1,7 +1,7 @@
 <div class="btn-container">
   <button *ngIf="selected!=null && selected.cs.length>0" mat-raised-button class="mr"
     (click)="openDialogImage(selected)">
-    <span class="btn">View logic newtwork <i class="fa fa-code-branch"></i></span>
+    <span class="btn">View logic network <i class="fa fa-code-branch"></i></span>
   </button>
   <div class="right">
     <button mat-raised-button class="mr" (click)="openImageInterrupt()">
@@ -86,7 +86,11 @@
         <input matInput [(ngModel)]="inputAddr" minlength="10" maxlength="10" matTooltip="0x format" matTooltipPosition="below" matTooltipClass="device-size"/>
       </mat-form-field>
       <button style="height:50px;position: relative;top: -10px;" mat-raised-button class="standard_margin_hor"
-        (click)="readMemoryAddressValues(inputAddr)">Show</button>
+        [matMenuTriggerFor]="menu"><i class="fas fa-search"></i></button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item (click)="readMemoryAddressValues(inputAddr)">Show</button>
+          <button mat-menu-item (click)="readMemoryDetail(inputAddr)">Show Detail</button>
+        </mat-menu>
     </div>
     <div class="group">
       <mat-form-field id="max" appearance="fill">
