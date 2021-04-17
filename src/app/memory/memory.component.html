@@ -53,8 +53,8 @@
         [disabled]="!canMoveSelectedLeft"><i class="fas fa-caret-left"></i></button>
       <mat-form-field id="min" appearance="fill">
         <mat-label>min</mat-label>
-        <input matInput (change)="onChange($event, 'min')" [(ngModel)]="selected.min_address_hex" minlength="8"
-          maxlength="8" [disabled]="selected.name == 'EPROM'" />
+        <input matInput (change)="onChange($event, 'min')" [(ngModel)]="selected.min_address_hex" minlength="10"
+          maxlength="10" [disabled]="selected.name == 'EPROM'" />
       </mat-form-field>
       <mat-form-field class="standard_margin_hor" id="name" appearance="fill">
         <mat-label>name</mat-label>
@@ -95,8 +95,8 @@
     <div class="group">
       <mat-form-field id="max" appearance="fill">
         <mat-label>max</mat-label>
-        <input matInput (change)="onChange($event, 'max')" [(ngModel)]="selected.max_address_hex" minlength="8"
-          maxlength="8" />
+        <input matInput (change)="onChange($event, 'max')" [(ngModel)]="selected.max_address_hex" minlength="10"
+          maxlength="10" />
       </mat-form-field>
       <button mat-raised-button id="move-right" (click)="moveSelectedRight()" [disabled]="!canMoveSelectedRight"><i
           class="fas fa-caret-right"></i></button>

@@ -28,6 +28,7 @@ import { ErrorDialogComponent } from './dialogs/error-dialog.component';
 import { SaveDialogComponent } from './dialogs/save-dialog.component';
 import { MatInputModule } from '@angular/material/input';
 import { InstructionDialogComponent } from './dialogs/instruction-dialog.component';
+import { FormatBytePipe } from './pipes/formatByte.pipe';
 @NgModule({
    declarations: [
       AppComponent,
@@ -45,7 +46,8 @@ import { InstructionDialogComponent } from './dialogs/instruction-dialog.compone
       AboutPageComponent,
       ErrorDialogComponent,
       SaveDialogComponent,
-      InstructionDialogComponent
+      InstructionDialogComponent,
+      FormatBytePipe
    ],
    imports: [
       BrowserModule,

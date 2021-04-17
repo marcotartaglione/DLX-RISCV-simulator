@@ -4,19 +4,25 @@
           <mat-grid-list cols="4" rowHeight="150px">
             <mat-grid-tile *ngFor="let el of data.values">
               <mat-card><h4>0x{{el.hexAddress}}</h4>
-              <span>{{el.value}}<sub>2</sub></span>
+              <span>{{el.value | formatByte: fType}}<sub *ngIf="fType=='bin'">2</sub></span>
               </mat-card>
             </mat-grid-tile>
           </mat-grid-list>
         <button mat-raised-button style="float: left;"id="pre" (click)="viewPreInstr()" 
-        [disabled]="isPreDisabled()" matTooltip="Previous instruction" matTooltipPosition="right">
+        [disabled]="isPreDisabled()" matTooltip="Previous addresses" matTooltipPosition="right">
           <i class="fas fa-arrow-left"></i>
         </button>
         <button style="float: right;" mat-raised-button id="next" (click)="viewNextInstr()" 
-        [disabled]="isNextDisabled()" matTooltip="Next instruction" matTooltipPosition="left">
+        [disabled]="isNextDisabled()" matTooltip="Next addresses" matTooltipPosition="left">
           <i class="fas fa-arrow-right"></i>
         </button>
     </mat-dialog-content>
+    <br>
+    <mat-button-toggle-group id="fType" name="fType" [(ngModel)]="fType">
+      <mat-button-toggle value="bin" style="width: 50%;margin:10px">Binary</mat-button-toggle>
+      <mat-button-toggle value="hex" style="width: 50%;margin:10px">Hexadecimal</mat-button-toggle>
+      <mat-button-toggle value="dec" style="width: 50%;margin:10px">Decimal</mat-button-toggle>
+    </mat-button-toggle-group>
 <mat-dialog-actions align="end">
     <button mat-button mat-dialog-close>Ok</button>
 </mat-dialog-actions>

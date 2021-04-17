@@ -1,4 +1,6 @@
 import { Injector } from '@angular/core';
+import { MatDialog } from '@angular/material';
+import { ErrorDialogComponent } from 'src/app/dialogs/error-dialog.component';
 
 export interface IDevice {
   new(min_address: number, max_address: number, injector: Injector): Device;
@@ -11,9 +13,10 @@ export class Device {
   max_address: number;
   cs: Array<{ id: string, address: number, hexAddress: string }>;
   devType: string;
+  dialog : MatDialog;
 
   public get min_address_hex(): string {
-    return ((this.min_address << 2) >>> 0).toString(16).toUpperCase().padStart(8, '0');
+    return "0x"+((this.min_address << 2) >>> 0).toString(16).toUpperCase().padStart(8, '0');
   }
 
   getCsValue(csId) {
@@ -32,7 +35,7 @@ export class Device {
 
   public set min_address_hex(v: string) {
     let last_min_address = this.min_address;
-    if (v.length == 8) {
+    if (v.length == 10) {
       let iv = parseInt(v, 16);
       if (iv || iv === 0) {
         this.min_address = iv >>> 2;
@@ -44,14 +47,14 @@ export class Device {
 
   public get max_address_hex(): string {
     if (this.max_address.toString(16).substring(4, 8) == "ffff" || this.max_address.toString(16).substring(4, 8) == "fff")
-      return ((this.max_address << 2) + 3 >>> 0).toString(16).toUpperCase().padStart(8, '0');
+      return "0x"+((this.max_address << 2) + 3 >>> 0).toString(16).toUpperCase().padStart(8, '0');
     else
       return ((this.max_address << 2) >>> 0).toString(16).toUpperCase().padStart(8, '0');
   }
 
   public set max_address_hex(v: string) {
     let last_max_address = this.max_address;
-    if (v.length == 8) {
+    if (v.length == 10) {
       let iv = parseInt(v, 16);
       if (iv || iv === 0) {
         this.max_address = iv >>> 2;
