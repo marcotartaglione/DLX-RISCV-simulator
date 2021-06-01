@@ -76,6 +76,11 @@ export class InstructionDialogComponent {
           })
       }
       
+      // Inverto l'array per visualizzare gli indirizzi dal più significativo
+      // al meno significativo
+
+      arrData.reverse();
+
       this.dialog.open(InstructionDialogComponent, {
         data: { values: arrData, service: this.service },
       });
@@ -115,6 +120,11 @@ export class InstructionDialogComponent {
           })
       }
 
+      // Inverto l'array per visualizzare gli indirizzi dal più significativo
+      // al meno significativo
+
+      arrData.reverse();
+      
       this.dialog.open(InstructionDialogComponent, {
         data: { values: arrData, service: this.service },
       });

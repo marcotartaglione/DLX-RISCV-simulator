@@ -2,6 +2,7 @@ import { Injectable, Injector } from '@angular/core';
 import { Device, IDevice } from '../memory/model/device';
 import { Eprom } from '../memory/model/eprom';
 import { LedLogicalNetwork } from '../memory/model/led.logical-network';
+import { Counter } from '../memory/model/counter';
 import { Memory } from '../memory/model/memory';
 import { StartLogicalNetwork } from '../memory/model/start.logical-network';
 
@@ -28,6 +29,7 @@ export class MemoryService {
       this.memory.add('RAM_A', 0x10000000, 0x1FFFFFFF);
       this.memory.add(StartLogicalNetwork, 0x30000000, 0x30000003, this.injector);
       this.memory.add(LedLogicalNetwork, 0x24000000, 0x24000003, this.injector);
+      this.memory.add(Counter, 0x29000000, 0x29000005, this.injector);
       this.memory.add('RAM_B', 0x38000000, 0x3FFFFFFF);
     }
   }
@@ -51,5 +53,10 @@ export class MemoryService {
 
   getEprom(): Eprom {
     return this.memory.get('EPROM') as Eprom;
+  }
+
+  getCounter(): Counter {
+    console.log("name "+this.memory.get('COUNTER').name)
+    return this.memory.get('COUNTER') as Counter;
   }
 }

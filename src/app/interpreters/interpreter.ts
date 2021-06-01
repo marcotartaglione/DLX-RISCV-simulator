@@ -6,7 +6,6 @@ export abstract class Interpreter {
 
     //dizionario tag -> numero riga
     protected tags: {[key: string]: number} = {};
-
     abstract run(line: string, registers: Registers, memory: Memory): void;
 
     abstract encode(line: string): number;
@@ -26,5 +25,4 @@ export abstract class Interpreter {
     getTag(name: string): number {
         return this.tags[name];
     }
-
 }

@@ -1,6 +1,6 @@
 <h1 style="width:900px" mat-dialog-title>Memory values</h1>
 <mat-dialog-content width="600px">
-  <mat-grid-list cols="5" rowHeight="150px">
+  <mat-grid-list cols="4" rowHeight="150px">
     <mat-grid-tile *ngFor="let el of data.values">
       <mat-card><h4>0x{{el.hexAddress}}</h4>
       <input matInput (input)="onInputChange($event.target.value,el)" value="{{el.value | format:fType}}" minlength="0" maxlength="10" />

@@ -18,7 +18,7 @@ import { MaterialModule } from './material.module';
 import { MemoryComponent } from './memory/memory.component';
 import { FormatPipe } from './pipes/format.pipe';
 import { RegistersComponent } from './registers/registers.component';
-import { MatSelectModule, MatIconModule } from '@angular/material';
+import { MatSelectModule, MatIconModule, MatFormFieldModule } from '@angular/material';
 import { LogicalNetworkDialogComponent } from './dialogs/logical-network-dialog.component';
 import { MatMenuModule } from '@angular/material/menu';
 import { MemoryAddressDialogComponent } from './dialogs/memory-address-dialog.component';
@@ -29,6 +29,8 @@ import { SaveDialogComponent } from './dialogs/save-dialog.component';
 import { MatInputModule } from '@angular/material/input';
 import { InstructionDialogComponent } from './dialogs/instruction-dialog.component';
 import { FormatBytePipe } from './pipes/formatByte.pipe';
+import { CounterDialogComponent } from './dialogs/counter-dialog.component'
+
 @NgModule({
    declarations: [
       AppComponent,
@@ -47,7 +49,8 @@ import { FormatBytePipe } from './pipes/formatByte.pipe';
       ErrorDialogComponent,
       SaveDialogComponent,
       InstructionDialogComponent,
-      FormatBytePipe
+      FormatBytePipe,
+      CounterDialogComponent
    ],
    imports: [
       BrowserModule,
@@ -63,7 +66,8 @@ import { FormatBytePipe } from './pipes/formatByte.pipe';
       MatSelectModule,
       MatIconModule,
       MatGridListModule,
-      MatInputModule
+      MatInputModule,
+      MatFormFieldModule
    ],
    entryComponents: [
       MessageDialogComponent,
@@ -73,7 +77,8 @@ import { FormatBytePipe } from './pipes/formatByte.pipe';
       LogicalNetworkDialogComponent,
       ErrorDialogComponent,
       SaveDialogComponent,
-      InstructionDialogComponent
+      InstructionDialogComponent,
+      CounterDialogComponent
    ],
    providers: [],
    bootstrap: [

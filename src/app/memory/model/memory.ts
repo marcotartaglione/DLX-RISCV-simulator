@@ -4,6 +4,7 @@ import { Eprom } from './eprom';
 import { StartLogicalNetwork } from './start.logical-network';
 import { LedLogicalNetwork } from './led.logical-network';
 import { FFDLogicalNetwork } from './ffd-logical-network';
+import { Counter } from './counter';
 
 export class Memory {
   devices: Device[] = [];
@@ -36,6 +37,10 @@ export class Memory {
             case FFDLogicalNetwork.name:
               this.add(FFDLogicalNetwork, el.min_address, el.max_address, injector);
               break;
+            
+            case Counter.name :
+              this.add(Counter, el.min_address, el.max_address, injector);
+              break;
   
           default:
             this.add(el.name, el.min_address, el.max_address);
@@ -64,10 +69,10 @@ export class Memory {
     this.devices = this.devices.filter(device => device != dev);
   }
 
-  public load(address: number): number {
+  public load(address: number, instrType?: string): number {
     let device = this.devices.find(dev => dev.checkAddress(address));
     if (device) {
-      let res = device.load(address);
+      let res = device.load(address,instrType);
       return res;
     } else {
       throw new Error('Device not found');

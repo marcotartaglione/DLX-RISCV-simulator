@@ -3,6 +3,7 @@
     (click)="openDialogImage(selected)">
     <span class="btn">View logic network <i class="fa fa-code-branch"></i></span>
   </button>
+  
   <div class="right">
     <button mat-raised-button class="mr" (click)="openImageInterrupt()">
       <span class="btn">View interrupt network <i class="fa fa-bolt"></i></span>
@@ -20,6 +21,11 @@
         <img *ngIf="device.isAStartNetwork()" class=" icon_absolute" width="70px"
           [style.left]="((device.min_address/1073741824)*100 -3.5).toFixed(2)+'%'"
           src="{{device.getCsValue('CS_READ_STARTUP') ? 'assets/img/led_on.png':'assets/img/led_off.png'}}" 
+          (click)="selected == device ? selected = null : selected = device" [class.selected]="selected == device"
+          [matTooltip]="device.name +' '+(device.ffd?'1':'0')" matTooltipPosition="above" matTooltipClass="device-size"/>
+        <img *ngIf="device.isACounter()" class=" icon_absolute" width="70px"
+          [style.left]="((device.min_address/1073741824)*100 -3.5).toFixed(2)+'%'"
+          src="assets/img/counter/counter.png" 
           (click)="selected == device ? selected = null : selected = device" [class.selected]="selected == device"
           [matTooltip]="device.name +' '+(device.ffd?'1':'0')" matTooltipPosition="above" matTooltipClass="device-size"/>
       <!-- <mat-icon *ngIf="device.isALedNetwork()" 
@@ -52,17 +58,16 @@
       <button class="standard_margin_hor" mat-raised-button id="move-left" (click)="moveSelectedLeft()"
         [disabled]="!canMoveSelectedLeft"><i class="fas fa-caret-left"></i></button>
       <mat-form-field id="min" appearance="fill">
-        <mat-label>min</mat-label>
+        <mat-label>Min</mat-label>
         <input matInput (change)="onChange($event, 'min')" [(ngModel)]="selected.min_address_hex" minlength="10"
-          maxlength="10" [disabled]="selected.name == 'EPROM'" />
+          maxlength="10" [disabled]="selected.name == 'EPROM'"/>
       </mat-form-field>
       <mat-form-field class="standard_margin_hor" id="name" appearance="fill">
-        <mat-label>name</mat-label>
+        <mat-label>Name</mat-label>
         <input matInput (change)="onChange($event, 'name')" [(ngModel)]="selected.name"
           [disabled]="selected.name == 'EPROM'" />
       </mat-form-field>
     </div>
-    
     <div class="group" *ngIf="selected.cs.length > 0">
       <mat-form-field appearance="fill">
         <mat-label>Chip-Select</mat-label>
@@ -94,7 +99,7 @@
     </div>
     <div class="group">
       <mat-form-field id="max" appearance="fill">
-        <mat-label>max</mat-label>
+        <mat-label>Max</mat-label>
         <input matInput (change)="onChange($event, 'max')" [(ngModel)]="selected.max_address_hex" minlength="10"
           maxlength="10" />
       </mat-form-field>
@@ -116,4 +121,8 @@
   <button mat-menu-item (click)="onAddLed()">
     <span>Led network</span>
   </button>
+  <button mat-menu-item (click)="onAddCounter()">
+    <span>Counter</span>
+  </button>
+
 </mat-menu>

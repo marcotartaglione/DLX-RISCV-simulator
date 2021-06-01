@@ -18,6 +18,32 @@ export function signExtend(n: number, dim: (8|16|26) = 16) {
     return parseInt(bin.padStart(32, bin.charAt(0)), 2);
 }
 
+// per convertire numero intero unsigned in signed. Dato che parseInt(10) non mi permette di specificare se il 
+// valore lo voglio convertire come signed o unssigned 
+
+export function uintToInt(uint, nbit) {
+    if (nbit > 32) throw new RangeError('uintToInt only supports ints up to 32 bits');
+    let bin = uint.toString(2);
+    
+    // se il numero non è della lunghezza di nbit significa che prima aveva degli zeri che toString nel convertire
+    // da per scontato e non visualizza. Riempo la stringa di zeri cosicchè il controllo successivo non dia risultati
+    // sbagliati. Do per scontato che prima di signExtend venga fatta la signExtend e quindi se il numero fosse con segno
+    // la lunghezza sarebbe corretta perche ho riempito in precedenza di uni.
+    
+    if(bin.length != nbit) {   
+        bin = bin.padStart(nbit, '0');
+    }
+    console.log(bin);
+    
+    // se il numero è signed converto nel numero decimale corrispondente. 
+    
+    if(bin.charAt(0) === "1" ) {
+        uint = uint - Math.pow(2,nbit-1)*2
+    }
+    return uint ;
+}
+
+
 const mask = {
     byte: [
         0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000
@@ -30,7 +56,7 @@ const mask = {
 function load(n: number, offset: number, dim: ('byte'|'halfword')) {
     if (n == 0) return 0;
     if (dim === 'halfword' && offset % 2 != 0) throw new Error('fault');
-    return n & mask[dim][offset % 4];
+    return (n & mask[dim][offset % 4]) >>> (offset % 4)*8 ;
 }
 
 function store(n: number, dest: number, offset: number, dim: ('byte'|'halfword')) {

@@ -13,6 +13,8 @@ import { ImageDialogComponent } from '../dialogs/image-dialog.component';
 import { ErrorDialogComponent } from '../dialogs/error-dialog.component';
 import { InstructionDialogComponent } from '../dialogs/instruction-dialog.component';
 import { isUndefined } from 'util';
+import { Counter } from './model/counter';
+import { CounterDialogComponent } from '../dialogs/counter-dialog.component';
 
 @Component({
   selector: 'app-memory',
@@ -36,6 +38,7 @@ export class MemoryComponent implements OnInit {
   selectedCS: { id: string, address: number, hexAddress: string }
   selected: Device;
   @Input() memoryService: MemoryService;
+  @Input() counter: Counter;
 
   get canMoveSelectedLeft(): boolean {
     let devices = this.memoryService.memory.devices;
@@ -58,9 +61,15 @@ export class MemoryComponent implements OnInit {
   }
 
   openDialogImage(n) {
-    this.dialog.open(LogicalNetworkDialogComponent, {
-      data: { network: n}
-    });
+    if(this.selected.isACounter()){
+      this.dialog.open(CounterDialogComponent, {
+        data: { network: n as Counter}
+      });
+    } else {
+      this.dialog.open(LogicalNetworkDialogComponent, {
+        data: { network: n}
+      });
+  }
   }
 
   onAdd() {
@@ -78,6 +87,12 @@ export class MemoryComponent implements OnInit {
   onAddLed() {
     let firstAdd = this.memoryService.memory.firstFreeAddr(0x20000000) + 1;
     this.memoryService.add(LedLogicalNetwork, firstAdd, firstAdd + 0x0000000C);
+    this.memoryService.save();
+  }
+
+  onAddCounter() {
+    let firstAdd = this.memoryService.memory.firstFreeAddr(0x20000000) + 1;
+    this.memoryService.add(Counter, firstAdd, firstAdd + 0x00000014);
     this.memoryService.save();
   }
 
@@ -230,6 +245,10 @@ export class MemoryComponent implements OnInit {
         })
     }
 
+    // Rovescio l'array per visualizzare a partire dall'indirizzo più
+    // significativo a quello meno significativo
+
+    arrData.reverse();
     this.dialog.open(InstructionDialogComponent, {
       data: { values: arrData, service: this.memoryService },
     });
@@ -256,7 +275,7 @@ export class MemoryComponent implements OnInit {
       return;
       }
       let arrData = [];
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 8; i++) {
         let v = d.load(finalAddr + (i * 0x00000001));
         if(isUndefined(v)) v= Math.floor(Math.random()*4294967296);
         // nel caso la cella di memoria non contenga alcun valore visualizzo un valore casuale 
@@ -269,6 +288,10 @@ export class MemoryComponent implements OnInit {
             hexAddress: d.getAddressHex(finalAddr + (i * 0x00000001))
           });
       }
+
+      // Rovescio l'array per visualizzare a partire dall'indirizzo più
+      // significativo a quello meno significativo
+      arrData.reverse();
 
       this.dialog.open(MemoryAddressDialogComponent, {
         data: { values: arrData, service: this.memoryService },

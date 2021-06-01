@@ -1,0 +1,81 @@
+<div mat-dialog-content>
+    <div>
+        <div style="display:inline-block;">
+            <img style="background-color:white ; display: block; margin:0 auto;" src="{{data.network.getImageNameNetwork()}}" width="450px" height="260px" />
+        </div>
+        <div style="display:inline-block;">
+            <img style="background-color:white ; display: block; margin:0 auto;" src="{{data.network.getImageName()}}" width="450px" height="260px"/>
+        </div>
+    </div>
+    <div>
+        <mat-form-field appearance="outline">
+            <mat-label>Current Value</mat-label>
+            <input matInput type="text" name="currentVal" [value]="data.network.currentValue" readonly>
+        </mat-form-field>
+        <div style="display:inline-block; margin:10px;" >
+            <mat-form-field appearance="outline">
+                <mat-label>N bit</mat-label>
+                <input matInput (change)="onChange()" [(ngModel)]="this.data.network.counting_basis" >
+            </mat-form-field>
+        </div>
+        <div style="display:inline-block; margin:10px;">
+            <mat-form-field appearance="outline">
+                <mat-label>Load Value</mat-label>
+                <input matInput [(ngModel)]="this.data.network.loadValue" >
+            </mat-form-field>
+        </div>
+        <div style="display:inline-block; margin:10px;" *ngIf="data.network.clkType">    
+            <mat-form-field appearance="fill">
+                <mat-label>Clock Type</mat-label>
+                <mat-select [(value)]="data.network.clkType">
+                    <mat-option value="MEMWR*">MEMWR*</mat-option>
+                    <mat-option value="MEMRD*">MEMRD*</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+    <div>
+    <div style="float: left;">
+        <div style="display:inline-block; margin:10px;" *ngIf="data.network.a_reset_value">    
+            <mat-form-field appearance="outline">
+                <mat-label>A_RES FFD</mat-label>
+                <mat-select [(value)]="data.network.a_res_value_ffd"> <!--  [disabled]="data.isReadOnly" -->
+                    <mat-option value="RESET" *ngIf="this.data.network.a_set_value_ffd!=='RESET'">RESET</mat-option>
+                    <mat-option value="0">0</mat-option>
+                </mat-select>
+            </mat-form-field>
+            &nbsp;
+            <mat-form-field appearance="outline">
+                <mat-label>A_SET FFD</mat-label>
+                <mat-select [(value)]="data.network.a_set_value_ffd"> <!--  [disabled]="data.isReadOnly" -->
+                    <mat-option value="RESET" *ngIf="this.data.network.a_res_value_ffd!=='RESET'">RESET</mat-option>
+                    <mat-option value="0">0</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+    <div style="float: right;">
+        <div style="display:inline-block; margin:10px;" *ngIf="data.network.a_reset_value">    
+            <mat-form-field appearance="outline">
+                <mat-label>A_RES</mat-label>
+                <mat-select [(value)]="data.network.a_reset_value"> <!--  [disabled]="data.isReadOnly" -->
+                    <mat-option value="CS_A_RES_COUNTER">CS_A_RES_COUNTER</mat-option>
+                    <mat-option value="RESET">RESET</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+    </div>
+    <br /> <br /><br /> <br /><br /> <br /> 
+    <div *ngIf="data.network.cs.length > 0">
+        <b>Chip-Select</b><br />
+        <span *ngFor="let cs of data.network.cs">
+            {{cs.id}} - {{cs.hexAddress}}<br />
+        </span>
+    </div>
+    <br />
+
+</div>
+<div mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close (click)="onSubmit()">Ok</button>
+</div>
