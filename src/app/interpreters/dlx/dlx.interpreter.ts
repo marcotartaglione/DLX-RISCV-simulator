@@ -71,7 +71,7 @@ export class DLXInterpreter extends Interpreter{
                 // converto in decimale con segno
                 
                 name = uintToInt(name,32);
-                registers.temp = registers.pc + 4 + name ;
+                registers.temp = registers.pc + name ;
                 func(registers);
             }
         },
@@ -111,11 +111,9 @@ export class DLXInterpreter extends Interpreter{
                 if (unsigned) { 
                     registers.temp = registers.pc + 4 + name ;
                 } else {
-                    console.log("name "+name.toString(16));
                     name = signExtend(name,26);
                     name = uintToInt(name,32);
-                    console.log("name "+name);
-                    registers.temp = registers.pc + 4 + name ;
+                    registers.temp = registers.pc + name ;
                 }
             func(registers);
             }
@@ -181,11 +179,15 @@ export class DLXInterpreter extends Interpreter{
                 } else if (specialRegisters.includes(arg.toUpperCase())) {
                     return specialRegisters.indexOf(arg.toUpperCase()) + 1;
                 } else if (arg.match(/^0x([0-9A-F]{4})/i)) {
-                    if(arg.length==9)  // nel caso di jump in cui ho immediato a 26 bit
+                    if (['J'].includes(instructions[instruction].type) && arg.length == 9) // nel caso di jump in cui ho immediato a 26 bit
                         return parseInt(arg.substring(2,9),16);  // prendo 7 byte
-                    else
+                    else if(['J'].includes(instructions[instruction].type) && arg.length!=9)
+                        throw new Error(instruction + " has 26 bit immediate")
+                    else if (arg.length == 6)
                         return parseInt(arg.substr(2, 4), 16);  // prendo 4 byte
-                } else if (this.tags[arg]) {
+                    else 
+                        throw new Error(instruction + " has 16 bit immediate");
+                } else if (this.tags[arg]>=0) {
                     tagged=true;  // si utilizza un tag
                     return this.tags[arg];
                 } else if (arg) 
