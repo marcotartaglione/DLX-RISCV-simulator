@@ -3,7 +3,7 @@ import { Instruction, InstructionType } from './dlx.instructions';
 export const inputs_encoder: {[key in InstructionType]: (args: number[]) => string} = {
     R: ([rd, rs1, rs2]) => rs1.toString(2).padStart(5, '0') + rs2.toString(2).padStart(5, '0') + rd.toString(2).padStart(5, '0') + '00000',
     RM: ([rd, rs1]) => inputs_encoder['R']([rd, rs1, 0]),
-    I: ([rd, rs1, immediate]) => rs1.toString(2).padStart(5, '0') + rd.toString(2).padStart(5, '0') + immediate.toString(2).padStart(16, '0'),
+    I: ([rd, rs1, immediate]) =>  rd.toString(2).padStart(5, '0')+ rs1.toString(2).padStart(5, '0')  + immediate.toString(2).padStart(16, '0'),
     IB: ([rs1, name]) => inputs_encoder['I']([0, rs1, name]),
     IJ: ([rs1]) => inputs_encoder['I']([rs1, 0, 0]),
     IL: ([rd, offset, rs1]) => inputs_encoder['I']([rd, rs1, offset]),
