@@ -41,8 +41,8 @@ export class Counter extends LogicalNetwork {
   // metodo che restituisce immagine contatore
 
   public getImageName() {
-    
-    return ("assets/img/counter/count/count_"+this.clkType+"_"+this.a_reset_value+".png").toLowerCase();
+    const clk = this.clkType == "MEMWR*" ? 'memwr' : 'memrd';
+    return ("assets/img/counter/count/count_"+clk+"_"+this.a_reset_value+".png").toLowerCase();
     
   }
 
