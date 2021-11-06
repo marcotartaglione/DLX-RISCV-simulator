@@ -195,7 +195,7 @@ export class MemoryComponent implements OnInit {
     // controllo che in input siano inseriti degli indirizzi in formato esadecimale che inizino per 0x altrimenti
     // si aprirà una finestra d'errore
     
-    if(! addr.startsWith("0x") || addr.length !== 10 || isNaN(addr)) { 
+    if((! addr.startsWith("0x") && ! addr.startsWith("0X")) || addr.length !== 10 || isNaN(addr)) { 
       this.dialog.open(ErrorDialogComponent,{
         data: { message: "Format Error : only hexadecimal value starting with 0x" }
       })
@@ -256,7 +256,7 @@ export class MemoryComponent implements OnInit {
 
   readMemoryAddressValues(addr) {
     let finalAddr;
-    if(! addr.startsWith("0x") || addr.length !== 10 || isNaN(addr)) { 
+    if((! addr.startsWith("0x") && ! addr.startsWith("0X")) || addr.length !== 10 || isNaN(addr)) { 
       this.dialog.open(ErrorDialogComponent,{
         data: { message: "Format Error : only hexadecimal value starting with 0x" }
       })
