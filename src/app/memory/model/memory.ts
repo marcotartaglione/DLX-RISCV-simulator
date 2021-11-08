@@ -5,6 +5,7 @@ import { StartLogicalNetwork } from './start.logical-network';
 import { LedLogicalNetwork } from './led.logical-network';
 import { FFDLogicalNetwork } from './ffd-logical-network';
 import { Counter } from './counter';
+import { isUndefined } from 'util';
 
 export class Memory {
   devices: Device[] = [];
@@ -73,6 +74,12 @@ export class Memory {
     let device = this.devices.find(dev => dev.checkAddress(address));
     if (device) {
       let res = device.load(address,instrType);
+      if (isUndefined(res)) {
+        // Se non è stato ancora inizializzata quella cella di memoria la inizializzo con un valore
+        // casuale e salvo quel valore in quella cella di memoria
+        res = Math.floor(Math.random()*4294967296)
+        device.store(address,res)
+      }
       return res;
     } else {
       throw new Error('Device not found');

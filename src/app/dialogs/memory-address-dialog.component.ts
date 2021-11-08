@@ -12,14 +12,13 @@ export class MemoryAddressDialogComponent {
   }
 
   onInputChange = (val,el) => {
-    //if("hex"==this.fType && (val.length!=8 || val.includes("0x")) && val.length != 10) return;
-    //let formattedVal = val;
-    /*if(val.includes("0x")) 
+    if("hex"==this.fType && (val.length!=8 || val.includes("0x")) && val.length != 10) return;
+    let formattedVal = val;
+    /*f(val.includes("0x")) 
       formattedVal = parseInt(val);
     else if("hex" == this.fType && val.length==8) 
       formattedVal = parseInt("0x".concat(val));*/
-     
-    let formattedVal = parseInt(val);
+     formattedVal = parseInt(val);
     this.data.values.find(x => x.address == el.address).value = formattedVal;
   }
 
