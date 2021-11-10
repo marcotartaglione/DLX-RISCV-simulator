@@ -218,7 +218,8 @@ export class DLXInterpreter extends Interpreter{
             let [instruction, argsFixed] = this.processLine(line);
             let inst = instructions[instruction];
             let [opcode, alucode] = encoder[instruction];
-            return parseInt(opcode + inputs_encoder[inst.type](argsFixed) + alucode, 2);
+            //NB: inverto ordine dei bit dell'opcode da -sig->+sig a +sig->-sig ; come vengono salvati i valori convertiti in binario
+            return parseInt(this.revString(opcode) + inputs_encoder[inst.type](argsFixed) + alucode, 2);
         } catch(error) {
             return 0;
         }
@@ -235,4 +236,11 @@ export class DLXInterpreter extends Interpreter{
         
         }
     }
+
+    /* 
+    Funzione di utilità utilizzata per invertire l'ordine dei bit nell'opcode.
+    */
+    public revString(str: string) {
+        return str.split("").reverse().join("");
+      }
 }
