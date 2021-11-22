@@ -18,23 +18,39 @@ export function signExtend(n: number, dim: (8|16|26) = 16) {
     return parseInt(bin.padStart(32, bin.charAt(0)), 2);
 }
 
-// per convertire numero intero unsigned in signed. Dato che parseInt(10) non mi permette di specificare se il 
-// valore lo voglio convertire come signed o unssigned 
+// uintToInt(n: number,  dim: (8|16|26) = 16, nbit: number)
+//
+// Metodo che effettua la conversione del segno restituendo un numero decimale postivo o negativo. 
+// è necessario dato che parseInt(10) non mi permette di specificare se il  valore lo voglio convertire 
+// come signed o unsigned, ma mi convertirà sempre la stringa interpretandola come unsigned. Quindi tutti
+// i numeri restituiti saranno positivi e nel caso di numeri con segno verrebbe restituito un valore decimale errato.
+//
+// Parametri:
+// - n : numero in decimale che voglio convertire
+// - dim : dimensione in bit del numero che voglio convertire (specifico se si tratta di un byte, una halfword o una word)
+// - nbit : dimensione in bit del valore trasformato con segno che voglio ottenere (solitamente è 32)
+//
+// Esempio:
+// 4 decimale trasformato in binario diventerà 100. Se lo volessi estendere con segno a 8 bit otterrò il numero
+// binario 11111100. Facendo la parseInt(10) di ques'ultimo numero binario otterrei 251 cioè il numero binario 
+// interpretato come unsigned. Invocando invece uintToInt() si otterrà invece -4
+// Effettua al suo interno già la conversione del segno
 
-export function uintToInt(uint, nbit) {
-    if (nbit > 32) throw new RangeError('uintToInt only supports ints up to 32 bits');
+export function uintToInt(n: number,  dim: (8|16|26) = 16, nbit: number) {
+
+    // Per prima cosa effettuo l'estensione del segno
+    
+    let uint=signExtend(n,dim)
+
+    if (nbit > 32) throw new Error('uintToInt only supports ints up to 32 bits');
     let bin = uint.toString(2);
     
     // se il numero non è della lunghezza di nbit significa che prima aveva degli zeri che toString nel convertire
     // da per scontato e non visualizza. Riempo la stringa di zeri cosicchè il controllo successivo non dia risultati
-    // sbagliati. Do per scontato che prima di signExtend venga fatta la signExtend e quindi se il numero fosse con segno
-    // la lunghezza sarebbe corretta perche ho riempito in precedenza di uni.
-    
+    // sbagliati.
     if(bin.length != nbit) {   
         bin = bin.padStart(nbit, '0');
     }
-    console.log(bin);
-    
     // se il numero è signed converto nel numero decimale corrispondente. 
     
     if(bin.charAt(0) === "1" ) {

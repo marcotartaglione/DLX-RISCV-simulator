@@ -35,7 +35,7 @@ export class DLXInterpreter extends Interpreter{
             if (!(/\w+\s+R[123]?\d\s*,\s*R[123]?\d\s*,\s*0x([0-9A-F]{4})/i.test(line))) throw new WrongArgumentsError(instruction, DLXDocumentation);
             registers.a = registers.r[rs1];
             registers.b = registers.r[rd];
-            registers.temp = unsigned ? immediate : signExtend(immediate);
+            registers.temp = unsigned ? immediate : uintToInt(immediate,16,32);
             try {
                 func(registers);
             } catch(e) {
@@ -64,13 +64,10 @@ export class DLXInterpreter extends Interpreter{
             {
                 registers.a = registers.r[rs1];
                 
-                // effettuo estensione del segno
-                
-                name = signExtend(name,16);
-                
                 // converto in decimale con segno
+                // dentro la uintToInt è già effettuata la conversione del segno
                 
-                name = uintToInt(name,32);
+                name = uintToInt(name,16,32);
                 registers.temp = registers.pc + name ;
                 func(registers);
             }
@@ -111,8 +108,7 @@ export class DLXInterpreter extends Interpreter{
                 if (unsigned) { 
                     registers.temp = registers.pc + 4 + name ;
                 } else {
-                    name = signExtend(name,26);
-                    name = uintToInt(name,32);
+                    name = uintToInt(name,26,32);
                     registers.temp = registers.pc + name ;
                 }
             func(registers);

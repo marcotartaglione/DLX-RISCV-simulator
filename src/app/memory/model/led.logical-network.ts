@@ -17,7 +17,7 @@ export class LedLogicalNetwork extends LogicalNetwork {
     this.a_set_value = "RESET";
     this.a_reset_value = "0";
     this.led=false;
-    this.setCS("CS_READ_LED", this.min_address, this.led);
+    this.setCS("CS_READ_LED", this.min_address, this.led ? 1 : 0);
     this.setCS("CS_SWITCH_LED", this.min_address + 0x00000001, 1);
     this.setCS("CS_A_RES_LED", this.min_address + 0x00000002, 0);
     this.setCS("CS_A_SET_LED", this.min_address + 0x00000003, 0);
@@ -48,11 +48,16 @@ export class LedLogicalNetwork extends LogicalNetwork {
     this.setCS("CS_READ_LED", this.min_address, this.led);
   }
 
-  public load(address: number): number {
+  public load(address: number,instrType?: string): number {
     let cs = this.cs.find(el => el.address == address);
     if (this.clkType == "MEMRD*")
       this.clk();
-    if (cs == null) return super.load(address);
+    
+    // se l'istruzione è del tipo IS ritorno il valore salvato in quella cella di memoria perchè significa 
+    // che questa specifica store proviene da una load effettuata quando si esegue una store (dlx.interpreter.ts - line 103)
+    // quindi gli interessa solamente il valore salvato in memoria e non vuole impartire nessun comnando al led.
+
+    if (cs == null || instrType=="IS") return super.load(address);
     else {
       switch (cs.id) {
         case "CS_READ_LED":
