@@ -29,7 +29,8 @@ import { SaveDialogComponent } from './dialogs/save-dialog.component';
 import { MatInputModule } from '@angular/material/input';
 import { InstructionDialogComponent } from './dialogs/instruction-dialog.component';
 import { FormatBytePipe } from './pipes/formatByte.pipe';
-import { CounterDialogComponent } from './dialogs/counter-dialog.component'
+import { CounterDialogComponent } from './dialogs/counter-dialog.component';
+import { DiagramComponent } from './diagram/diagram.component'
 
 @NgModule({
    declarations: [
@@ -50,7 +51,8 @@ import { CounterDialogComponent } from './dialogs/counter-dialog.component'
       SaveDialogComponent,
       InstructionDialogComponent,
       FormatBytePipe,
-      CounterDialogComponent
+      CounterDialogComponent,
+      DiagramComponent
    ],
    imports: [
       BrowserModule,

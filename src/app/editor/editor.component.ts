@@ -8,6 +8,7 @@ import { EditorFromTextArea } from 'codemirror';
 import 'codemirror/addon/selection/active-line';
 import { Subscription } from 'rxjs';
 import { SaveDialogComponent } from "../dialogs/save-dialog.component";
+import { Counter } from "../memory/model/counter";
 import { FFDLogicalNetwork } from '../memory/model/ffd-logical-network.js';
 import { LedLogicalNetwork } from '../memory/model/led.logical-network.js';
 import { StartLogicalNetwork } from '../memory/model/start.logical-network.js';
@@ -189,14 +190,19 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     this.memoryService.memory.devices.forEach(el => {
       if(el.devType.includes("Start"))
         (el as StartLogicalNetwork).startOp();
-        if(el.devType.includes("Led"))
+      if(el.devType.includes("Led"))
         (el as LedLogicalNetwork).startOp();
-        if(el.devType.includes("FF-D"))
-          (el as FFDLogicalNetwork).startOp();
+      if(el.devType.includes("FF-D"))
+        (el as FFDLogicalNetwork).startOp();
+      if(el.devType.includes("Counter"))
+        (el as Counter).startOp();
     });
   }
 
   onRun() {
+    /*se l'interprete non sta eseguendo
+    inizia da capo, ovvero va a cercare il tag di avvio ed inizia l'esecuzione dal tag
+    */
     if (!this.running) {
       this.doc.removeLineClass(this.runnedLine, 'wrap', 'error');
       this.errorMessage = undefined;
@@ -205,6 +211,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       this._pc = this.codeService.interpreter.getTag('start_tag');
       this.running = true;
     }
+    /*Altrimenti riprendo da una pausa e quindi l'esecuzione riprende dalla linea in cui era stata messa in pausa */
     this.runnedLine = this.currentLine;
     this.currentLine++;
     try { 

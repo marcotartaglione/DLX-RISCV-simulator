@@ -1,0 +1,55 @@
+@keyframes clockTranslate
+  0%
+    transform: translateX(0px)
+  100%
+    transform: translateX(-721px)
+
+@keyframes generalTranslate
+  0%
+    transform: translateX(0px)
+  100%
+    transform: translateX(-735px)
+
+@media (prefers-reduced-motion: no-preference)
+  .clock
+    animation: clockTranslate 0s linear infinite
+    -webkit-animation: clockTranslate 0s linear infinite
+    -moz-animation: clockTranslate 0s linear infinite
+    -o-animation: clockTranslate 0s linear infinite
+  .general
+    animation: generalTranslate 0s linear 1
+    -webkit-animation: generalTranslate 0s linear 1
+    -moz-animation: generalTranslate 0s linear 1
+    -o-animation: generalTranslate 0s linear 1
+
+.diagram
+  width: 400px
+  height: 100px
+  border: 1px solid
+  overflow: hidden
+  position: relative
+  border-radius: 5px
+  margin-top: .3em
+  margin-bottom: 1em
+
+.diagrams
+  align-items: center
+  margin-left: 2.5em
+
+.btn
+    display: flex
+    align-items: center
+    
+    svg
+        margin-left: .5em
+
+.btn-container
+    margin-top: 1rem
+    .left
+        float: left
+    .mat-raised-button
+        height: fit-content
+        margin: 13.5px 0
+
+.mr
+    margin-right: .5rem !important

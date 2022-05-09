@@ -13,6 +13,12 @@
           [memoryService]="memoryService"
           (formDirtyChange)="isFormDirty = $event"
         ></app-editor>
+        <!--Qui inserisco il componente per mostrare i diagrammi dei cicli di bus-->
+        <!--bottone per visualizzare i diagrammi dei segnali-->
+        <button mat-raised-button class="mr" (click)="toggleDiagrams()">
+          <span class="btn">View signal diagrams<i class="fas fa-wave-square"></i></span>
+        </button>
+        <app-diagram *ngIf="this.getDiagramsStatus() == true"></app-diagram>
         <app-memory [memoryService]="memoryService"></app-memory>
       </div>
       <div class="right">

@@ -8,7 +8,7 @@ export class FormatPipe implements PipeTransform {
   transform(n: number, type: 'dec' | 'bin' | 'hex' | 'oct' | string, length: number = 32): any {
     switch (type) {
       case 'dec':
-        return (n > 268435455 || n<0) ? n >>> 4 : n;
+        return (n > 268435455 || n<0) ? n >>> 0 /*4*/ : n; //in questo modo la rappresentazione risulta corretta
       case 'bin':
         return (n >>> 0).toString(2).padStart(length, '0');
       case 'hex':

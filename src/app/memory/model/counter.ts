@@ -1,6 +1,7 @@
 import { Injector, Input, Inject, Injectable } from '@angular/core';
 import { LogicalNetwork } from './logical-network';
 import { MemoryService } from 'src/app/services/memory.service';
+
 @Injectable()
 export class Counter extends LogicalNetwork {
   //ffd( name, d, a_res, a_set, clk)
@@ -100,7 +101,7 @@ export class Counter extends LogicalNetwork {
   // reset asicnrono del contatore
 
   public a_reset() {
-      this.currentValue = 0 ;
+    this.currentValue = 0 ;
 
       // aggiorno cs_read_value_counter con il nuovo valore di currentValue. Se non lo facessi facendo 
       // successivamente una lettura a cs_read_value_counter non otterrei il valore aggiornato di 
@@ -108,6 +109,36 @@ export class Counter extends LogicalNetwork {
 
       this.setCS("CS_READ_VALUE_COUNTER", this.min_address ,this.currentValue); 
   }
+
+   // reset asincrono del FFD
+
+   public a_reset_ffd(){
+    //asserendo il segnale di A_RESET, il FFD inizializza l'output a 0
+    this.up_down_value = 0;
+  }
+
+  //set asincrono del FFD
+
+  public a_set_ffd(){
+    //asserendo il segnale di A_SET, il FFD inizializza l'output a 1
+    this.up_down_value = 1;
+  }
+
+
+  //operazioni di avvio del Counter
+
+  public startOp() {
+    //pone a 0 il valore del counter
+    if(this.a_reset_value.includes("RESET"))
+      this.a_reset();
+    //pone a 0 il valore di output del FFD
+    if(this.a_set_value_ffd.includes("RESET"))
+      this.a_set_ffd();
+    //pone a 1 il valore di output del FFD
+    if(this.a_res_value_ffd.includes("RESET"))
+      this.a_reset_ffd();
+  }
+
 
   // LOAD : metodo invocato quando si fa una lettura ad un certo indirizzo
   
@@ -131,14 +162,14 @@ export class Counter extends LogicalNetwork {
         // quindi quando viene fatta lettura e il clock vale MEMRD*
 
         case "CS_READ_VALUE_COUNTER":
-          if(this.clkType == "MEMRD*"){ 
+          //if(this.clkType == "MEMRD*" ){ 
 
             // se ho un fronte di salita allora aggiorno il valore campionato con il currentValue e 
             // aggiorno il cs_read_value_counter
 
             this.sampleValue = this.currentValue;
             this.setCS("CS_READ_VALUE_COUNTER",this.min_address,this.currentValue);
-          }
+          //}
 
           // Restitutisco sempre sampleValue. Nel caso ci sia appena stato 
           // un fronte di salita verrà restituito il valore 

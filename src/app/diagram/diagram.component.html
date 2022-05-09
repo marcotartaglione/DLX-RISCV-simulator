@@ -1,0 +1,59 @@
+<div class="btn-container">
+    <button mat-raised-button class="mr" (click)="onPauseClick()">
+        <span class="btn">Pause</span>
+    </button>
+    <button mat-raised-button class="mr" (click)="onResumeClick()">
+        <span class="btn">Resume</span>
+    </button>
+    <button mat-raised-button class="mr" (click)="onStopClick()">
+        <span class="btn">Stop</span>
+    </button>
+    <button mat-raised-button class="mr" (click)="onLoad()">
+        <span class="btn">Lettura</span>
+    </button>
+    <button mat-raised-button class="mr" (click)="onStore()">
+        <span class="btn">Scrittura</span>
+    </button>
+    <button mat-raised-button class="mr" (click)="onIdle()">
+        <span class="btn">Idle</span>
+    </button>
+</div>
+<br>
+<div class="diagrams">
+    <div *ngIf="isDLX">
+        <span>CLOCK</span>
+        <div class="diagram">
+            <img class="{{this.dlxDiagrams.clock.getAnimationClass()}}" [ngStyle]="{'animation-duration': dlxDiagrams.clock.getAnimationDuration() + 'ms',
+                                                                                    'animation-play-state': dlxDiagrams.clock.getPlayState(), 
+                                                                                    'animation-iteration-count': 'infinite'}" src="{{dlxDiagrams.clock.getImageName()}}" width="1140" height="100" alt="clock-signal" />
+        </div>
+        <span>ADDRESS</span>
+        <div class="diagram">
+            <img class="{{this.dlxDiagrams.address.getAnimationClass()}}" [ngStyle]="{  'animation-duration': dlxDiagrams.clock.getAnimationDuration() + 'ms',
+                                                                                        'animation-play-state': dlxDiagrams.address.getPlayState(),
+                                                                                        'animation-iteration-count': '1',
+                                                                                        'animation-fill-mode': 'initial'}" src="{{dlxDiagrams.address.getImageName()}}" width="1140" height="100" alt="address-signal" />
+        </div>
+        <span>MEMRD</span>
+        <div class="diagram">
+            <img class="{{this.dlxDiagrams.memrd.getAnimationClass()}}" [ngStyle]="{'animation-duration': dlxDiagrams.clock.getAnimationDuration() + 'ms',
+                                                                                    'animation-play-state': dlxDiagrams.memrd.getPlayState(),
+                                                                                    'animation-iteration-count': '1',
+                                                                                    'animation-fill-mode': 'initial'}" src="{{dlxDiagrams.memrd.getImageName()}}" width="1140" height="100" alt="memrd-signal" />
+        </div>
+        <span>MEMWR</span>
+        <div class="diagram">
+            <img class="{{this.dlxDiagrams.memwr.getAnimationClass()}}" [ngStyle]="{'animation-duration': dlxDiagrams.clock.getAnimationDuration() + 'ms',
+                                                                                    'animation-play-state': dlxDiagrams.memwr.getPlayState(),
+                                                                                    'animation-iteration-count': '1',
+                                                                                    'animation-fill-mode': 'initial'}" src="{{dlxDiagrams.memwr.getImageName()}}" width="1140" height="100" alt="memwr-signal" />
+        </div>
+        <span>DATA</span>
+        <div class="diagram">
+            <img class="{{this.dlxDiagrams.data.getAnimationClass()}}" [ngStyle]="{ 'animation-duration': dlxDiagrams.clock.getAnimationDuration() + 'ms',
+                                                                                    'animation-play-state': dlxDiagrams.data.getPlayState(),
+                                                                                    'animation-iteration-count': '1',
+                                                                                    'animation-fill-mode': 'initial'}" src="{{dlxDiagrams.data.getImageName()}}" width="1140" height="100" alt="data-signal" />
+        </div>
+    </div>
+</div>
