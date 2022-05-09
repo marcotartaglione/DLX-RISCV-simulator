@@ -13,6 +13,9 @@ export class DiagramComponent{
   @Input() diagrams: Diagram;
   //@Input() editor: EditorComponent; //prendo interval che mi servirà per definire l'animationDuration 
   animationDuration: number; //definisce la durata complessiva dell'animazione del diagramma
+  private auto: boolean = true; //definisce se il componente funziona in modalità automatica o manuale
+  /*Nella modalità manuale i diagrammi sono controllati dall'utente
+    In quella automatica i diagrammi si muovono in base al codice*/
 
   get dlxDiagrams(): DLXDiagrams{
     return this.diagrams as DLXDiagrams;
@@ -230,5 +233,19 @@ export class DiagramComponent{
     this.resetMemrd();
     this.resetMemwr();
     this.resetData();
+  }
+
+  //imposta il funzionamento dei diagrammi in automatico
+  public setAuto(){
+    this.auto = true;
+  }
+
+  //imposta il funzionamento dei diagrammi in manuale
+  public setManual(){
+    this.auto = false;
+  }
+
+  public getAuto(){
+    return this.auto;
   }
 }

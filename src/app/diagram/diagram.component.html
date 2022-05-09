@@ -1,4 +1,13 @@
 <div class="btn-container">
+    <button mat mat-raised-button class="mr" (click)="setAuto()">
+        <span class="btn">Auto Mode</span>
+    </button>
+    <button mat mat-raised-button class="mr" (click)="setManual()">
+        <span class="btn">Manual Mode</span>
+    </button>
+</div>
+
+<div class="btn-container" *ngIf="this.getAuto() == false">
     <button mat-raised-button class="mr" (click)="onPauseClick()">
         <span class="btn">Pause</span>
     </button>
