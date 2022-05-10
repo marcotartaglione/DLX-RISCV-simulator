@@ -156,7 +156,7 @@ export class DiagramComponent{
   }
 
   /*METODI PER TESTING */
-  public onResumeClick(){
+  public onResume(){
     this.resumeClock();
     this.resumeAddress();
     this.resumeMemrd();
@@ -164,7 +164,7 @@ export class DiagramComponent{
     this.resumeData();
   }
 
-  public onStopClick(){
+  public onStop(){
     this.resetClock();
     this.resetAddress();
     this.resetMemrd();
@@ -172,7 +172,7 @@ export class DiagramComponent{
     this.resetData();
   }
 
-  public onPauseClick(){
+  public onPause(){
     this.pauseClock();
     this.pauseAddress();
     this.pauseMemrd();
@@ -245,7 +245,7 @@ export class DiagramComponent{
     this.auto = false;
   }
 
-  public getAuto(){
+  public isAuto(){
     return this.auto;
   }
 }
