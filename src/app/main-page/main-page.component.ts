@@ -16,6 +16,7 @@ export class MainPageComponent implements OnDestroy {
 
   private routeDataSub: Subscription;
   private breakpointSub: Subscription;
+  private animationSub: Subscription;
   private diagramsStatus: boolean = false;//mi dice se i diagrammi sono visibili o no
 
   registers: Registers;
