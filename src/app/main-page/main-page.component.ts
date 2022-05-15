@@ -5,6 +5,7 @@ import {ActivatedRoute} from '@angular/router';
 import {Subscription} from 'rxjs';
 import {Registers} from '../registers/registers';
 import {CodeService} from '../services/code.service';
+import { DiagramService } from '../services/diagram.service';
 import {MemoryService} from '../services/memory.service';
 
 @Component({
@@ -32,6 +33,7 @@ export class MainPageComponent implements OnDestroy {
   constructor(
     public codeService: CodeService,
     public memoryService: MemoryService,
+    public diagramService: DiagramService,
     route: ActivatedRoute,
     breakpointObserver: BreakpointObserver
   ) {

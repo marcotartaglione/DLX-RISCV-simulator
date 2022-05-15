@@ -1,4 +1,5 @@
-import { ApplicationRef, Component, ElementRef, Input, Renderer2, ViewChild} from '@angular/core';
+import { ApplicationRef, Component, ElementRef, Input, OnInit, Renderer2, ViewChild} from '@angular/core';
+import { DiagramService } from '../services/diagram.service';
 import { Diagram } from './diagram';
 import { DLXDiagrams } from './dlx.diagrams';
 
@@ -8,29 +9,34 @@ import { DLXDiagrams } from './dlx.diagrams';
   styleUrls: ['./diagram.component.sass']
 })
 
-export class DiagramComponent{
+export class DiagramComponent implements OnInit{
 
-  @Input() diagrams: Diagram;
+  //dlxDiagrams: DLXDiagrams;
+  @Input() diagramService: DiagramService;
   //@Input() editor: EditorComponent; //prendo interval che mi servirà per definire l'animationDuration 
   animationDuration: number; //definisce la durata complessiva dell'animazione del diagramma
   private auto: boolean = true; //definisce se il componente funziona in modalità automatica o manuale
   /*Nella modalità manuale i diagrammi sono controllati dall'utente
     In quella automatica i diagrammi si muovono in base al codice*/
-
+  /*
   get dlxDiagrams(): DLXDiagrams{
     return this.diagrams as DLXDiagrams;
-  }
-
+  }*/
+  /*
   get isDLX(): boolean{
-    return this.diagrams.constructor.name === DLXDiagrams.name;
-  }
+    return this.dlxDiagrams.constructor.name === DLXDiagrams.name;
+  }*/
 
   constructor(private appRef: ApplicationRef) {
     this.animationDuration = this.calculateAnimationDuration();//default
     //mettere un algoritmo per il calcolo della speed in base a interval 
-    this.diagrams = new DLXDiagrams(this.animationDuration);
+    //this.diagrams = new DLXDiagrams(this.animationDuration);
   }
   
+  ngOnInit(): void {
+    //this.dlxDiagrams = new DLXDiagrams(this.appRef);  
+  }
+
   /*Metodo di utility per calcolare la durata dell'animazione in base all'interval scelto*/
   private calculateAnimationDuration(/*Prende l'interval come input*/){
     /*Nel disegno un ciclo di clock è lungo 60 pixel
@@ -44,9 +50,33 @@ export class DiagramComponent{
     return 4000;
   }
 
+  public onPause(){
+    this.diagramService.pause();
+  }
+
+  public onResume(){
+    this.diagramService.resume();
+  }
+
+  public onStop(){
+    this.diagramService.stop();
+  }
+
+  public onLoad(){
+    this.diagramService.load();
+  }
+
+  public onStore(){
+    this.diagramService.store();
+  }
+
+  public onIdle(){
+    this.diagramService.idle();
+  }
+
   /*METODI PAUSE*/
   /*Per mettere in pausa le animazioni*/
-  public pauseClock(){
+  /*public pauseClock(){
     this.dlxDiagrams.clock.setPaused(true);
   }
   
@@ -64,11 +94,11 @@ export class DiagramComponent{
 
   public pauseData(){
     this.dlxDiagrams.data.setPaused(true);
-  }
+  }*/
 
   /*METODI RESUME*/
   /*Per avviare o riprendere una animazione*/
-  public resumeClock(){
+  /*public resumeClock(){
     //se l'animazione è stata messa in pausa
     if(this.dlxDiagrams.clock.isPaused()){
       this.dlxDiagrams.clock.setPaused(false);
@@ -108,11 +138,11 @@ export class DiagramComponent{
     }else{
       this.dlxDiagrams.data.setRunning(true);
     }
-  }
+  }*/
 
   /*METODI RESET*/
-  /*Per resettare le animazioni */  
-  public resetClock(){
+  /*Per resettare le animazioni */
+  /*public stopClock(){
     this.dlxDiagrams.clock.setRunning(false);
     this.dlxDiagrams.clock.setPaused(false);
     //setto la classe a 'none'
@@ -123,7 +153,7 @@ export class DiagramComponent{
     this.dlxDiagrams.clock.setAnimationClass("clock");
   }
 
-  public resetAddress(){
+  public stopAddress(){
     this.dlxDiagrams.address.setRunning(false);
     this.dlxDiagrams.address.setPaused(false);
     this.dlxDiagrams.address.setAnimationClass("none");
@@ -131,7 +161,7 @@ export class DiagramComponent{
     this.dlxDiagrams.address.setAnimationClass("general");
   }
 
-  public resetMemrd(){
+  public stopMemrd(){
     this.dlxDiagrams.memrd.setRunning(false);
     this.dlxDiagrams.memrd.setPaused(false);
     this.dlxDiagrams.memrd.setAnimationClass("none");
@@ -139,7 +169,7 @@ export class DiagramComponent{
     this.dlxDiagrams.memrd.setAnimationClass("general");
   }
 
-  public resetMemwr(){
+  public stopMemwr(){
     this.dlxDiagrams.memwr.setRunning(false);
     this.dlxDiagrams.memwr.setPaused(false);
     this.dlxDiagrams.memwr.setAnimationClass("none");
@@ -147,16 +177,16 @@ export class DiagramComponent{
     this.dlxDiagrams.memwr.setAnimationClass("general");
   }
 
-  public resetData(){
+  public stopData(){
     this.dlxDiagrams.data.setRunning(false);
     this.dlxDiagrams.data.setPaused(false);
     this.dlxDiagrams.data.setAnimationClass("none");
     this.appRef.tick();
     this.dlxDiagrams.data.setAnimationClass("general");
-  }
+  }*/
 
   /*METODI PER TESTING */
-  public onResume(){
+  /*public onResume(){
     this.resumeClock();
     this.resumeAddress();
     this.resumeMemrd();
@@ -165,11 +195,11 @@ export class DiagramComponent{
   }
 
   public onStop(){
-    this.resetClock();
-    this.resetAddress();
-    this.resetMemrd();
-    this.resetMemwr();
-    this.resetData();
+    this.stopClock();
+    this.stopAddress();
+    this.stopMemrd();
+    this.stopMemwr();
+    this.stopData();
   }
 
   public onPause(){
@@ -178,62 +208,61 @@ export class DiagramComponent{
     this.pauseMemrd();
     this.pauseMemwr();
     this.pauseData();
-  }
+  }*/
 
-  /*PATTERN*/
   /*CICLO DI BUS DI LETTURA*/
-  public onLoad(){
+  /*public onLoad(){
     //setto data come data_in
     this.dlxDiagrams.data.setType("data_in");
     //resetto e faccio partire
     //clock
-    this.resetClock();
+    this.stopClock();
     this.resumeClock();
     //address
-    this.resetAddress();
+    this.stopAddress();
     this.resumeAddress();
     //memwr
-    this.resetMemwr();
+    this.stopMemwr();
     //memrd
-    this.resetMemrd();
+    this.stopMemrd();
     this.resumeMemrd();
     //data
-    this.resetData();
+    this.stopData();
     this.resumeData();
-  }
+  }*/
 
   /*CICLO DI BUS DI SCRITTURA */
-  public onStore(){
+  /*public onStore(){
     //setto data come data_out
     this.dlxDiagrams.data.setType("data_out");
     //resetto e faccio partire
     //clock
-    this.resetClock();
+    this.stopClock();
     this.resumeClock();
     //address
-    this.resetAddress();
+    this.stopAddress();
     this.resumeAddress();
     //memwr
-    this.resetMemwr();
+    this.stopMemwr();
     this.resumeMemwr();
     //memrd
-    this.resetMemrd();
+    this.stopMemrd();
     //data
-    this.resetData();
+    this.stopData();
     this.resumeData();
-  }
+  }*/
 
   /*ANIMAZIONE DI IDLE*/
   /*Quando non vengono fatte operazione di I/O*/
-  public onIdle(){
-    this.resetClock();
+  /*public onIdle(){
+    this.stopClock();
     this.resumeClock();
     //faccio un reset degli altri
-    this.resetAddress();
-    this.resetMemrd();
-    this.resetMemwr();
-    this.resetData();
-  }
+    this.stopAddress();
+    this.stopMemrd();
+    this.stopMemwr();
+    this.stopData();
+  }*/
 
   //imposta il funzionamento dei diagrammi in automatico
   public setAuto(){

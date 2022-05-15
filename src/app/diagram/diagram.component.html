@@ -7,14 +7,20 @@
     </button>
 </div>
 
-<div class="btn-container" *ngIf="this.getAuto() == false">
-    <button mat-raised-button class="mr" (click)="onPauseClick()">
+<div class="btn-container" *ngIf="this.isAuto() == false">
+    <button mat-raised-button class="mr" (click)="onPause()">
         <span class="btn">Pause</span>
     </button>
-    <button mat-raised-button class="mr" (click)="onResumeClick()">
+    <button mat-raised-button class="mr" (click)="onResume()">
         <span class="btn">Resume</span>
     </button>
-    <button mat-raised-button class="mr" (click)="onStopClick()">
+    <!--
+    <button mat-raised-button class="mr" (click)="this.isAnimationRunning() ? onPause() : continuousRun()"
+      [disabled]="!isAnimationRunning()">
+      <span class="btn" *ngIf="!this.isAnimationRunning()">Run <i class="fas fa-play green"></i></span>
+      <span class="btn" *ngIf="this.isAnimationRunning()">Pause <i class="fas fa-pause green"></i></span>
+    </button>-->
+    <button mat-raised-button class="mr" (click)="onStop()">
         <span class="btn">Stop</span>
     </button>
     <button mat-raised-button class="mr" (click)="onLoad()">
@@ -29,40 +35,40 @@
 </div>
 <br>
 <div class="diagrams">
-    <div *ngIf="isDLX">
+    <div> <!--*ngIf="isDLX"-->
         <span>CLOCK</span>
         <div class="diagram">
-            <img class="{{this.dlxDiagrams.clock.getAnimationClass()}}" [ngStyle]="{'animation-duration': dlxDiagrams.clock.getAnimationDuration() + 'ms',
-                                                                                    'animation-play-state': dlxDiagrams.clock.getPlayState(), 
-                                                                                    'animation-iteration-count': 'infinite'}" src="{{dlxDiagrams.clock.getImageName()}}" width="1140" height="100" alt="clock-signal" />
+            <img class="{{diagramService.dlxDiagrams.clock.getAnimationClass()}}" [ngStyle]="{  'animation-duration': diagramService.dlxDiagrams.clock.getAnimationDuration() + 'ms',
+                                                                                                'animation-play-state': diagramService.dlxDiagrams.clock.getPlayState(), 
+                                                                                                'animation-iteration-count': 'infinite'}" src="{{diagramService.dlxDiagrams.clock.getImageName()}}" width="1140" height="100" alt="clock-signal" />
         </div>
         <span>ADDRESS</span>
         <div class="diagram">
-            <img class="{{this.dlxDiagrams.address.getAnimationClass()}}" [ngStyle]="{  'animation-duration': dlxDiagrams.clock.getAnimationDuration() + 'ms',
-                                                                                        'animation-play-state': dlxDiagrams.address.getPlayState(),
-                                                                                        'animation-iteration-count': '1',
-                                                                                        'animation-fill-mode': 'initial'}" src="{{dlxDiagrams.address.getImageName()}}" width="1140" height="100" alt="address-signal" />
+            <img class="{{diagramService.dlxDiagrams.address.getAnimationClass()}}" [ngStyle]="{'animation-duration': diagramService.dlxDiagrams.clock.getAnimationDuration() + 'ms',
+                                                                                                'animation-play-state': diagramService.dlxDiagrams.address.getPlayState(),
+                                                                                                'animation-iteration-count': '1',
+                                                                                                'animation-fill-mode': 'initial'}" src="{{diagramService.dlxDiagrams.address.getImageName()}}" width="1140" height="100" alt="address-signal" />
         </div>
         <span>MEMRD</span>
         <div class="diagram">
-            <img class="{{this.dlxDiagrams.memrd.getAnimationClass()}}" [ngStyle]="{'animation-duration': dlxDiagrams.clock.getAnimationDuration() + 'ms',
-                                                                                    'animation-play-state': dlxDiagrams.memrd.getPlayState(),
-                                                                                    'animation-iteration-count': '1',
-                                                                                    'animation-fill-mode': 'initial'}" src="{{dlxDiagrams.memrd.getImageName()}}" width="1140" height="100" alt="memrd-signal" />
+            <img class="{{diagramService.dlxDiagrams.memrd.getAnimationClass()}}" [ngStyle]="{  'animation-duration': diagramService.dlxDiagrams.clock.getAnimationDuration() + 'ms',
+                                                                                                'animation-play-state': diagramService.dlxDiagrams.memrd.getPlayState(),
+                                                                                                'animation-iteration-count': '1',
+                                                                                                'animation-fill-mode': 'initial'}" src="{{diagramService.dlxDiagrams.memrd.getImageName()}}" width="1140" height="100" alt="memrd-signal" />
         </div>
         <span>MEMWR</span>
         <div class="diagram">
-            <img class="{{this.dlxDiagrams.memwr.getAnimationClass()}}" [ngStyle]="{'animation-duration': dlxDiagrams.clock.getAnimationDuration() + 'ms',
-                                                                                    'animation-play-state': dlxDiagrams.memwr.getPlayState(),
-                                                                                    'animation-iteration-count': '1',
-                                                                                    'animation-fill-mode': 'initial'}" src="{{dlxDiagrams.memwr.getImageName()}}" width="1140" height="100" alt="memwr-signal" />
+            <img class="{{diagramService.dlxDiagrams.memwr.getAnimationClass()}}" [ngStyle]="{  'animation-duration': diagramService.dlxDiagrams.clock.getAnimationDuration() + 'ms',
+                                                                                                'animation-play-state': diagramService.dlxDiagrams.memwr.getPlayState(),
+                                                                                                'animation-iteration-count': '1',
+                                                                                                'animation-fill-mode': 'initial'}" src="{{diagramService.dlxDiagrams.memwr.getImageName()}}" width="1140" height="100" alt="memwr-signal" />
         </div>
         <span>DATA</span>
         <div class="diagram">
-            <img class="{{this.dlxDiagrams.data.getAnimationClass()}}" [ngStyle]="{ 'animation-duration': dlxDiagrams.clock.getAnimationDuration() + 'ms',
-                                                                                    'animation-play-state': dlxDiagrams.data.getPlayState(),
-                                                                                    'animation-iteration-count': '1',
-                                                                                    'animation-fill-mode': 'initial'}" src="{{dlxDiagrams.data.getImageName()}}" width="1140" height="100" alt="data-signal" />
+            <img class="{{diagramService.dlxDiagrams.data.getAnimationClass()}}" [ngStyle]="{   'animation-duration': diagramService.dlxDiagrams.clock.getAnimationDuration() + 'ms',
+                                                                                                'animation-play-state': diagramService.dlxDiagrams.data.getPlayState(),
+                                                                                                'animation-iteration-count': '1',
+                                                                                                'animation-fill-mode': 'initial'}" src="{{diagramService.dlxDiagrams.data.getImageName()}}" width="1140" height="100" alt="data-signal" />
         </div>
     </div>
 </div>
