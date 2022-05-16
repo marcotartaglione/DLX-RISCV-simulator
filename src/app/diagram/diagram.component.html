@@ -8,20 +8,20 @@
 </div>
 
 <div class="btn-container" *ngIf="this.isAuto() === false">
+    <!--
     <button mat-raised-button class="mr" (click)="onPause()">
         <span class="btn">Pause</span>
     </button>
     <button mat-raised-button class="mr" (click)="onResume()">
         <span class="btn">Resume</span>
+    </button> -->
+    <button mat-raised-button class="mr" (click)="diagramService.isPauseEnabled() ? diagramService.pause() : diagramService.resume()"
+    [disabled]="!diagramService.isStopEnabled()"> 
+      <span class="btn" *ngIf="!diagramService.isPauseEnabled()" >Resume <i class="fas fa-play green"></i></span>
+      <span class="btn" *ngIf="diagramService.isPauseEnabled()">Pause <i class="fas fa-pause green"></i></span>
     </button>
-    <!--
-    <button mat-raised-button class="mr" (click)="this.isAnimationRunning() ? onPause() : continuousRun()"
-      [disabled]="!isAnimationRunning()">
-      <span class="btn" *ngIf="!this.isAnimationRunning()">Run <i class="fas fa-play green"></i></span>
-      <span class="btn" *ngIf="this.isAnimationRunning()">Pause <i class="fas fa-pause green"></i></span>
-    </button>-->
-    <button mat-raised-button class="mr" (click)="onStop()">
-        <span class="btn">Stop</span>
+    <button mat-raised-button class="mr" (click)="onStop()" [disabled]="!diagramService.isStopEnabled()">
+        <span class="btn">Stop<i class="fas fa-square red"></i></span>
     </button>
     <button mat-raised-button class="mr" (click)="onLoad()">
         <span class="btn">Lettura</span>
