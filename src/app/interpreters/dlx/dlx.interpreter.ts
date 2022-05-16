@@ -238,5 +238,5 @@ export class DLXInterpreter extends Interpreter{
     */
     public revString(str: string) {
         return str.split("").reverse().join("");
-      }
+    }
 }
