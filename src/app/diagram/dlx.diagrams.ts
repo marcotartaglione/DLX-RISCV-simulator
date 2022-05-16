@@ -51,18 +51,18 @@ export class DLXDiagrams {
         //resetto e faccio partire
         //clock
         this.clock.stop();
-        this.clock.resume();
+        this.clock.start();
         //address
         this.address.stop();
-        this.address.resume();
+        this.address.start();
         //memwr
         this.memwr.stop();
         //memrd
         this.memrd.stop();
-        this.memrd.resume();
+        this.memrd.start();
         //data
         this.data.stop();
-        this.data.resume();
+        this.data.start();
     }
 
     /*CICLO DI BUS DI SCRITTURA */
@@ -72,25 +72,25 @@ export class DLXDiagrams {
         //resetto e faccio partire
         //clock
         this.clock.stop();
-        this.clock.resume();
+        this.clock.start();
         //address
         this.address.stop();
-        this.address.resume();
+        this.address.start();
         //memwr
         this.memwr.stop();
-        this.memwr.resume();
+        this.memwr.start();
         //memrd
         this.memrd.stop();
         //data
         this.data.stop();
-        this.data.resume();
+        this.data.start();
     }
 
     /*ANIMAZIONE DI IDLE*/
     /*Quando non vengono fatte operazione di I/O*/
     public idle() {
         this.clock.stop();
-        this.clock.resume();
+        this.clock.start();
         //faccio un reset degli altri
         this.address.stop();
         this.memrd.stop();

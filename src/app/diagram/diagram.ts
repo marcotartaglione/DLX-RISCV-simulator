@@ -51,15 +51,15 @@ export class Diagram{
     }
   }
 
-  public setRunning(running: boolean){
+  private setRunning(running: boolean){
     this.running = running;
   }
 
-  public setPaused(paused: boolean){
+  private setPaused(paused: boolean){
     this.paused = paused;
   }
 
-  public setAnimationClass(animationClass: string){
+  private setAnimationClass(animationClass: string){
     if(animationClass != "")
       this.animationClass = animationClass;
   }
@@ -78,12 +78,18 @@ export class Diagram{
     this.setPaused(true);
   }
   
-  /*Per riprendere o avviare l'animazione*/
+  /*Per far partire l'animazione*/
+  public start(){
+    if(this.isPaused()){
+      this.setPaused(false);
+    }
+    this.setRunning(true);
+  }
+
+  /*Per riprendere l'animazione*/
   public resume(){
     if(this.isPaused()){
       this.setPaused(false);
-    }else{
-      this.setRunning(true);
     }
   }
 
