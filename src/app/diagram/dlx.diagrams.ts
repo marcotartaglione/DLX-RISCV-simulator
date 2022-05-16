@@ -12,147 +12,36 @@ export class DLXDiagrams {
 
     constructor(private appRef: ApplicationRef) {
         //creo i 5 diagram per i cicli di bus
-        this.clock = new Diagram('clock', 'clock');
-        this.address = new Diagram('address', 'general');
-        this.memrd = new Diagram('memrd', 'general');
-        this.memwr = new Diagram('memwr', 'general');
-        this.data = new Diagram('data_in', 'general');
-    }
-
-    /*METODI PAUSE*/
-    /*Per mettere in pausa le animazioni*/
-    private pauseClock() {
-        this.clock.setPaused(true);
-    }
-
-    private pauseAddress() {
-        this.address.setPaused(true);
-    }
-
-    private pauseMemrd() {
-        this.memrd.setPaused(true);
-    }
-
-    private pauseMemwr() {
-        this.memwr.setPaused(true);
-    }
-
-    private pauseData() {
-        this.data.setPaused(true);
-    }
-
-    /*METODI RESUME*/
-    /*Per avviare o riprendere una animazione*/
-    private resumeClock() {
-        //se l'animazione è stata messa in pausa
-        if (this.clock.isPaused()) {
-            this.clock.setPaused(false);
-        } else {
-            //se l'animazione viene avviata
-            this.clock.setRunning(true);
-        }
-    }
-
-    private resumeAddress() {
-        if (this.address.isPaused()) {
-            this.address.setPaused(false);
-        } else {
-            this.address.setRunning(true);
-        }
-    }
-
-    private resumeMemrd() {
-        if (this.memrd.isPaused()) {
-            this.memrd.setPaused(false);
-        } else {
-            this.memrd.setRunning(true);
-        }
-    }
-
-    private resumeMemwr() {
-        if (this.memwr.isPaused()) {
-            this.memwr.setPaused(false);
-        } else {
-            this.memwr.setRunning(true);
-        }
-    }
-
-    private resumeData() {
-        if (this.data.isPaused()) {
-            this.data.setPaused(false);
-        } else {
-            this.data.setRunning(true);
-        }
-    }
-
-    /*METODI RESET*/
-    /*Per resettare le animazioni */
-    private stopClock() {
-        this.clock.setRunning(false);
-        this.clock.setPaused(false);
-        //setto la classe a 'none'
-        this.clock.setAnimationClass("none");
-        //triggero il refresh
-        this.appRef.tick();
-        //rimetto la classe giusta
-        this.clock.setAnimationClass("clock");
-    }
-
-    private stopAddress() {
-        this.address.setRunning(false);
-        this.address.setPaused(false);
-        this.address.setAnimationClass("none");
-        this.appRef.tick();
-        this.address.setAnimationClass("general");
-    }
-
-    private stopMemrd() {
-        this.memrd.setRunning(false);
-        this.memrd.setPaused(false);
-        this.memrd.setAnimationClass("none");
-        this.appRef.tick();
-        this.memrd.setAnimationClass("general");
-    }
-
-    private stopMemwr() {
-        this.memwr.setRunning(false);
-        this.memwr.setPaused(false);
-        this.memwr.setAnimationClass("none");
-        this.appRef.tick();
-        this.memwr.setAnimationClass("general");
-    }
-
-    private stopData() {
-        this.data.setRunning(false);
-        this.data.setPaused(false);
-        this.data.setAnimationClass("none");
-        this.appRef.tick();
-        this.data.setAnimationClass("general");
+        this.clock = new Diagram('clock', 'clock', this.appRef);
+        this.address = new Diagram('address', 'general', this.appRef);
+        this.memrd = new Diagram('memrd', 'general', this.appRef);
+        this.memwr = new Diagram('memwr', 'general', this.appRef);
+        this.data = new Diagram('data_in', 'general', this.appRef);
     }
 
     /*METODI PUBBLICI INVOCATI DA DiagramService */
     public resume() {
-        this.resumeClock();
-        this.resumeAddress();
-        this.resumeMemrd();
-        this.resumeMemwr();
-        this.resumeData();
+        this.clock.resume();
+        this.address.resume();
+        this.memrd.resume();
+        this.memwr.resume();
+        this.data.resume();
     }
 
     public stop() {
-        this.stopClock();
-        this.stopAddress();
-        this.stopMemrd();
-        this.stopMemwr();
-        this.stopData();
+        this.clock.stop();
+        this.address.stop();
+        this.memrd.stop();
+        this.memwr.stop();
+        this.data.stop();
     }
 
     public pause() {
-        this.pauseClock();
-        this.pauseAddress();
-        this.pauseMemrd();
-        this.pauseMemwr();
-        this.pauseData();
+        this.clock.pause();
+        this.address.pause();
+        this.memrd.pause();
+        this.memwr.pause();
+        this.data.pause();
     }
 
     /*CICLO DI BUS DI LETTURA*/
@@ -161,19 +50,19 @@ export class DLXDiagrams {
         this.data.setType("data_in");
         //resetto e faccio partire
         //clock
-        this.stopClock();
-        this.resumeClock();
+        this.clock.stop();
+        this.clock.resume();
         //address
-        this.stopAddress();
-        this.resumeAddress();
+        this.address.stop();
+        this.address.resume();
         //memwr
-        this.stopMemwr();
+        this.memwr.stop();
         //memrd
-        this.stopMemrd();
-        this.resumeMemrd();
+        this.memrd.stop();
+        this.memrd.resume();
         //data
-        this.stopData();
-        this.resumeData();
+        this.data.stop();
+        this.data.resume();
     }
 
     /*CICLO DI BUS DI SCRITTURA */
@@ -182,31 +71,31 @@ export class DLXDiagrams {
         this.data.setType("data_out");
         //resetto e faccio partire
         //clock
-        this.stopClock();
-        this.resumeClock();
+        this.clock.stop();
+        this.clock.resume();
         //address
-        this.stopAddress();
-        this.resumeAddress();
+        this.address.stop();
+        this.address.resume();
         //memwr
-        this.stopMemwr();
-        this.resumeMemwr();
+        this.memwr.stop();
+        this.memwr.resume();
         //memrd
-        this.stopMemrd();
+        this.memrd.stop();
         //data
-        this.stopData();
-        this.resumeData();
+        this.data.stop();
+        this.data.resume();
     }
 
     /*ANIMAZIONE DI IDLE*/
     /*Quando non vengono fatte operazione di I/O*/
     public idle() {
-        this.stopClock();
-        this.resumeClock();
+        this.clock.stop();
+        this.clock.resume();
         //faccio un reset degli altri
-        this.stopAddress();
-        this.stopMemrd();
-        this.stopMemwr();
-        this.stopData();
+        this.address.stop();
+        this.memrd.stop();
+        this.memwr.stop();
+        this.data.stop();
     }
 
 }

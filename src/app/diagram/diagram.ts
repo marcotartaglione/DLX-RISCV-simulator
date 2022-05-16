@@ -12,14 +12,15 @@ export class Diagram{
   paused: boolean; //indica se l'animazione è stata messa in pausa
   animationClass: string; //indica la classe dell'animazione
   animationDuration: number; //velocità di scorrimento
-  @Input() appRef: ApplicationRef;
+  appRef: ApplicationRef;
 
-  constructor(type: string, animationClass: string) {
+  constructor(type: string, animationClass: string, appRef: ApplicationRef) {
     this.type = type;
     this.running = false;
     this.paused = false;
     this.animationClass = animationClass;
     this.animationDuration = 4000;
+    this.appRef = appRef;
   }
 
   /*METODI GETTER */
@@ -99,7 +100,7 @@ export class Diagram{
   }
 
   /*Metodo che ritorna la classe dell'animazione in base al tipo*/
-  public getAnimationClassFromType(){
+  private getAnimationClassFromType(){
     if(this.getType() === 'clock') return 'clock';
     else return 'general';
   }
