@@ -15,7 +15,7 @@ export class DiagramService {
     this.injector = injector;
     this.dlxDiagrams = new DLXDiagrams(appRef);
     this.stopEnabled = false;
-    this.pauseEnabled = false;
+    this.pauseEnabled = true;
   }
 
   public resume(){
@@ -26,7 +26,7 @@ export class DiagramService {
   public stop(){
     this.dlxDiagrams.stop();
     this.stopEnabled = false;
-    this.pauseEnabled = false;
+    this.pauseEnabled = true;
   }
 
   public pause(){
