@@ -1,7 +1,5 @@
-import { ApplicationRef, Component, ElementRef, Input, OnInit, Renderer2, ViewChild} from '@angular/core';
+import { ApplicationRef, Component, Input, OnInit} from '@angular/core';
 import { DiagramService } from '../services/diagram.service';
-import { Diagram } from './diagram';
-import { DLXDiagrams } from './dlx.diagrams';
 
 @Component({
   selector: 'app-diagram',
@@ -25,9 +23,7 @@ export class DiagramComponent implements OnInit{
     //this.diagrams = new DLXDiagrams(this.animationDuration);
   }
   
-  ngOnInit(): void {
-    //this.dlxDiagrams = new DLXDiagrams(this.appRef);  
-  }
+  ngOnInit(): void {}
 
   /*Metodo di utility per calcolare la durata dell'animazione in base all'interval scelto*/
   private calculateAnimationDuration(/*Prende l'interval come input*/){
