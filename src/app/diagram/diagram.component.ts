@@ -1,4 +1,5 @@
 import { ApplicationRef, Component, Input, OnInit} from '@angular/core';
+import { EditorComponent } from '../editor/editor.component';
 import { DiagramService } from '../services/diagram.service';
 
 @Component({
@@ -10,7 +11,7 @@ import { DiagramService } from '../services/diagram.service';
 export class DiagramComponent implements OnInit{
 
   @Input() diagramService: DiagramService;
-  //@Input() editor: EditorComponent; //prendo interval che mi servirà per definire l'animationDuration 
+  //@Input() editorComponent: EditorComponent //prendo interval che mi servirà per definire l'animationDuration 
   animationDuration: number; //definisce la durata complessiva dell'animazione del diagramma
   private auto: boolean = true; //definisce se il componente funziona in modalità automatica o manuale
   /*Nella modalità manuale i diagrammi sono controllati dall'utente
@@ -18,25 +19,10 @@ export class DiagramComponent implements OnInit{
   */
 
   constructor(private appRef: ApplicationRef) {
-    this.animationDuration = this.calculateAnimationDuration();//default
-    //mettere un algoritmo per il calcolo della speed in base a interval 
-    //this.diagrams = new DLXDiagrams(this.animationDuration);
+    this.animationDuration = 1000;
   }
   
   ngOnInit(): void {}
-
-  /*Metodo di utility per calcolare la durata dell'animazione in base all'interval scelto*/
-  private calculateAnimationDuration(/*Prende l'interval come input*/){
-    /*Nel disegno un ciclo di clock è lungo 60 pixel
-      deve scorrere nell'interval passato
-      nel disegno ci sono N cicli di clock
-      la durata complessiva dell'animazione è data dal prodotto N * Interval 
-      l'unità di misura sono i ms
-    */
-    //return N * editor.getInterval();  
-    /*Per scopi di testing ritorna un valore di default*/
-    return 4000;
-  }
 
   public onPause(){
     this.diagramService.pause();
@@ -78,4 +64,8 @@ export class DiagramComponent implements OnInit{
     return this.auto;
   }
   
+  public getAnimationDuration(){
+    return this.animationDuration;
+  }
+
 }
