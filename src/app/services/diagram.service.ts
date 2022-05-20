@@ -6,12 +6,15 @@ import { DLXDiagrams } from '../diagram/dlx.diagrams';
 })
 export class DiagramService {
 
+  static instance: DiagramService;
+
   dlxDiagrams: DLXDiagrams;
   injector: Injector;
   pauseEnabled: boolean; //mi dice se il pulsante di pause è cliccabile
   stopEnabled: boolean; //mi dice se il pulsante di stop è cliccabile
 
   constructor(injector: Injector, appRef: ApplicationRef) {
+    DiagramService.instance = this;
     this.injector = injector;
     this.dlxDiagrams = new DLXDiagrams(appRef);
     this.stopEnabled = false;
