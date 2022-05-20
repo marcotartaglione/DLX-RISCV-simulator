@@ -32,10 +32,14 @@
     <button mat-raised-button class="mr" (click)="onIdle()">
         <span class="btn">Idle</span>
     </button>
+    <mat-form-field class="input-interval">
+        <mat-label>Animation duration (ms)</mat-label>
+        <input matInput type="number" name="animationDuration" [(ngModel)]="diagramService.dlxDiagrams.clock.animationDuration" min="1000">
+      </mat-form-field>
 </div>
 <br>
 <div class="diagrams">
-    <div> <!--*ngIf="isDLX"-->
+    <div> 
         <span>CLOCK</span>
         <div class="diagram">
             <img class="{{diagramService.dlxDiagrams.clock.getAnimationClass()}}" [ngStyle]="{  'animation-duration': diagramService.dlxDiagrams.clock.getAnimationDuration() + 'ms',

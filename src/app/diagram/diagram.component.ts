@@ -11,11 +11,6 @@ import { DiagramService } from '../services/diagram.service';
 export class DiagramComponent implements OnInit{
 
   @Input() diagramService: DiagramService;
-  //@Input() editorComponent: EditorComponent //prendo interval che mi servirà per definire l'animationDuration 
-  private auto: boolean = true; //definisce se il componente funziona in modalità automatica o manuale
-  /*Nella modalità manuale i diagrammi sono controllati dall'utente
-    In quella automatica i diagrammi si muovono in base al codice
-  */
 
   constructor(private appRef: ApplicationRef) {
   }
@@ -49,17 +44,17 @@ export class DiagramComponent implements OnInit{
   //imposta il funzionamento dei diagrammi in automatico
   public setAuto(){
     this.diagramService.stop();
-    this.auto = true;
+    this.diagramService.setAuto();
   }
 
   //imposta il funzionamento dei diagrammi in manuale
   public setManual(){
     this.diagramService.stop();
-    this.auto = false;
+    this.diagramService.setManual();
   }
 
   public isAuto(){
-    return this.auto;
+    return this.diagramService.isAuto();
   }
   
 }

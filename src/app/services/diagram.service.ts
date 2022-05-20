@@ -12,6 +12,10 @@ export class DiagramService {
   injector: Injector;
   pauseEnabled: boolean; //mi dice se il pulsante di pause è cliccabile
   stopEnabled: boolean; //mi dice se il pulsante di stop è cliccabile
+  auto: boolean; //definisce se il componente funziona in modalità automatica o manuale
+  /*Nella modalità manuale i diagrammi sono controllati dall'utente
+    In quella automatica i diagrammi si muovono in base al codice
+  */
 
   constructor(injector: Injector, appRef: ApplicationRef) {
     DiagramService.instance = this;
@@ -19,6 +23,7 @@ export class DiagramService {
     this.dlxDiagrams = new DLXDiagrams(appRef);
     this.stopEnabled = false;
     this.pauseEnabled = true;
+    this.auto = true;
   }
 
   public resume(){
@@ -70,6 +75,18 @@ export class DiagramService {
     this.dlxDiagrams.memrd.setAnimationDuration(animationDuration);
     this.dlxDiagrams.memwr.setAnimationDuration(animationDuration);
     this.dlxDiagrams.data.setAnimationDuration(animationDuration);
+  }
+
+  public setAuto(){
+    this.auto = true;
+  }
+
+  public setManual(){
+    this.auto = false;
+  }
+
+  public isAuto(){
+    return this.auto;
   }
 
 }
