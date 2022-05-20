@@ -12,14 +12,12 @@ export class DiagramComponent implements OnInit{
 
   @Input() diagramService: DiagramService;
   //@Input() editorComponent: EditorComponent //prendo interval che mi servirà per definire l'animationDuration 
-  animationDuration: number; //definisce la durata complessiva dell'animazione del diagramma
   private auto: boolean = true; //definisce se il componente funziona in modalità automatica o manuale
   /*Nella modalità manuale i diagrammi sono controllati dall'utente
     In quella automatica i diagrammi si muovono in base al codice
   */
 
   constructor(private appRef: ApplicationRef) {
-    this.animationDuration = 1000;
   }
   
   ngOnInit(): void {}
@@ -64,8 +62,4 @@ export class DiagramComponent implements OnInit{
     return this.auto;
   }
   
-  public getAnimationDuration(){
-    return this.animationDuration;
-  }
-
 }
