@@ -185,8 +185,10 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   onPause() {
     if (this.timeout) clearTimeout(this.timeout);
     this.continuousRunning = false;
-    this.diagramService.pause();
-    this.diagramService.setAnimationDuration(this.interval);
+    if(this.diagramService.isAuto()){
+      this.diagramService.pause();
+      this.diagramService.setAnimationDuration(this.interval);
+    }
   }
 
   startResetSignal() {
@@ -214,14 +216,18 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       this.startResetSignal();
       this._pc = this.codeService.interpreter.getTag('start_tag');
       this.running = true;
-      this.diagramService.setAnimationDuration(this.interval);
-      this.diagramService.idle();
+      if(this.diagramService.isAuto()){
+        this.diagramService.setAnimationDuration(this.interval);
+        this.diagramService.idle();
+      }
     }
     /*Altrimenti riprendo da una pausa e quindi l'esecuzione riprende dalla linea in cui era stata messa in pausa */
     this.runnedLine = this.currentLine;
     this.currentLine++;
-    this.diagramService.setAnimationDuration(this.interval);
-    this.diagramService.resume();
+    if(this.diagramService.isAuto()){
+      this.diagramService.setAnimationDuration(this.interval);
+      this.diagramService.resume();
+    }
     try { 
       this.codeService.interpreter.run(this.doc.getLine(this.runnedLine), this.registers, this.memoryService.memory);
     } catch (error) {
@@ -241,8 +247,10 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     this.currentLine = 0;
     clearTimeout(this.timeout);
     this.continuousRunning = false;
-    this.diagramService.stop();
-    this.diagramService.setAnimationDuration(this.interval);
+    if(this.diagramService.isAuto()){
+      this.diagramService.stop();
+      this.diagramService.setAnimationDuration(this.interval);
+    }
   }
 
   onSave() {
@@ -263,7 +271,9 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     this.memoryService.setMemory();
     this.codeService.load();
     this.storeCode();
-    this.diagramService.stop();
+    if(this.diagramService.isAuto()){
+      this.diagramService.stop();
+    }
   }
 
   onInterrupt() {

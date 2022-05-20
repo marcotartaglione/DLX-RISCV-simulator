@@ -90,7 +90,9 @@ export class DLXInterpreter extends Interpreter{
             if (rd) {
                 registers.r[rd] = registers.c;
             }
-            DiagramService.instance.load();
+            if(DiagramService.instance.isAuto()){
+                DiagramService.instance.load();
+            }
         },
         IS: (line, instruction, [rd, offset, rs1], func, registers, memory) => {
             if (!(/\w+\s+R[123]?\d\s*,\s*0x([0-9A-F]{4})\s*\(\s*R[123]?\d\s*\)\s*/i.test(line))) throw new WrongArgumentsError(instruction, DLXDocumentation);
@@ -100,7 +102,10 @@ export class DLXInterpreter extends Interpreter{
             registers.temp = offset;
             let addr = Math.floor((registers.mar >>> 0) / 4) >>> 0;
             memory.store(addr, func(registers, [memory.load(addr,"IS")]));
-            DiagramService.instance.store();
+            //se l'esecuzione è impostata su auto, l'animazione viene gestita dall'interprete
+            if(DiagramService.instance.isAuto()){
+                DiagramService.instance.store();
+            }
         },
         J: (line, instruction, [name], func, registers, _memory, unsigned = false,tagged) => {
             if (!(/\w+\s+\w+/i.test(line))) throw new WrongArgumentsError(instruction, DLXDocumentation);
