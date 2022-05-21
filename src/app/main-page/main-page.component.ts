@@ -17,7 +17,7 @@ export class MainPageComponent implements OnDestroy {
 
   private routeDataSub: Subscription;
   private breakpointSub: Subscription;
-  private diagramsStatus: boolean = false;//mi dice se i diagrammi sono visibili o no
+  private diagramsOpened: boolean = false;//mi dice se i diagrammi sono visibili o no
 
   registers: Registers;
   sidebarMode: string = 'side';
@@ -56,15 +56,15 @@ export class MainPageComponent implements OnDestroy {
   }
 
   toggleDiagrams(){
-    if(!this.diagramsStatus){
-      this.diagramsStatus = true;
+    if(!this.diagramsOpened){
+      this.diagramsOpened = true;
     }else{
-      this.diagramsStatus = false;
+      this.diagramsOpened = false;
     }
   }
 
-  getDiagramsStatus(){
-    return this.diagramsStatus;
+  isDiagramsOpened(){
+    return this.diagramsOpened;
   }
 
   ngOnDestroy() {
