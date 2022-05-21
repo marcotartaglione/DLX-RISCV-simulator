@@ -70,11 +70,7 @@ export class DiagramService {
   }
 
   public setAnimationDuration(animationDuration: number){
-    this.dlxDiagrams.clock.setAnimationDuration(animationDuration);
-    this.dlxDiagrams.address.setAnimationDuration(animationDuration);
-    this.dlxDiagrams.memrd.setAnimationDuration(animationDuration);
-    this.dlxDiagrams.memwr.setAnimationDuration(animationDuration);
-    this.dlxDiagrams.data.setAnimationDuration(animationDuration);
+    this.dlxDiagrams.setAnimationDuration(animationDuration);
   }
 
   public setAuto(){

@@ -97,5 +97,12 @@ export class DLXDiagrams {
         this.memwr.stop();
         this.data.stop();
     }
-
+    /*Metodo per impostare la durata dell'animazione*/
+    public setAnimationDuration(animationDuration: number){
+        this.clock.setAnimationDuration(animationDuration);
+        this.address.setAnimationDuration(animationDuration);
+        this.memrd.setAnimationDuration(animationDuration);
+        this.memwr.setAnimationDuration(animationDuration);
+        this.data.setAnimationDuration(animationDuration);
+    }
 }
