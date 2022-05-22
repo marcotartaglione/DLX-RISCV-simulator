@@ -45,40 +45,38 @@
 </div>
 <br>
 <div class="diagrams">
-    <div> 
-        <span>CLOCK</span>
+    <span>CLOCK</span>
         <div class="diagram">
             <img class="{{diagramService.dlxDiagrams.clock.getAnimationClass()}}" [ngStyle]="{  'animation-duration': diagramService.dlxDiagrams.clock.getAnimationDuration() + 'ms',
                                                                                                 'animation-play-state': diagramService.dlxDiagrams.clock.getPlayState(), 
                                                                                                 'animation-iteration-count': 'infinite'}" src="{{diagramService.dlxDiagrams.clock.getImageName()}}" width="855" height="75" alt="clock-signal" />
         </div>
-        <span>ADDRESS</span>
+    <span>ADDRESS</span>
         <div class="diagram">
             <img class="{{diagramService.dlxDiagrams.address.getAnimationClass()}}" [ngStyle]="{'animation-duration': diagramService.dlxDiagrams.clock.getAnimationDuration() + 'ms',
                                                                                                 'animation-play-state': diagramService.dlxDiagrams.address.getPlayState(),
                                                                                                 'animation-iteration-count': '1',
                                                                                                 'animation-fill-mode': 'initial'}" src="{{diagramService.dlxDiagrams.address.getImageName()}}" width="855" height="75" alt="address-signal" />
         </div>
-        <span>MEMRD</span>
+    <span>MEMRD</span>
         <div class="diagram">
             <img class="{{diagramService.dlxDiagrams.memrd.getAnimationClass()}}" [ngStyle]="{  'animation-duration': diagramService.dlxDiagrams.clock.getAnimationDuration() + 'ms',
                                                                                                 'animation-play-state': diagramService.dlxDiagrams.memrd.getPlayState(),
                                                                                                 'animation-iteration-count': '1',
                                                                                                 'animation-fill-mode': 'initial'}" src="{{diagramService.dlxDiagrams.memrd.getImageName()}}" width="855" height="75" alt="memrd-signal" />
         </div>
-        <span>MEMWR</span>
+    <span>MEMWR</span>
         <div class="diagram">
             <img class="{{diagramService.dlxDiagrams.memwr.getAnimationClass()}}" [ngStyle]="{  'animation-duration': diagramService.dlxDiagrams.clock.getAnimationDuration() + 'ms',
                                                                                                 'animation-play-state': diagramService.dlxDiagrams.memwr.getPlayState(),
                                                                                                 'animation-iteration-count': '1',
                                                                                                 'animation-fill-mode': 'initial'}" src="{{diagramService.dlxDiagrams.memwr.getImageName()}}" width="855" height="75" alt="memwr-signal" />
         </div>
-        <span>DATA</span>
+    <span>DATA</span>
         <div class="diagram">
             <img class="{{diagramService.dlxDiagrams.data.getAnimationClass()}}" [ngStyle]="{   'animation-duration': diagramService.dlxDiagrams.clock.getAnimationDuration() + 'ms',
                                                                                                 'animation-play-state': diagramService.dlxDiagrams.data.getPlayState(),
                                                                                                 'animation-iteration-count': '1',
                                                                                                 'animation-fill-mode': 'initial'}" src="{{diagramService.dlxDiagrams.data.getImageName()}}" width="855" height="75" alt="data-signal" />
         </div>
-    </div>
 </div>
