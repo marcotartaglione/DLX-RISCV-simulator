@@ -18,10 +18,10 @@
         <button mat-raised-button class="mr" (click)="toggleDiagrams()">
           <span class="btn">View signal diagrams<i class="fas fa-wave-square"></i></span>
         </button>
-        <app-diagram [diagramService]="diagramService" *ngIf="this.isDiagramsOpened() == true"></app-diagram>
         <app-memory [memoryService]="memoryService"></app-memory>
       </div>
       <div class="right">
+        <app-diagram [diagramService]="diagramService" *ngIf="this.isDiagramsOpened() == true"></app-diagram>
         <app-registers [registers]="registers"></app-registers>
       </div>
     </div>
