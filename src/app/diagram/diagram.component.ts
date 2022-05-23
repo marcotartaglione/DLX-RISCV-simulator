@@ -43,13 +43,11 @@ export class DiagramComponent implements OnInit{
 
   //imposta il funzionamento dei diagrammi in automatico
   public setAuto(){
-    this.diagramService.stop();
     this.diagramService.setAuto();
   }
 
   //imposta il funzionamento dei diagrammi in manuale
   public setManual(){
-    this.diagramService.stop();
     this.diagramService.setManual();
   }
 

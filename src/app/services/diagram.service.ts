@@ -72,10 +72,12 @@ export class DiagramService {
   }
 
   public setAuto(){
+    this.stop();
     this.auto = true;
   }
 
   public setManual(){
+    this.stop();
     this.auto = false;
   }
 
