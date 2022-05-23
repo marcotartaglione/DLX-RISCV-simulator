@@ -99,26 +99,22 @@ export class Counter extends LogicalNetwork {
   }
 
   // reset asicnrono del contatore
-
   public a_reset() {
     this.currentValue = 0 ;
-
-      // aggiorno cs_read_value_counter con il nuovo valore di currentValue. Se non lo facessi facendo 
-      // successivamente una lettura a cs_read_value_counter non otterrei il valore aggiornato di 
-      //  currentValue
-
+      /*aggiorno cs_read_value_counter con il nuovo valore di currentValue. Se non lo facessi facendo 
+        successivamente una lettura a cs_read_value_counter non otterrei il valore aggiornato di 
+        currentValue
+      */
       this.setCS("CS_READ_VALUE_COUNTER", this.min_address ,this.currentValue); 
   }
 
    // reset asincrono del FFD
-
    public a_reset_ffd(){
     //asserendo il segnale di A_RESET, il FFD inizializza l'output a 0
     this.up_down_value = 0;
   }
 
-  //set asincrono del FFD
-
+  // set asincrono del FFD
   public a_set_ffd(){
     //asserendo il segnale di A_SET, il FFD inizializza l'output a 1
     this.up_down_value = 1;
@@ -126,7 +122,6 @@ export class Counter extends LogicalNetwork {
 
 
   //operazioni di avvio del Counter
-
   public startOp() {
     //pone a 0 il valore del counter
     if(this.a_reset_value.includes("RESET"))
@@ -141,8 +136,7 @@ export class Counter extends LogicalNetwork {
 
 
   // LOAD : metodo invocato quando si fa una lettura ad un certo indirizzo
-  
-  public load(address: number, instrType?: string): number {
+    public load(address: number, instrType?: string): number {
 
     // Se l'indirizzo a cui si fa la load corrisponde ad un cs allora lavoro sul cs andando a leggere l'id e in
     // base a questo decido cosa fare (switch(cs.id)). Se l'indirizzo non corrisponde ad alcun cs allora effettuo
