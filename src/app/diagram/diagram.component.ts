@@ -1,5 +1,5 @@
 import { ApplicationRef, Component, Input, OnInit} from '@angular/core';
-import { EditorComponent } from '../editor/editor.component';
+import { DLXRegisters } from '../registers/dlx.registers';
 import { DiagramService } from '../services/diagram.service';
 
 @Component({
@@ -11,6 +11,7 @@ import { DiagramService } from '../services/diagram.service';
 export class DiagramComponent implements OnInit{
 
   @Input() diagramService: DiagramService;
+  @Input() registers: DLXRegisters;
 
   constructor(private appRef: ApplicationRef) {
   }

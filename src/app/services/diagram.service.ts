@@ -1,4 +1,4 @@
-import { ApplicationRef, Injectable, Injector } from '@angular/core';
+import { ApplicationRef, Injectable} from '@angular/core';
 import { DLXDiagrams } from '../diagram/dlx.diagrams';
 
 @Injectable({
@@ -9,8 +9,9 @@ export class DiagramService {
   static instance: DiagramService;
 
   dlxDiagrams: DLXDiagrams;
-  pauseEnabled: boolean; //mi dice se il pulsante di pause è cliccabile
-  stopEnabled: boolean; //mi dice se il pulsante di stop è cliccabile
+  pauseEnabled: boolean; //indica se il pulsante di pause è cliccabile
+  stopEnabled: boolean; //indica se il pulsante di stop è cliccabile
+  addressVisible: boolean; //indica se gli indirizzi sono visibili
   auto: boolean; //definisce se il componente funziona in modalità automatica o manuale
   /*Nella modalità manuale i diagrammi sono controllati dall'utente
     In quella automatica i diagrammi si muovono in base al codice
@@ -22,6 +23,7 @@ export class DiagramService {
     this.stopEnabled = false;
     this.pauseEnabled = true;
     this.auto = true;
+    this.addressVisible = false;
   }
 
   public resume(){
@@ -33,6 +35,7 @@ export class DiagramService {
     this.dlxDiagrams.stop();
     this.stopEnabled = false;
     this.pauseEnabled = true;
+    this.addressVisible = false;
   }
 
   public pause(){
@@ -45,12 +48,14 @@ export class DiagramService {
     this.dlxDiagrams.load();
     this.pauseEnabled = true;
     this.stopEnabled = true;
+    this.addressVisible = true;
   }
 
   public store(){
     this.dlxDiagrams.store();
     this.pauseEnabled = true;
     this.stopEnabled = true;
+    this.addressVisible = true;
   }
 
   public idle(){
@@ -83,6 +88,10 @@ export class DiagramService {
 
   public isAuto(){
     return this.auto;
+  }
+
+  public isAddressVisible(){
+    return this.addressVisible;
   }
 
 }
