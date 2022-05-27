@@ -26,7 +26,11 @@
         <app-memory [memoryService]="memoryService"></app-memory>
       </div>
       <div class="right">
-        <app-diagram [diagramService]="diagramService" *ngIf="this.isDiagramsOpened() == true"></app-diagram>
+        <app-diagram 
+        [diagramService]="diagramService"
+        *ngIf="this.isDiagramsOpened() == true"
+        [registers]="registers"
+        ></app-diagram>
         <app-registers [registers]="registers"></app-registers>
       </div>
     </div>
