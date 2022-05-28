@@ -113,7 +113,7 @@ export class Diagram{
 
   /*Metodo che ritorna il nome dell'immagine del componente */
   public getImageName() {
-    return ("../assets/img/diagram/"+this.getType()+".png"); 
+    return ("assets/img/diagram/"+this.getType()+".png"); 
   }
 
   public getPlayState(){
