@@ -28,9 +28,15 @@ export class DLXInterpreter extends Interpreter{
             if (rd) {
                 registers.r[rd] = registers.c;
             }
+            if(DiagramService.instance.isAuto()){
+                DiagramService.instance.addressVisible = false;
+            }
         },
         RM: (_line, _instruction, args, func, registers) => {
             func(registers, args);
+            if(DiagramService.instance.isAuto()){
+                DiagramService.instance.addressVisible = false;
+            }
         },
         I: (line, instruction, [rd, rs1, immediate], func, registers, _memory, unsigned = false) => {
             if (!(/\w+\s+R[123]?\d\s*,\s*R[123]?\d\s*,\s*0x([0-9A-F]{4})/i.test(line))) throw new WrongArgumentsError(instruction, DLXDocumentation);
@@ -44,6 +50,9 @@ export class DLXInterpreter extends Interpreter{
             }
             if (rd) {
                 registers.r[rd] = registers.c;
+            }
+            if(DiagramService.instance.isAuto()){
+                DiagramService.instance.addressVisible = false;
             }
         },
         IB: (line, instruction, [rs1, name], func, registers, _memory, unsigned = false,tagged) => {
@@ -72,11 +81,17 @@ export class DLXInterpreter extends Interpreter{
                 registers.temp = registers.pc + name ;
                 func(registers);
             }
+            if(DiagramService.instance.isAuto()){
+                DiagramService.instance.addressVisible = false;
+            }
         },
         IJ: (line, instruction, [rs1], func, registers) => {
             if (!(/\w+\s+R[123]?\d/i.test(line))) throw new WrongArgumentsError(instruction, DLXDocumentation);
             registers.a = registers.r[rs1];
             func(registers);
+            if(DiagramService.instance.isAuto()){
+                DiagramService.instance.addressVisible = false;
+            }
         },
         IL: (line, instruction, [rd, offset, rs1], func, registers, memory) => {
             if (!(/\w+\s+R[123]?\d\s*,\s*0x([0-9A-F]{4})\s*\(\s*R[123]?\d\s*\)\s*/i.test(line))) throw new WrongArgumentsError(instruction, DLXDocumentation);
@@ -121,6 +136,9 @@ export class DLXInterpreter extends Interpreter{
                 }
             func(registers);
             }
+            if(DiagramService.instance.isAuto()){
+                DiagramService.instance.addressVisible = false;
+            }
         },
         LHI: (line, instruction, [rd, immediate], func, registers) => {
             if (!(/\w+\s+R[123]?\d\s*,\s*0x([0-9A-F]{4})/i.test(line))) throw new WrongArgumentsError(instruction, DLXDocumentation);
@@ -129,14 +147,23 @@ export class DLXInterpreter extends Interpreter{
             if (rd) {
                 registers.r[rd] = registers.c;
             }
+            if(DiagramService.instance.isAuto()){
+                DiagramService.instance.addressVisible = false;
+            }
         },
-        NOP: () => {},
+        NOP: () => {
+            if(DiagramService.instance.isAuto()){
+                DiagramService.instance.addressVisible = false;
+            }
+        },
         RFE: (_line, instruction, args, func, registers) => {
             if (args.length) throw new WrongArgumentsError(instruction, DLXDocumentation);
             func(registers);
             this.interruptEnabled = true;
             (registers as DLXRegisters).ien = 0;
-
+            if(DiagramService.instance.isAuto()){
+                DiagramService.instance.addressVisible = false;
+            }
             // registers.r = this.tmpReg;
         }
     }

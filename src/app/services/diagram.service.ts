@@ -48,20 +48,21 @@ export class DiagramService {
     this.dlxDiagrams.load();
     this.pauseEnabled = true;
     this.stopEnabled = true;
-    this.addressVisible = true;
+    this.isAuto() ? this.addressVisible = true : this.addressVisible = false;
   }
 
   public store(){
     this.dlxDiagrams.store();
     this.pauseEnabled = true;
     this.stopEnabled = true;
-    this.addressVisible = true;
+    this.isAuto() ? this.addressVisible = true : this.addressVisible = false;
   }
 
   public idle(){
     this.dlxDiagrams.idle();
     this.pauseEnabled = true;
     this.stopEnabled = true;
+    this.addressVisible = false;
   }
 
   public isPauseEnabled(){
@@ -84,6 +85,7 @@ export class DiagramService {
   public setManual(){
     this.stop();
     this.auto = false;
+    this.addressVisible = false;
   }
 
   public isAuto(){
