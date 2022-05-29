@@ -30,12 +30,14 @@ export class DLXInterpreter extends Interpreter{
             }
             if(DiagramService.instance.isAuto()){
                 DiagramService.instance.addressVisible = false;
+                DiagramService.instance.idle();
             }
         },
         RM: (_line, _instruction, args, func, registers) => {
             func(registers, args);
             if(DiagramService.instance.isAuto()){
                 DiagramService.instance.addressVisible = false;
+                DiagramService.instance.idle();
             }
         },
         I: (line, instruction, [rd, rs1, immediate], func, registers, _memory, unsigned = false) => {
@@ -53,6 +55,7 @@ export class DLXInterpreter extends Interpreter{
             }
             if(DiagramService.instance.isAuto()){
                 DiagramService.instance.addressVisible = false;
+                DiagramService.instance.idle();
             }
         },
         IB: (line, instruction, [rs1, name], func, registers, _memory, unsigned = false,tagged) => {
@@ -83,6 +86,7 @@ export class DLXInterpreter extends Interpreter{
             }
             if(DiagramService.instance.isAuto()){
                 DiagramService.instance.addressVisible = false;
+                DiagramService.instance.idle();
             }
         },
         IJ: (line, instruction, [rs1], func, registers) => {
@@ -91,6 +95,7 @@ export class DLXInterpreter extends Interpreter{
             func(registers);
             if(DiagramService.instance.isAuto()){
                 DiagramService.instance.addressVisible = false;
+                DiagramService.instance.idle();
             }
         },
         IL: (line, instruction, [rd, offset, rs1], func, registers, memory) => {
@@ -138,6 +143,7 @@ export class DLXInterpreter extends Interpreter{
             }
             if(DiagramService.instance.isAuto()){
                 DiagramService.instance.addressVisible = false;
+                DiagramService.instance.idle();
             }
         },
         LHI: (line, instruction, [rd, immediate], func, registers) => {
@@ -149,11 +155,13 @@ export class DLXInterpreter extends Interpreter{
             }
             if(DiagramService.instance.isAuto()){
                 DiagramService.instance.addressVisible = false;
+                DiagramService.instance.idle();
             }
         },
         NOP: () => {
             if(DiagramService.instance.isAuto()){
                 DiagramService.instance.addressVisible = false;
+                DiagramService.instance.idle();
             }
         },
         RFE: (_line, instruction, args, func, registers) => {
@@ -163,6 +171,7 @@ export class DLXInterpreter extends Interpreter{
             (registers as DLXRegisters).ien = 0;
             if(DiagramService.instance.isAuto()){
                 DiagramService.instance.addressVisible = false;
+                DiagramService.instance.idle();
             }
             // registers.r = this.tmpReg;
         }
