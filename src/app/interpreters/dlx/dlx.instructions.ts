@@ -20,8 +20,8 @@ export function signExtend(n: number, dim: (8|16|26) = 16) {
 
 // uintToInt(n: number,  dim: (8|16|26) = 16, nbit: number)
 //
-// Metodo che effettua la conversione del segno restituendo un numero decimale postivo o negativo. 
-// è necessario dato che parseInt(10) non mi permette di specificare se il  valore lo voglio convertire 
+// Metodo che effettua la conversione del segno restituendo un numero decimale postivo o negativo.
+// è necessario dato che parseInt(10) non mi permette di specificare se il  valore lo voglio convertire
 // come signed o unsigned, ma mi convertirà sempre la stringa interpretandola come unsigned. Quindi tutti
 // i numeri restituiti saranno positivi e nel caso di numeri con segno verrebbe restituito un valore decimale errato.
 //
@@ -32,27 +32,27 @@ export function signExtend(n: number, dim: (8|16|26) = 16) {
 //
 // Esempio:
 // 4 decimale trasformato in binario diventerà 100. Se lo volessi estendere con segno a 8 bit otterrò il numero
-// binario 11111100. Facendo la parseInt(10) di ques'ultimo numero binario otterrei 251 cioè il numero binario 
+// binario 11111100. Facendo la parseInt(10) di ques'ultimo numero binario otterrei 251 cioè il numero binario
 // interpretato come unsigned. Invocando invece uintToInt() si otterrà invece -4
 // Effettua al suo interno già la conversione del segno
 
 export function uintToInt(n: number,  dim: (8|16|26) = 16, nbit: number) {
 
     // Per prima cosa effettuo l'estensione del segno
-    
+
     let uint=signExtend(n,dim)
 
     if (nbit > 32) throw new Error('uintToInt only supports ints up to 32 bits');
     let bin = uint.toString(2);
-    
+
     // se il numero non è della lunghezza di nbit significa che prima aveva degli zeri che toString nel convertire
     // da per scontato e non visualizza. Riempo la stringa di zeri cosicchè il controllo successivo non dia risultati
     // sbagliati.
-    if(bin.length != nbit) {   
+    if(bin.length != nbit) {
         bin = bin.padStart(nbit, '0');
     }
-    // se il numero è signed converto nel numero decimale corrispondente. 
-    
+    // se il numero è signed converto nel numero decimale corrispondente.
+
     if(bin.charAt(0) === "1" ) {
         uint = uint - Math.pow(2,nbit-1)*2
     }
@@ -72,7 +72,7 @@ const mask = {
 function load(n: number, offset: number, dim: ('byte'|'halfword')) {
     if (n == 0) return 0;
     if (dim === 'halfword' && offset % 2 != 0) throw new Error('fault');
-    return (n & mask[dim][offset % 4]) >>> (offset % 4)*8 ;
+    return (n & mask[dim][offset % 4]) >>> (offset % 4)*8 ;  //
 }
 
 function store(n: number, dest: number, offset: number, dim: ('byte'|'halfword')) {
@@ -88,7 +88,7 @@ export const specialRegisters: string[] = ['IAR'];
 
 export const instructions: {
         [key in Instruction]: {
-            type: InstructionType, 
+            type: InstructionType,
             func: (registers: DLXRegisters, args?: number[]) => number,
             unsigned?: boolean
         }

@@ -38,11 +38,11 @@ export class Memory {
             case FFDLogicalNetwork.name:
               this.add(FFDLogicalNetwork, el.min_address, el.max_address, injector);
               break;
-            
+
             case Counter.name :
               this.add(Counter, el.min_address, el.max_address, injector);
               break;
-  
+
           default:
             this.add(el.name, el.min_address, el.max_address);
             break;
@@ -95,5 +95,5 @@ export class Memory {
     }
     return word;
   }
-  
+
 }

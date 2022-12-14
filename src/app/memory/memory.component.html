@@ -3,7 +3,7 @@
     (click)="openDialogImage(selected)">
     <span class="btn">View logic network <i class="fa fa-code-branch"></i></span>
   </button>
-  
+
   <div class="right">
     <button mat-raised-button class="mr" (click)="openImageInterrupt()">
       <span class="btn">View interrupt network <i class="fa fa-bolt"></i></span>
@@ -15,20 +15,20 @@
     <ng-container *ngFor="let device of memoryService.memory.devices">
       <img *ngIf="device.isALedNetwork()" class=" icon_absolute" width="70px"
         [style.left]="((device.min_address/1073741824)*100 -3.5).toFixed(2)+'%'"
-        src="{{device.getCsValue('CS_READ_LED') ? 'assets/img/led_on.png':'assets/img/led_off.png'}}" 
+        src="{{device.getCsValue('CS_READ_LED') ? 'assets/img/led_on.png':'assets/img/led_off.png'}}"
         (click)="selected == device ? selected = null : selected = device" [class.selected]="selected == device"
         [matTooltip]="device.name +' '+(device.ffd?'1':'0')" matTooltipPosition="above" matTooltipClass="device-size"/>
         <img *ngIf="device.isAStartNetwork()" class=" icon_absolute" width="70px"
           [style.left]="((device.min_address/1073741824)*100 -3.5).toFixed(2)+'%'"
-          src="{{device.getCsValue('CS_READ_STARTUP') ? 'assets/img/led_on.png':'assets/img/led_off.png'}}" 
+          src="{{device.getCsValue('CS_READ_STARTUP') ? 'assets/img/led_on.png':'assets/img/led_off.png'}}"
           (click)="selected == device ? selected = null : selected = device" [class.selected]="selected == device"
           [matTooltip]="device.name +' '+(device.ffd?'1':'0')" matTooltipPosition="above" matTooltipClass="device-size"/>
         <img *ngIf="device.isACounter()" class=" icon_absolute" width="70px"
           [style.left]="((device.min_address/1073741824)*100 -3.5).toFixed(2)+'%'"
-          src="assets/img/counter/counter.png" 
+          src="assets/img/counter/counter.png"
           (click)="selected == device ? selected = null : selected = device" [class.selected]="selected == device"
           [matTooltip]="device.name +' '+(device.ffd?'1':'0')" matTooltipPosition="above" matTooltipClass="device-size"/>
-      <!-- <mat-icon *ngIf="device.isALedNetwork()" 
+      <!-- <mat-icon *ngIf="device.isALedNetwork()"
         aria-hidden="false" [ngClass]="{'amber': device.getCsValue('CS_READ_LED')}" class="icon_absolute"
         aria-label="Example home icon">
         highlight

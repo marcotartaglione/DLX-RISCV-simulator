@@ -15,6 +15,7 @@ import { InstructionDialogComponent } from '../dialogs/instruction-dialog.compon
 import { isUndefined } from 'util';
 import { Counter } from './model/counter';
 import { CounterDialogComponent } from '../dialogs/counter-dialog.component';
+import { instructions } from '../interpreters/dlx/dlx.instructions';
 
 @Component({
   selector: 'app-memory',
@@ -61,6 +62,7 @@ export class MemoryComponent implements OnInit {
   }
 
   openDialogImage(n) {
+    console.log(n);
     if(this.selected.isACounter()){
       this.dialog.open(CounterDialogComponent, {
         data: { network: n as Counter}
@@ -186,7 +188,7 @@ export class MemoryComponent implements OnInit {
     return 0;
   }
 
-  // Metodo invocato cliccando su Show Detail che permette la visualizzazione byte per byte dei valori in memoria
+  // METODO INVOCATO CLICCANDO SU SHOW DETAIL CHE PERMETTE LA VISUALIZZAZIONE BYTE PER BYTE DEI VALORI IN MEMORIA
 
   readMemoryDetail(addr){
 
@@ -194,20 +196,20 @@ export class MemoryComponent implements OnInit {
 
     // controllo che in input siano inseriti degli indirizzi in formato esadecimale che inizino per 0x altrimenti
     // si aprirà una finestra d'errore
-    
-    if((! addr.startsWith("0x") && ! addr.startsWith("0X")) || addr.length !== 10 || isNaN(addr)) { 
+
+    if((! addr.startsWith("0x") && ! addr.startsWith("0X")) || addr.length !== 10 || isNaN(addr)) {
       this.dialog.open(ErrorDialogComponent,{
         data: { message: "Format Error : only hexadecimal value starting with 0x" }
       })
       return;
     }
-    
+
     let iv = parseInt(addr, 16);
     if (iv || iv === 0) {
       finalAddr = iv >>> 2;
     }
 
-    // Cerco nella memoria quale Device è allocato all'indirizzo scelto dall'utente. Se a quell'indirizzo non è 
+    // Cerco nella memoria quale Device è allocato all'indirizzo scelto dall'utente. Se a quell'indirizzo non è
     // mappato alcun device si aprirà una finestra d'errore
 
     let d = this.memoryService.memory.devices.find(el => el.min_address <= finalAddr && el.max_address >= finalAddr);
@@ -217,28 +219,29 @@ export class MemoryComponent implements OnInit {
       })
       return;
       }
-    
+
       // per visualizzare sempre il codice a partire da multipli di 4, così da non avere disallineamento tra
-    // indirizzo e codifica 
-    
+    // indirizzo e codifica
+
     if(iv % 4 !== 0) iv = (Math.floor(iv/4))*4;
     let instr = d.load(finalAddr);
-    
+
     // se la memoria a quell'indirizzo non è ancora stata inizializzata , allora la load restituirà un valore undefined
     // in tal caso visualizzerò un valore casuale scelto con la riga di codice seguente
-    
-    if(isUndefined(instr)) instr= Math.floor(Math.random()*4294967296); 
+
+    if(isUndefined(instr)) instr= Math.floor(Math.random()*4294967296);
+    //if(isUndefined(instr)) instr= Math.floor(Math.random()*256); //Gabri 2^8 max
     let bin=(instr >>> 0).toString(2).padStart(32, '0');
     let arrData = [] ;
-    
-    //Spezzo il valore a 32 bit in gruppi da un byte e inserisco ciascun byte nell'array 
+
+    //Spezzo il valore a 32 bit in gruppi da un byte e inserisco ciascun byte nell'array
     //con il relativo indirizzo associato
-    
+
     for (let i=0 ; i<32 ; i+=8) {
       arrData.push(
         {
           iv: iv,
-          instruction : (instr >>> 0).toString(16).padStart(8,'0').toUpperCase() , 
+          instruction : (instr >>> 0).toString(16).padStart(8,'0').toUpperCase() ,
           value: bin.slice(24-i,32-i) ,    // riempio l'array dalla fine per visualizzare in formato Little Endian
           address: iv + (i/8),
           hexAddress: d.getAddressHexInstr(iv + i/8)
@@ -256,16 +259,15 @@ export class MemoryComponent implements OnInit {
 
   readMemoryAddressValues(addr) {
     let finalAddr;
-    if((! addr.startsWith("0x") && ! addr.startsWith("0X")) || addr.length !== 10 || isNaN(addr)) { 
+    if((! addr.startsWith("0x") && ! addr.startsWith("0X")) || addr.length !== 10 || isNaN(addr)) {
       this.dialog.open(ErrorDialogComponent,{
         data: { message: "Format Error : only hexadecimal value starting with 0x" }
       })
       return;
     }
-    
     let iv = parseInt(addr, 16);
     if (iv || iv === 0) {
-      finalAddr = iv >>> 2;
+      finalAddr = iv >>> 2;// è un numero a 32 bit sotto
     }
       let d = this.memoryService.memory.devices.find(el => el.min_address <= finalAddr && el.max_address >= finalAddr);
       if(d==null){
@@ -278,25 +280,23 @@ export class MemoryComponent implements OnInit {
       for (let i = 0; i < 8; i++) {
         let v = d.load(finalAddr + (i * 0x00000001));
         if(isUndefined(v)) v= Math.floor(Math.random()*4294967296);
-        // nel caso la cella di memoria non contenga alcun valore visualizzo un valore casuale 
-        //(4294...=2^32 cioè il valore massimo rappresentabile con 32 bit) per simulare il fatto 
+        // nel caso la cella di memoria non contenga alcun valore visualizzo un valore casuale
+        //(4294...=2^32 cioè il valore massimo rappresentabile con 32 bit) per simulare il fatto
         // che le celle di memoria contengono valori casuali all'inizializzazione
         arrData.push(
           {
-            value: v ,  
+            value: v ,
             address: finalAddr + (i * 0x00000001),
             hexAddress: d.getAddressHex(finalAddr + (i * 0x00000001))
           });
       }
-
       // Rovescio l'array per visualizzare a partire dall'indirizzo più
       // significativo a quello meno significativo
       arrData.reverse();
-
       this.dialog.open(MemoryAddressDialogComponent, {
         data: { values: arrData, service: this.memoryService },
       });
-    
+
   }
 
   isLN(dev: Device) {
@@ -309,3 +309,9 @@ export class MemoryComponent implements OnInit {
     });
   }
 }
+
+
+
+
+
+

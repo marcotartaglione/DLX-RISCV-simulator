@@ -13,7 +13,7 @@ import {MemoryService} from '../services/memory.service';
   templateUrl: './main-page.component.html',
   styleUrls: ['./main-page.component.sass']
 })
-export class MainPageComponent implements OnDestroy {
+export class MainPageComponent implements OnDestroy{
 
   private routeDataSub: Subscription;
   private breakpointSub: Subscription;
@@ -21,7 +21,7 @@ export class MainPageComponent implements OnDestroy {
 
   registers: Registers;
   sidebarMode: string = 'side';
-  
+
   @ViewChild('sidenav', {static: true}) sidenav: MatSidenav;
 
   @Input() sidebarOpened: boolean;
@@ -75,4 +75,5 @@ export class MainPageComponent implements OnDestroy {
       this.breakpointSub.unsubscribe();
     }
   }
+
 }

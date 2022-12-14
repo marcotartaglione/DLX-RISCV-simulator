@@ -33,7 +33,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   public onRouterOutletActivate(event: MainPageComponent) {
-    if (event instanceof MainPageComponent) {
+      if (event instanceof MainPageComponent) {
       this.mainPageComponent = event;
       this.mainPageComponent.sidebarOpened = this.sidebarOpened;
       if (this.sideBarOpenedSub) {

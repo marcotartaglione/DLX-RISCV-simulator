@@ -13,7 +13,7 @@ export class DLXInterpreter extends Interpreter{
     private tmpReg : any;
 
     private readonly process_instruction: {
-        [key in InstructionType]: 
+        [key in InstructionType]:
             (line: string, instruction: string, args: number[], func: (registers: DLXRegisters, args?: number[]) => number, registers: DLXRegisters, memory?: Memory, unsigned?: boolean, tagged?: boolean) => void
     } = {
         R: (line, instruction, [rd, rs1, rs2], func, registers) => {
@@ -66,26 +66,26 @@ export class DLXInterpreter extends Interpreter{
         },
         IB: (line, instruction, [rs1, name], func, registers, _memory, unsigned = false,tagged) => {
             if (!(/\w+\s+R[123]?\d\s*,\s*\w+/i.test(line))) throw new WrongArgumentsError(instruction, DLXDocumentation);
-            
-            // Se nella branch si fa riferimento ad un tag saltiamo direttamente a quello. Nel registro 
+
+            // Se nella branch si fa riferimento ad un tag saltiamo direttamente a quello. Nel registro
             // temp ci carico l'indirizzo del tag . Il valore di temp sarà poi caricare nel pc.
-            
+
             if(tagged === true) {
                 registers.a = registers.r[rs1];
                 registers.temp = name ;
                 func(registers);
-            } 
+            }
             else
-            
-            // Se invece al posto del tag c'è un immediato a 16 bit , nel pc dovrò caricare il valore 
+
+            // Se invece al posto del tag c'è un immediato a 16 bit , nel pc dovrò caricare il valore
             // pc + 4 + immediato 16 bit esteso con segno
 
             {
                 registers.a = registers.r[rs1];
-                
+
                 // converto in decimale con segno
                 // dentro la uintToInt è già effettuata la conversione del segno
-                
+
                 name = uintToInt(name,16,32);
                 registers.temp = registers.pc + name ;
                 func(registers);
@@ -113,9 +113,12 @@ export class DLXInterpreter extends Interpreter{
             registers.a = registers.r[rs1];
             registers.b = registers.r[rd];
             registers.mar = signExtend(offset) + registers.a;
+            let rest = (registers.mar >>> 0) % 4
             let addr = Math.floor((registers.mar >>> 0) / 4) >>> 0;
+            //console.log("addr: ",rest) //prende il finalAddr
             registers.mdr = memory.load(addr,"IL");
-            registers.temp = offset;
+            console.log("mdr: ",registers.mdr.toString(16))
+            registers.temp = (offset == 0 ? rest : offset)
             func(registers);
             if (rd) {
                 registers.r[rd] = registers.c;
@@ -143,7 +146,7 @@ export class DLXInterpreter extends Interpreter{
                 registers.temp = name ;
                 func(registers);
             } else {
-                if (unsigned) { 
+                if (unsigned) {
                     registers.temp = registers.pc + 4 + name ;
                 } else {
                     name = uintToInt(name,26,32);
@@ -195,9 +198,9 @@ export class DLXInterpreter extends Interpreter{
         }
     }
 
-    // In caso di overflow si notifica l'errore di overflow 
+    // In caso di overflow si notifica l'errore di overflow
     // Nella versione precedente ci si comportava come nel codice commentato.
-    // Io l'ho tolto perchè facendo come nel codice commentato quando avveniva un overflow 
+    // Io l'ho tolto perchè facendo come nel codice commentato quando avveniva un overflow
     // non si capiva e sembrava che il codie impazzisse e tornasse ogni volta dal punto di partenza
     // Lascio comunque la vecchia versione nel caso volesse essere ripristinata.
 
@@ -215,8 +218,8 @@ export class DLXInterpreter extends Interpreter{
         let tokens: string[];
         let lineFixed: string;
 
-        // La variabile tagged indica se nel caso delle istruzioni di branch e jump se si utilizza 
-        // un tag. Nel caso di utilizzo di tag bisognerà fare un "salto" assoluto mentre nel caso di 
+        // La variabile tagged indica se nel caso delle istruzioni di branch e jump se si utilizza
+        // un tag. Nel caso di utilizzo di tag bisognerà fare un "salto" assoluto mentre nel caso di
         // immediato sarà caricato nel pc il valore pc + 4 + immediato
 
         let tagged: boolean= false;
@@ -224,11 +227,14 @@ export class DLXInterpreter extends Interpreter{
             tokens = ['NOP'];
         } else {
             lineFixed = line.split(';')[0].replace(/^(\w+:)?\s+/, '');
+            //console.log("lineFixed: ",lineFixed)
             tokens = lineFixed.split(/\W+/);
+            //console.log("tokens: ",tokens)
         }
 
         let [instruction, ... args] = tokens;
         let argsFixed: number[] = [];
+        //console.log(args)
 
         if (instructions[instruction]) {
             argsFixed = args.map<number>(arg => {
@@ -243,13 +249,13 @@ export class DLXInterpreter extends Interpreter{
                         throw new Error(instruction + " has 26 bit immediate")
                     else if (arg.length == 6)
                         return parseInt(arg.substr(2, 4), 16);  // prendo 4 byte
-                    else 
+                    else
                         throw new Error(instruction + " has 16 bit immediate");
                 } else if (this.tags[arg]>=0) {
                     tagged=true;  // si utilizza un tag
                     return this.tags[arg];
-                } else if (arg) 
-                    if (['IB', 'J'].includes(instructions[instruction].type)) 
+                } else if (arg)
+                    if (['IB', 'J'].includes(instructions[instruction].type))
                         throw new Error("the tag doesn't exist")
                     else
                         throw new WrongArgumentsError(instruction, DLXDocumentation);
@@ -257,7 +263,6 @@ export class DLXInterpreter extends Interpreter{
         } else if (instruction) {
             throw new NotExistingInstructionError(instruction);
         }
-
         return [instruction, argsFixed, lineFixed,tagged];
     }
 
@@ -266,7 +271,7 @@ export class DLXInterpreter extends Interpreter{
         let inst = instructions[instruction];
         if(inst) {
             let [opcode, alucode] = encoder[instruction];
-            (registers as DLXRegisters).ir = parseInt(opcode + inputs_encoder[inst.type](argsFixed) + alucode, 2);
+            (registers as DLXRegisters).ir = parseInt(opcode + inputs_encoder[inst.type](argsFixed) + alucode, 2); //otteniamo l'istruzione scritta in 32 bit
             this.process_instruction[inst.type](lineFixed, instruction, argsFixed, inst.func, registers as DLXRegisters, memory, inst.unsigned,tagged);
         }
     }
@@ -291,11 +296,11 @@ export class DLXInterpreter extends Interpreter{
             (registers as DLXRegisters).ien = 1;
             // this.tmpReg = (registers as DLXRegisters).r;
             // (registers as DLXRegisters).r = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        
+
         }
     }
 
-    /* 
+    /*
     Funzione di utilità utilizzata per invertire l'ordine dei bit nell'opcode.
     */
     public revString(str: string) {

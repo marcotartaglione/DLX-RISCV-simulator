@@ -135,15 +135,18 @@ export class Device {
     return this.min_address <= address && address <= this.max_address;
   }
 
-  // nella load inserisco il tipo di istruzione(instrType). Perche altrimenti nelle reti logiche non 
+  // nella load inserisco il tipo di istruzione(instrType). Perche altrimenti nelle reti logiche non
   // riesco a distinguere se viene fatta una load vera e propria oppure viene fatta una load all'
-  // interno di una store . Infatti nel contatore se vedo una load che deriva da una store non 
+  // interno di una store . Infatti nel contatore se vedo una load che deriva da una store non
   // leggo i cs ma faccio una super.load(address). Questo perchè nella store viene anche fatta una load.
   // Non è una cosa facile da spiegare in un commento. Per chiarimenti potete contattarmi all'indirizzo mail
   // filippo.comastri2@studio.unibo.it
 
   public load(address: number,instrType?: string): number {
+    //console.log("indirizzo: ", address, " instrType: ",instrType);
     let res = this.memory[address - this.min_address];
+    //console.log(res," indirizzo: ",this.getAddressHex(address - this.min_address));
+    //console.log("min_address: ",this.min_address,this.getAddressHex(this.min_address))
     return res;
   }
 

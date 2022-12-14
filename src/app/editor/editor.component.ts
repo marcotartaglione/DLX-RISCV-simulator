@@ -101,7 +101,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     if (this.doc && (val != this._pc || !this.running)) {
       let pre = Math.floor(this._pc / 4);
       let cur = Math.floor(val / 4);
-
+      // G console.log("vediamo quale linea sta eseguendo");
       if (!this.running) {
         this.doc.removeLineClass(this.previousLine, 'wrap', 'runned');
         this.doc.removeLineClass(pre, 'wrap', 'next');
@@ -228,14 +228,14 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       this.diagramService.setAnimationDuration(this.interval);
       this.diagramService.resume();
     }
-    try { 
+    try {
       this.codeService.interpreter.run(this.doc.getLine(this.runnedLine), this.registers, this.memoryService.memory);
     } catch (error) {
       this.onStop();
       this.doc.addLineClass(this.runnedLine, 'wrap', 'error');
       this.errorMessage = error.message;
     }
-    
+
     this.memoryService.memory.devices.forEach(el => {
       if(el.devType.includes("Start"))
         this.isInterruptDisabled = (el as StartLogicalNetwork).startup;
@@ -282,8 +282,8 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
 
   // METODO CHE SALVA IL CODICE IN MEMORIA (nella EPROM)
   // Per ogni riga invoca il metodo encode che restituisce la codifica di quella riga di comando
-  
-  storeCode() { 
+
+  storeCode() {
     this.codeService.interpreter.parseTags(this.codeService.content, this.start);
     let lines = this.codeService.content.split("\n");
     for(let i=0; i<lines.length;i++){
