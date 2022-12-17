@@ -113,12 +113,11 @@ export class DLXInterpreter extends Interpreter{
             registers.a = registers.r[rs1];
             registers.b = registers.r[rd];
             registers.mar = signExtend(offset) + registers.a;
-            let rest = (registers.mar >>> 0) % 4
+            let rest = (registers.mar >>> 0) % 4   //permette di capire a da quale byte partiamo per l'accesso in memoria  es: FFFF0003 -> 3 byte (quello meno significativo)
             let addr = Math.floor((registers.mar >>> 0) / 4) >>> 0;
-            //console.log("addr: ",rest) //prende il finalAddr
             registers.mdr = memory.load(addr,"IL");
-            console.log("mdr: ",registers.mdr.toString(16))
-            registers.temp = (offset == 0 ? rest : offset)
+            ///console.log("mdr: ",registers.mdr.toString(16))
+            registers.temp = rest
             func(registers);
             if (rd) {
                 registers.r[rd] = registers.c;
@@ -132,7 +131,8 @@ export class DLXInterpreter extends Interpreter{
             registers.a = registers.r[rs1];
             registers.mdr = registers.b = registers.r[rd];
             registers.mar = signExtend(offset) + registers.a;
-            registers.temp = offset;
+            let rest = (registers.mar >>> 0) % 4   //permette di capire a da quale byte partiamo per l'accesso in memoria  es: FFFF0003 -> 3 byte (quello meno significativo)
+            registers.temp = rest;
             let addr = Math.floor((registers.mar >>> 0) / 4) >>> 0;
             memory.store(addr, func(registers, [memory.load(addr,"IS")]));
             //se l'esecuzione è impostata su auto, l'animazione viene gestita dall'interprete
@@ -227,14 +227,11 @@ export class DLXInterpreter extends Interpreter{
             tokens = ['NOP'];
         } else {
             lineFixed = line.split(';')[0].replace(/^(\w+:)?\s+/, '');
-            //console.log("lineFixed: ",lineFixed)
             tokens = lineFixed.split(/\W+/);
-            //console.log("tokens: ",tokens)
         }
 
         let [instruction, ... args] = tokens;
         let argsFixed: number[] = [];
-        //console.log(args)
 
         if (instructions[instruction]) {
             argsFixed = args.map<number>(arg => {
