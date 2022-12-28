@@ -66,17 +66,22 @@ const mask = {
     ],
     halfword: [
         0x0000FFFF, undefined, 0xFFFF0000, undefined
+    ],
+    word: [
+        0xFFFFFFFF, undefined, undefined, undefined
     ]
 }
 
-function load(n: number, offset: number, dim: ('byte'|'halfword')) {
-    if (n == 0) return 0;
+function load(n: number, offset: number, dim: ('byte'|'halfword'|'word')) {
+    //if (n == 0) return 0;
+    if (dim === 'word' && offset % 4 != 0) throw new Error('fault');
     if (dim === 'halfword' && offset % 2 != 0) throw new Error('fault');
-    return (n & mask[dim][offset % 4]) >>> (offset % 4)*8 ;  //
+    return (n & mask[dim][offset % 4]) >>> (offset % 4)*8 ;
 }
 
-function store(n: number, dest: number, offset: number, dim: ('byte'|'halfword')) {
-    if (n == 0) return 0;
+function store(n: number, dest: number, offset: number, dim: ('byte'|'halfword'|'word')) {
+    //if (n == 0) return 0;
+    if (dim === 'word' && offset % 4 != 0) throw new Error('fault');
     if (dim === 'halfword' && offset % 2 != 0) throw new Error('fault');
     let m = mask[dim];
     return ((n & m[0]) << ((offset % 4)*8)) | (dest & ~m[offset % 4]);
@@ -111,7 +116,8 @@ export const instructions: {
     LH:     { type: 'IL',  func: (registers) => registers.c = signExtend(load(registers.mdr, registers.temp, 'halfword')) },
     LHI:    { type: 'LHI', func: (registers) => registers.c = registers.temp << 16 },
     LHU:    { type: 'IL',  func: (registers) => registers.c = load(registers.mdr, registers.temp, 'halfword') },
-    LW:     { type: 'IL',  func: (registers) => registers.c = registers.mdr },
+    //LW:     { type: 'IL',  func: (registers) => registers.c = registers.mdr,},
+    LW:     { type: 'IL',  func: (registers) => registers.c = load(registers.mdr, registers.temp, 'word')},
     MOVI2S: { type: 'RM',  func: (registers, [rd, rs1]) => registers[specialRegisters[rd-1].toLowerCase()] = registers.a = registers.r[rs1] },
     MOVS2I: { type: 'RM',  func: (registers, [rd, rs1]) => rd ? registers.r[rd] = registers.c = registers[specialRegisters[rs1-1].toLowerCase()] : 0 },
     NOP:    { type: 'NOP', func: () => null },
@@ -142,7 +148,8 @@ export const instructions: {
     SUBI:   { type: 'I',   func: (registers) => overflowCheck(instructions['SUBUI'].func(registers), true) },
     SUBU:   { type: 'R',   func: (registers) => registers.c = registers.a - registers.temp },
     SUBUI:  { type: 'I',   func: (registers) => registers.c = registers.a - registers.temp, unsigned: true },
-    SW:     { type: 'IS',  func: (registers) => registers.mdr },
+    //SW:     { type: 'IS',  func: (registers) => registers.mdr },
+    SW:     { type: 'IS',  func: (registers, [stored]) => store(registers.mdr, stored, registers.temp, 'word') },
     TRAP:   { type: 'J',   func: (registers) => { registers.iar = registers.pc + 4; return registers.pc = registers.temp; }, unsigned: true },
     XOR:    { type: 'R',   func: (registers) => registers.c = registers.a ^ registers.temp },
     XORI:   { type: 'I',   func: (registers) => registers.c = registers.a ^ registers.temp, unsigned: true },
