@@ -8,60 +8,107 @@ import {StartLogicalNetwork} from '../memory/model/logicalNetworks/start.logical
 import {InputPort} from '../memory/model/input-port';
 import {Ram} from '../memory/model/ram';
 
+/**
+ * Service responsible for managing the memory configuration, including loading and saving the memory state to localStorage, and providing
+ * methods to manipulate the memory devices.
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class MemoryService {
+  private _memory: Memory;
 
-  memory: Memory;
-  injector: Injector;
-
-  constructor(injector: Injector) {
-    this.injector = injector;
-    this.setMemory();
+  constructor() {
+    this.init();
   }
 
-  public setMemory() {
-    const tmp = window.localStorage.getItem('memory');
-    console.log(tmp);
-    if (tmp) {
-      this.memory = new Memory(tmp);
+  /**
+   * Initializes the memory configuration. If there is a stored memory configuration in localStorage, it loads the memory
+   * from it. Otherwise, it creates a default memory configuration.
+   */
+  public init() {
+    const storedMemory = window.localStorage.getItem('memory');
+
+    if (storedMemory) {
+      this._memory = new Memory(storedMemory);
     } else {
-      this.memory = new Memory();
-      this.memory.add(new Eprom(0x00000000, 0x07FFFFFF));
-      this.memory.add(new Ram(0x10000000, 0x1FFFFFFF));
-      this.memory.add(new StartLogicalNetwork(0x30000000, 0x30000003));
-      this.memory.add(new LedLogicalNetwork(0x24000000, 0x24000003));
-      this.memory.add(new Counter(0x29000000, 0x29000005));
-      this.memory.add(new Ram(0x38000000, 0x3FFFFFFF));
-      this.memory.add(new InputPort(0x0C000000, 0x0C000003));
+      this._memory = new Memory();
+      this._memory.add(new Eprom(0x00000000, 0x07FFFFFF));
+      this._memory.add(new Ram(0x10000000, 0x1FFFFFFF));
+      this._memory.add(new StartLogicalNetwork(0x30000000, 0x30000003));
+      this._memory.add(new LedLogicalNetwork(0x24000000, 0x24000003));
+      this._memory.add(new Counter(0x29000000, 0x29000005));
+      this._memory.add(new Ram(0x38000000, 0x3FFFFFFF));
+      this._memory.add(new InputPort(0x0C000000, 0x0C000003));
     }
   }
 
-  public add(name: Device): void {
-    this.memory.add(name);
+  /**
+   * Adds a new device to the memory configuration.
+   *
+   * @param device The device to be added to the memory.
+   */
+  public add(device: Device): void {
+    this._memory.add(device);
   }
 
-  public remove(dev: Device): void {
-    this.memory.remove(dev);
+  /**
+   * Removes a device from the memory configuration.
+   *
+   * @param device The device to be removed from the memory.
+   */
+  public remove(device: Device): void {
+    this._memory.remove(device);
   }
 
-  public clearMemory = () => {
+  /**
+   * Returns the list of devices currently stored in the memory configuration.
+   */
+  public get devices(): Device[] {
+    return this._memory.devices;
+  }
+
+  /**
+   * Returns the current memory configuration, which includes all the devices and their respective address ranges.
+   * This allows other components to access and manipulate the memory configuration as needed.
+   */
+  public get memory(): Memory {
+    return this._memory;
+  }
+
+  /**
+   * Removes the stored memory configuration from localStorage, effectively resetting the memory to its default state on the next
+   * initialization.
+   */
+  public removeFromMemory = () => {
     window.localStorage.removeItem('memory');
   }
 
-  save() {
-    window.localStorage.setItem('memory', JSON.stringify(this.memory.devices.map(dev => {
+  /**
+   * Stores the current memory configuration in localStorage, allowing it to be persisted across page reloads and browser sessions.
+   * The memory configuration is serialized to JSON format before being stored.
+   */
+  public storeInMemory() {
+    window.localStorage.setItem('memory', JSON.stringify(this._memory.devices.map(dev => {
       return {proto: dev.constructor.name, name: dev.name, min_address: dev.minAddress, max_address: dev.maxAddress};
     })));
   }
 
+  /**
+   * Finds the first free address in the memory configuration starting from a given address.
+   *
+   * @param startAddress The address from which to start searching for a free address.
+   */
+  public firstFreeAddr(startAddress: number = 0): number {
+    return this._memory.firstFreeAddr(startAddress);
+  }
+
   getEprom(): Eprom {
-    return this.memory.get('EPROM') as Eprom;
+    return this._memory.get('EPROM') as Eprom;
   }
 
   getCounter(): Counter {
-    console.log('name ' + this.memory.get('COUNTER').name);
-    return this.memory.get('COUNTER') as Counter;
+    console.log('name ' + this._memory.get('COUNTER').name);
+    return this._memory.get('COUNTER') as Counter;
   }
 }

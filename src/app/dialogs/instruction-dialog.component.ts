@@ -28,7 +28,7 @@ export class InstructionDialogComponent {
       // tslint:disable-next-line:no-bitwise
       finalAddr = next >>> 2;
     }
-    if (this.service.memory.devices.find(el => el.minAddress <= finalAddr && el.maxAddress >= finalAddr) == null) {
+    if (this.service.devices.find(el => el.minAddress <= finalAddr && el.maxAddress >= finalAddr) == null) {
       return true;
     }
 
@@ -43,7 +43,7 @@ export class InstructionDialogComponent {
       finalAddr = pre >>> 2;
     }
 
-    if (this.service.memory.devices.find(el => el.minAddress <= finalAddr && el.maxAddress >= finalAddr) == null) {
+    if (this.service.devices.find(el => el.minAddress <= finalAddr && el.maxAddress >= finalAddr) == null) {
       return true;
     }
 
@@ -62,7 +62,7 @@ export class InstructionDialogComponent {
       // tslint:disable-next-line:no-bitwise
       finalAddr = next >>> 2;
     }
-    const d = this.service.memory.devices.find(el => el.minAddress <= finalAddr && el.maxAddress >= finalAddr);
+    const d = this.service.devices.find(el => el.minAddress <= finalAddr && el.maxAddress >= finalAddr);
     // per visualizzare sempre il codice a partire da multipli di 4, così da non avere disallineamento tra
     // indirizzo e codifica
     if (next % 4 !== 0) {
@@ -114,7 +114,7 @@ export class InstructionDialogComponent {
       finalAddr = pre >>> 2;
     }
 
-    const d = this.service.memory.devices.find(el => el.minAddress <= finalAddr && el.maxAddress >= finalAddr);
+    const d = this.service.devices.find(el => el.minAddress <= finalAddr && el.maxAddress >= finalAddr);
     // per visualizzare sempre il codice a partire da multipli di 4, così da non avere disallineamento tra
     // indirizzo e codifica
     if (pre % 4 !== 0) {

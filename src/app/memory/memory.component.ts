@@ -49,7 +49,7 @@ export class MemoryComponent implements OnInit {
   }
 
   get canMoveSelectedLeft(): boolean {
-    const devices = this.memoryService.memory.devices;
+    const devices = this.memoryService.devices;
     const index = devices.indexOf(this.selected);
     return (this.selected.name !== 'EPROM' && this.selected.name !== 'RAM_B') &&
       (index > 0);
@@ -57,7 +57,7 @@ export class MemoryComponent implements OnInit {
   }
 
   get canMoveSelectedRight(): boolean {
-    const devices = this.memoryService.memory.devices;
+    const devices = this.memoryService.devices;
     const index = devices.indexOf(this.selected);
     return (this.selected.name !== 'EPROM') &&
       (index < devices.length - 1);
@@ -84,20 +84,20 @@ export class MemoryComponent implements OnInit {
   }
 
   onAdd(type: Type<Device>) {
-    const firstAdd = this.memoryService.memory.firstFreeAddr(0) + 1;
+    const firstAdd = this.memoryService.firstFreeAddr() + 1;
     this.memoryService.add(new type(firstAdd, firstAdd + 0x01FFFFFF));
-    this.memoryService.save();
+    this.memoryService.storeInMemory();
   }
 
   onDelete(dev: Device) {
     this.memoryService.remove(dev);
     this.selected = null;
-    this.memoryService.save();
+    this.memoryService.storeInMemory();
   }
 
   onChangeCS(newValue: string, id: string) {
-    const devices = this.memoryService.memory.devices;
-    const indexSelectedDevice = this.memoryService.memory.devices.indexOf(this.selected);
+    const devices = this.memoryService.devices;
+    const indexSelectedDevice = this.memoryService.devices.indexOf(this.selected);
     const cs = devices[indexSelectedDevice].chipSelects.find(el => el.id === id);
 
     if (cs === null) {
@@ -114,8 +114,8 @@ export class MemoryComponent implements OnInit {
   }
 
   onChange(event: any, side: string) {
-    const devices = this.memoryService.memory.devices;
-    const indexSelectedDevice = this.memoryService.memory.devices.indexOf(this.selected);
+    const devices = this.memoryService.devices;
+    const indexSelectedDevice = this.memoryService.devices.indexOf(this.selected);
     if (side === 'min') {
       if (this.selected.minAddress <= devices[indexSelectedDevice - 1].maxAddress) {
         this.selected.minAddress = devices[indexSelectedDevice - 1].maxAddress + 1;
@@ -126,7 +126,7 @@ export class MemoryComponent implements OnInit {
       }
     }
     if (this.selected.size('MB') >= 128 || this.selected instanceof LogicalNetwork) {
-      this.memoryService.save();
+      this.memoryService.storeInMemory();
     } else {
       this.dialog.open(MessageDialogComponent, {
         data: {message: 'Memory is less than 128MB'}
@@ -136,11 +136,11 @@ export class MemoryComponent implements OnInit {
 
   moveSelectedLeft() {
     let endAddress = 0;
-    const indexSelectedDevice = this.memoryService.memory.devices.indexOf(this.selected);
+    const indexSelectedDevice = this.memoryService.devices.indexOf(this.selected);
     const sizeOfSelected = this.selected.maxAddress - this.selected.minAddress;
     const spaceBeforeFirstDevice =
-      this.memoryService.memory.devices[indexSelectedDevice].minAddress -
-      this.memoryService.memory.devices[indexSelectedDevice - 1].maxAddress;
+      this.memoryService.devices[indexSelectedDevice].minAddress -
+      this.memoryService.devices[indexSelectedDevice - 1].maxAddress;
 
     if (spaceBeforeFirstDevice >= 33554432) {
       this.selected.maxAddress = this.selected.maxAddress - 33554432;
@@ -154,17 +154,17 @@ export class MemoryComponent implements OnInit {
       }
     }
 
-    this.memoryService.memory.devices = this.memoryService.memory.devices.sort((a, b) => a.minAddress - b.minAddress);
-    this.memoryService.save();
+    this.memoryService.memory.devices = this.memoryService.devices.sort((a, b) => a.minAddress - b.minAddress);
+    this.memoryService.storeInMemory();
   }
 
   moveSelectedRight() {
     let startAddress = 0;
-    const indexSelectedDevice = this.memoryService.memory.devices.indexOf(this.selected);
+    const indexSelectedDevice = this.memoryService.devices.indexOf(this.selected);
     const sizeOfSelected = this.selected.maxAddress - this.selected.minAddress;
     const spaceBeforeFirstDevice =
-      this.memoryService.memory.devices[indexSelectedDevice + 1].minAddress -
-      this.memoryService.memory.devices[indexSelectedDevice].maxAddress;
+      this.memoryService.devices[indexSelectedDevice + 1].minAddress -
+      this.memoryService.devices[indexSelectedDevice].maxAddress;
 
     if (spaceBeforeFirstDevice >= 33554432) { // Muovi avanti 128Mb se c'è abbastanza spazio
       this.selected.maxAddress = this.selected.maxAddress + 33554432;
@@ -176,8 +176,8 @@ export class MemoryComponent implements OnInit {
         this.selected.maxAddress = this.selected.minAddress + sizeOfSelected;
       }
     }
-    this.memoryService.memory.devices = this.memoryService.memory.devices.sort((a, b) => a.minAddress - b.minAddress);
-    this.memoryService.save();
+    this.memoryService.memory.devices = this.memoryService.devices.sort((a, b) => a.minAddress - b.minAddress);
+    this.memoryService.storeInMemory();
   }
 
   readMemoryDetail(addr) {
@@ -203,7 +203,7 @@ export class MemoryComponent implements OnInit {
     // Cerco nella memoria quale Device è allocato all'indirizzo scelto dall'utente. Se a quell'indirizzo non è
     // mappato alcun device si aprirà una finestra d'errore
 
-    const d = this.memoryService.memory.devices.find(el => el.minAddress <= finalAddr && el.maxAddress >= finalAddr);
+    const d = this.memoryService.devices.find(el => el.minAddress <= finalAddr && el.maxAddress >= finalAddr);
     if (d == null) {
       this.dialog.open(ErrorDialogComponent, {
         data: {message: 'No memory allocated in this range'}
@@ -270,7 +270,7 @@ export class MemoryComponent implements OnInit {
       // tslint:disable-next-line:no-bitwise
       finalAddr = iv >>> 2; // è un numero a 32 bit sotto
     }
-    const d = this.memoryService.memory.devices.find(el => el.minAddress <= finalAddr && el.maxAddress >= finalAddr);
+    const d = this.memoryService.devices.find(el => el.minAddress <= finalAddr && el.maxAddress >= finalAddr);
     if (d == null) {
       this.dialog.open(ErrorDialogComponent, {
         data: {message: 'No memory allocated in this range'}
@@ -279,7 +279,7 @@ export class MemoryComponent implements OnInit {
     }
     const arrData = [];
     for (let i = 0; i < 8; i++) {
-      let v = d.load(finalAddr + (i * 0x00000001));
+      let v = d.load(finalAddr + (i));
       if (v === undefined) {
         v = Math.floor(Math.random() * 4294967296);
       }
@@ -289,7 +289,7 @@ export class MemoryComponent implements OnInit {
       arrData.push(
         {
           value: v,
-          address: finalAddr + (i * 0x00000001),
+          address: finalAddr + (i),
           hexAddress: new FormatPipe().transform(finalAddr + (i), 'hex')
         });
     }
@@ -359,14 +359,14 @@ export class MemoryComponent implements OnInit {
   }
 
   private spaceBetweenDevices(indexSelectedDevice: number, sizeOfSelected: number, side: string): number {
-    for (let i = indexSelectedDevice; i < this.memoryService.memory.devices.length - 2 && side === 'right'; i++) {
-      if ((this.memoryService.memory.devices[i + 2].minAddress - this.memoryService.memory.devices[i + 1].maxAddress) >= sizeOfSelected) {
-        return this.memoryService.memory.devices[i + 1].maxAddress;
+    for (let i = indexSelectedDevice; i < this.memoryService.devices.length - 2 && side === 'right'; i++) {
+      if ((this.memoryService.devices[i + 2].minAddress - this.memoryService.devices[i + 1].maxAddress) >= sizeOfSelected) {
+        return this.memoryService.devices[i + 1].maxAddress;
       }
     }
     for (let i = indexSelectedDevice; i > 1 && side === 'left'; i--) {
-      if ((this.memoryService.memory.devices[i - 1].minAddress - this.memoryService.memory.devices[i - 2].maxAddress) >= sizeOfSelected) {
-        return this.memoryService.memory.devices[i - 1].minAddress;
+      if ((this.memoryService.devices[i - 1].minAddress - this.memoryService.devices[i - 2].maxAddress) >= sizeOfSelected) {
+        return this.memoryService.devices[i - 1].minAddress;
       }
     }
     return 0;

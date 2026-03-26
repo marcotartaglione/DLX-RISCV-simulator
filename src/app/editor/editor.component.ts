@@ -55,7 +55,7 @@ import {LogicalNetwork} from '../memory/model/logical-network';
     ])
   ],
 })
-export class EditorComponent implements OnInit, AfterViewInit, OnDestroy {
+export class EditorComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('codeEditor', {static: false}) codeEditor: CodemirrorComponent;
   @ViewChild('form', {static: false}) form: NgForm;
@@ -214,7 +214,7 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   startResetSignal() {
     // WHEN THE APPLICATION START SEND THE RESET SIGNAL TO THE LOGICAL NETWORKS
-    this.memoryService.memory.devices.forEach(el => {
+    this.memoryService.devices.forEach(el => {
       if (el instanceof LogicalNetwork) {
         (el as LogicalNetwork).startOperation();
       }
@@ -252,7 +252,7 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy {
       this.errorMessage = error.message;
     }
 
-    this.memoryService.memory.devices.forEach(el => {
+    this.memoryService.devices.forEach(el => {
       if (el instanceof StartLogicalNetwork) {
         this.isInterruptDisabled = (el as StartLogicalNetwork).startup;
       }
@@ -283,9 +283,9 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onClear() {
-    this.memoryService.clearMemory();
+    this.memoryService.removeFromMemory();
     this.codeService.clear();
-    this.memoryService.setMemory();
+    this.memoryService.init();
     this.codeService.load();
     this.storeCode();
     if (this.diagramService.isAuto()) {
@@ -298,11 +298,6 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onInterruptPort(devName: string) {
-    this.memoryService.memory.devices.forEach(dev => {
-      if (devName === dev.name) {
-        (dev as InputPort).interrupt();
-      }
-    });
     this.codeService.interpreter.interrupt(this.registers);
   }
 
@@ -322,11 +317,6 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.form.dirty) {
       $event.returnValue = true;
     }
-  }
-
-  ngOnInit() {
-    // creo Array delle Porte in Input
-    this.memoryService.memory.popolaIPorts();
   }
 
   ngOnDestroy() {
