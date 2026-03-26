@@ -12,7 +12,7 @@
 </div>
 <div class="main-container">
   <div class="memory">
-    <ng-container *ngFor="let device of memoryService.memory.devices">
+    <ng-container *ngFor="let device of memoryService.devices">
       <img (click)="selected === device ? selected = null : selected = device"
            *ngIf="isLed(device)"
            [class.selected]="selected === device"
@@ -40,7 +40,7 @@
            [style.left]="((device.minAddress/1073741824)*100 -3.5).toFixed(2)+'%'"
            alt="" class=" icon_absolute"
            matTooltipClass="device-size" matTooltipPosition="above"
-           src="assets/img/counter/counter.png"
+           ngSrc="assets/img/counter/counter.png"
            width="70px"/>
 
       <img (click)="selected == device ? selected = null : selected = device" *ngIf="isInputPort(device)"
@@ -49,7 +49,7 @@
            [style.left]="((device.minAddress/1073741824)*100 -3.5).toFixed(2)+'%'"
            alt="" class=" icon_absolute"
            matTooltipClass="device-size" matTooltipPosition="above"
-           src="assets/img/icon_port.png"
+           ngSrc="assets/img/icon_port.png"
            width="70px"/>
 
       <div (click)="selected == device ? selected = null : selected = device"

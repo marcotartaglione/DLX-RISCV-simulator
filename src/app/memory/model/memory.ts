@@ -125,16 +125,4 @@ export class Memory {
     result += String.fromCharCode(65 + num);
     return result;
   }
-
-  // viene invocata solamente all'inizio, in ngAfterViewInit nell'editor component
-  popolaIPorts() {
-    let i = 0;
-    this.devices.forEach(dev => {
-      if (dev.name.includes('INPUT_PORT')) {
-        dev.name = this.setNameExt(i);
-        this.inputPorts.push((dev as InputPort));
-        i++;
-      }
-    });
-  }
 }
