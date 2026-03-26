@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { MatDialog } from '@angular/material';
 import { Interpreter } from '../interpreters/interpreter';
 
 @Injectable({
@@ -11,7 +10,7 @@ export class CodeService {
   public interpreter: Interpreter;
   public editorMode: string;
 
-  constructor(private dialog: MatDialog) {
+  constructor() {
 
   }
 

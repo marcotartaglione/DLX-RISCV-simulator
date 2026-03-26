@@ -4,7 +4,6 @@ import {StartLogicalNetwork} from './logicalNetworks/start.logical-network';
 import {LedLogicalNetwork} from './logicalNetworks/led.logical-network';
 import {FFDLogicalNetwork} from './logicalNetworks/ffd-logical-network';
 import {Counter} from './counter';
-import {isUndefined} from 'util';
 import {InputPort} from './input-port';
 import {Ram} from './ram';
 
@@ -88,7 +87,7 @@ export class Memory {
     const device = this.devices.find((dev) => dev.hasAddress(address));
     if (device) {
       let res = device.load(address);
-      if (isUndefined(res)) {
+      if (res === undefined) {
         // Se non è stato ancora inizializzata quella cella di memoria la inizializzo con un valore
         // casuale e salvo quel valore in quella cella di memoria
         res = Math.floor(Math.random() * 4294967296);

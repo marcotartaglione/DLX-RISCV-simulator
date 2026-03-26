@@ -12,7 +12,6 @@ import {FFDLogicalNetwork} from './model/logicalNetworks/ffd-logical-network';
 import {ImageDialogComponent} from '../dialogs/image-dialog.component';
 import {ErrorDialogComponent} from '../dialogs/error-dialog.component';
 import {InstructionDialogComponent} from '../dialogs/instruction-dialog.component';
-import {isUndefined} from 'util';
 import {Counter} from './model/counter';
 import {CounterDialogComponent} from '../dialogs/counter-dialog.component';
 import {InputPort} from './model/input-port';
@@ -223,7 +222,7 @@ export class MemoryComponent implements OnInit {
     // se la memoria a quell'indirizzo non è ancora stata inizializzata , allora la load restituirà un valore undefined
     // in tal caso visualizzerò un valore casuale scelto con la riga di codice seguente
 
-    if (isUndefined(instr)) {
+    if (instr === undefined) {
       instr = Math.floor(Math.random() * 4294967296);
     }
     // if(isUndefined(instr)) instr= Math.floor(Math.random()*256); //Gabri 2^8 max
@@ -281,7 +280,7 @@ export class MemoryComponent implements OnInit {
     const arrData = [];
     for (let i = 0; i < 8; i++) {
       let v = d.load(finalAddr + (i * 0x00000001));
-      if (isUndefined(v)) {
+      if (v === undefined) {
         v = Math.floor(Math.random() * 4294967296);
       }
       // nel caso la cella di memoria non contenga alcun valore visualizzo un valore casuale
