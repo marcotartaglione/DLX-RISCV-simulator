@@ -63,6 +63,12 @@
                   "maximumError": "10kb"
                 }
               ]
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "sourceMap": true,
+              "namedChunks": true
             }
           }
         },
@@ -76,6 +82,9 @@
           "configurations": {
             "production": {
               "browserTarget": "DLX-RISCV-simulator:build:production"
+            },
+            "development": {
+              "browserTarget": "DLX-RISCV-simulator:build:development"
             }
           }
         },
