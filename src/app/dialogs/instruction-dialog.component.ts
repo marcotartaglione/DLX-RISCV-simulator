@@ -1,7 +1,6 @@
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {MemoryService} from '../services/memory.service';
-import {isUndefined} from 'util';
 import {FormatPipe} from '../pipes/format.pipe';
 
 @Component({
@@ -70,7 +69,7 @@ export class InstructionDialogComponent {
       next = (Math.floor(next / 4)) * 4;
     }
     let instr = d.load(finalAddr);
-    if (isUndefined(instr)) {
+    if (instr === undefined) {
       instr = Math.floor(Math.random() * 4294967296);
     }
     // tslint:disable-next-line:no-bitwise
@@ -122,7 +121,7 @@ export class InstructionDialogComponent {
       pre = (Math.floor(pre / 4)) * 4;
     }
     let instr = d.load(finalAddr);
-    if (isUndefined(instr)) {
+    if (instr === undefined) {
       instr = Math.floor(Math.random() * 4294967296);
     }
     // tslint:disable-next-line:no-bitwise

@@ -12,16 +12,12 @@ import {
   ViewChild
 } from '@angular/core';
 import {NgForm} from '@angular/forms';
-import {MatDialog} from '@angular/material';
-import {ActivatedRoute} from '@angular/router';
+import {MatDialog} from '@angular/material/dialog';
 import {CodemirrorComponent} from '@ctrl/ngx-codemirror';
 import {EditorFromTextArea} from 'codemirror';
 import 'codemirror/addon/selection/active-line';
 import {Subscription} from 'rxjs';
 import {SaveDialogComponent} from '../dialogs/save-dialog.component';
-import {Counter} from '../memory/model/counter';
-import {FFDLogicalNetwork} from '../memory/model/logicalNetworks/ffd-logical-network';
-import {LedLogicalNetwork} from '../memory/model/logicalNetworks/led.logical-network';
 import {StartLogicalNetwork} from '../memory/model/logicalNetworks/start.logical-network';
 import {Registers} from '../registers/registers.js';
 import {CodeService} from '../services/code.service.js';
@@ -83,7 +79,6 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private appRef: ApplicationRef,
-    route: ActivatedRoute,
     private dialog: MatDialog
   ) {
     try {

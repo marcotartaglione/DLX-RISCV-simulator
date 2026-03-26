@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {LogicalNetwork} from './logical-network';
 import {ChipSelect} from './ChipSelect';
 
-@Injectable()
 export class Counter extends LogicalNetwork {
 
   constructor(

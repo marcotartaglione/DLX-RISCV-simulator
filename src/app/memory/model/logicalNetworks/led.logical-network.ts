@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {LogicalNetwork} from '../logical-network';
 import {ChipSelect} from '../ChipSelect';
 
-@Injectable()
 export class LedLogicalNetwork extends LogicalNetwork {
   // ffd( name, d, a_res, a_set, clk)
   // mux( zero, one, sel)
