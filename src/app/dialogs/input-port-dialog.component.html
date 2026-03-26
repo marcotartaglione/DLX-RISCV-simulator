@@ -1,32 +1,32 @@
 <div mat-dialog-content>
   <div>
       <div style="display:inline-block;">
-          <img style="background-color:white ; display: block; margin:0 auto;" [src]="url_image" width="730px" height="500px"/>
+          <img style="background-color:white ; display: block; margin:0 auto;" [src]="urlImage" width="730px" height="500px"/>
       </div>
   </div>
   <br>
   <div>
       <mat-form-field appearance="outline">
           <mat-label>Current Value</mat-label>
-          <input matInput type="text" name="currentVal" [value]="this.data.network.data" readonly>
+          <input matInput type="text" name="currentVal" [value]="this.data.network.data + ''" readonly>
       </mat-form-field>
       <div style="display:inline-block; margin:10px;" >
         <mat-form-field appearance="outline">
             <mat-label>Size Port Bit</mat-label>
-            <input matInput [(ngModel)]="this.data.network.size_port" >
+            <input matInput [(ngModel)]="this.data.network.dataSize" >
         </mat-form-field>
       </div>
-      <div style="display:inline-block; margin:10px;" *ngIf="data.network.clkType">
+      <div style="display:inline-block; margin:10px;" *ngIf="data.network.clockType">
           <mat-form-field appearance="fill">
               <mat-label>Clock Type</mat-label>
-              <input matInput type="text" name="clkType" [value]="this.data.network.clkType" readonly>
+              <input matInput type="text" name="clkType" [value]="this.data.network.clockType" readonly>
           </mat-form-field>
       </div>
   </div>
-  <div *ngIf="data.network.cs.length > 0">
+  <div *ngIf="data.network.chipSelects.length > 0">
       <b>Chip-Select</b><br />
-      <span *ngFor="let cs of data.network.cs">
-          {{cs.id}} - {{cs.hexAddress}}<br />
+      <span *ngFor="let cs of data.network.chipSelects">
+          {{cs.id}} - {{cs.address | format: 'hex'}}<br />
       </span>
   </div>
   <br />

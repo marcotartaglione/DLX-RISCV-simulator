@@ -1,34 +1,35 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ErrorDialogComponent } from '../dialogs/error-dialog.component';
-import { InputPort } from '../memory/model/input-port';
+import {Component, Inject, OnInit} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialog} from '@angular/material/dialog';
+import {ErrorDialogComponent} from './error-dialog.component';
+import {InputPort} from '../memory/model/input-port';
 
 
 @Component({
   templateUrl: './input-port-dialog.component.html',
 })
-export class InputPortDialogComponent implements OnInit{
+export class InputPortDialogComponent implements OnInit {
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: {network : InputPort}, private dialog: MatDialog) {}
+  dimLast: 8 | 16 | 32;
+  urlImage: string;
 
-  dim_last : number;
-  url_image : string;
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { network: InputPort }, private dialog: MatDialog) {
+  }
 
-  onSubmit(){
-    //setto la lunghezza della porta in input
-    let dim = this.data.network.size_port;
-    if(dim != 8 && dim != 16 && dim != 32){
-      this.dialog.open(ErrorDialogComponent,{
-        data: { message: "Size Port must be: 8 / 16 / 32 bit" }
-      })
-      this.data.network.size_port = this.dim_last;
+  onSubmit() {
+    // setto la lunghezza della porta in input
+    const dim = this.data.network.dataSize;
+    if (dim !== 8 && dim !== 16 && dim !== 32) {
+      this.dialog.open(ErrorDialogComponent, {
+        data: {message: 'Size Port must be: 8 / 16 / 32 bit'}
+      });
+      this.data.network.dataSize = this.dimLast;
       return;
     }
   }
 
-  ngOnInit(){
-    this.dim_last = this.data.network.size_port;
-    this.url_image = "assets/img/input-port/input_port_bit_"+this.dim_last+".png"
+  ngOnInit() {
+    this.dimLast = this.data.network.dataSize;
+    this.urlImage = 'assets/img/input-port/input_port_bit_' + this.dimLast + '.png';
   }
 
 }

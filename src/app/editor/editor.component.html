@@ -8,11 +8,11 @@
       <button mat-raised-button class="mr" [disabled]="isInterruptDisabled" (click)="onInterrupt()">
         <span class="btn">Int (Led) <i class="fas fa-bolt amber"></i></span>
       </button>
-      <button mat-raised-button class="mr" *ngIf="memoryService.memory.portmapped" [matMenuTriggerFor]="menuInputPort" [disabled]="isInterruptDisabled">
+      <button mat-raised-button class="mr" *ngIf="memoryService.memory.inputPorts.length > 0" [matMenuTriggerFor]="menuInputPort" [disabled]="isInterruptDisabled">
         <span class="btn">Int (Input Port) <i class="fas fa-bolt amber"></i></span>
       </button>
       <mat-menu #menuInputPort="matMenu">
-        <ng-container *ngFor="let device of memoryService.memory.Iports">
+        <ng-container *ngFor="let device of memoryService.memory.inputPorts">
           <button mat-menu-item (click)="onInterruptPort(device.name)">{{ device.name }}</button>
         </ng-container>
       </mat-menu>

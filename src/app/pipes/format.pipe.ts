@@ -17,5 +17,4 @@ export class FormatPipe implements PipeTransform {
         return (n >>> 0).toString(8).padStart(Math.ceil(length / 2), '0').toUpperCase();
     }
   }
-
 }

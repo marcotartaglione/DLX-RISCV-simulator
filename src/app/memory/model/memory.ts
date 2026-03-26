@@ -1,79 +1,74 @@
-import { Injector, Inject } from "@angular/core";
-import { Device, IDevice } from "./device";
-import { Eprom } from "./eprom";
-import { StartLogicalNetwork } from "./start.logical-network";
-import { LedLogicalNetwork } from "./led.logical-network";
-import { FFDLogicalNetwork } from "./ffd-logical-network";
-import { Counter } from "./counter";
-import { isUndefined } from "util";
-import { InputPort } from "./input-port";
+import {Device} from './device';
+import {Eprom} from './eprom';
+import {StartLogicalNetwork} from './logicalNetworks/start.logical-network';
+import {LedLogicalNetwork} from './logicalNetworks/led.logical-network';
+import {FFDLogicalNetwork} from './logicalNetworks/ffd-logical-network';
+import {Counter} from './counter';
+import {isUndefined} from 'util';
+import {InputPort} from './input-port';
+import {Ram} from './ram';
 
 export class Memory {
   devices: Device[] = [];
-  Iports: Device[] = [];
-  portmapped: boolean = false; //flag che ci dice se almeno una porta è mappata
+  inputPorts: Device[] = [];
 
-  public firstFreeAddr(startAddr): number {
-    for (let i = 0; i < this.devices.length - 1; i++) {
-      if (
-        this.devices[i + 1].min_address - this.devices[i].max_address >=
-          33554432 &&
-        this.devices[i + 1].max_address > startAddr
-      ) {
-        return this.devices[i].max_address + 33554432 / 2;
-      }
-    }
-    return 0;
-  }
-
-  constructor(struct?: string, injector?: Injector) {
+  constructor(struct?: string) {
     if (struct) {
       JSON.parse(struct).forEach((el) => {
-        console.log(el.proto);
         switch (el.proto) {
           case Eprom.name:
-            this.add(Eprom, el.min_address, el.max_address, injector);
+            this.add(Eprom.fromJSON(el));
             break;
           case StartLogicalNetwork.name:
-            this.add(StartLogicalNetwork, el.min_address, el.max_address, injector);
+            this.add(StartLogicalNetwork.fromJSON(el));
             break;
 
           case LedLogicalNetwork.name:
-            this.add(LedLogicalNetwork, el.min_address, el.max_address, injector);
+            this.add(LedLogicalNetwork.fromJSON(el));
             break;
 
           case FFDLogicalNetwork.name:
-            this.add(FFDLogicalNetwork, el.min_address, el.max_address, injector);
+            this.add(FFDLogicalNetwork.fromJSON(el));
             break;
 
           case Counter.name:
-            this.add(Counter, el.min_address, el.max_address, injector);
+            this.add(Counter.fromJSON(el));
             break;
 
           case InputPort.name:
-            this.add(InputPort, el.min_address, el.max_address, injector);
+            this.add(InputPort.fromJSON(el));
             break;
 
-          default:
-            this.add(el.name, el.min_address, el.max_address);
+          case Ram.name:
+            this.add(Ram.fromJSON(el));
             break;
         }
       });
     }
   }
 
-  public add(name: string | IDevice, min_address: number, max_address: number, injector?: Injector): void {
-    if (this.devices.every((dev) => !(dev.checkAddress(min_address) || dev.checkAddress(max_address)))) {
-      if (typeof name == "string") {
-        this.devices.push(new Device(name, min_address, max_address));
-      } else {
-        this.devices.push(new name(min_address, max_address, injector));
+  public firstFreeAddr(startAddr): number {
+    for (let i = 0; i < this.devices.length - 1; i++) {
+      if (
+        this.devices[i + 1].minAddress - this.devices[i].maxAddress >=
+        33554432 &&
+        this.devices[i + 1].maxAddress > startAddr
+      ) {
+        return this.devices[i].maxAddress + 33554432 / 2;
       }
-      this.devices = this.devices.sort((a, b) => a.min_address - b.min_address);
     }
+    return 0;
+  }
 
-    if(name == InputPort){
-      this.portmapped = true;
+  public add(device: Device): void {
+    if (this.devices.every((dev) => !(dev.hasAddress(device.minAddress) || dev.hasAddress(device.maxAddress)))) {
+      this.devices.push(device);
+      this.devices = this.devices.sort((a, b) => a.minAddress - b.minAddress);
+
+      if (device instanceof InputPort) {
+        device.name = this.setNameExt(this.inputPorts.length);
+        this.inputPorts.push(device);
+      }
     }
   }
 
@@ -82,15 +77,17 @@ export class Memory {
   }
 
   public remove(dev: Device): void {
-    this.devices = this.devices.filter((device) => device != dev);
-    if(this.Iports.length == 0)
-      this.portmapped = false;
+    this.devices = this.devices.filter((device) => device !== dev);
+
+    if (dev instanceof InputPort) {
+      this.inputPorts = this.inputPorts.filter((port) => port !== dev);
+    }
   }
 
   public load(address: number, instrType?: string): number {
-    let device = this.devices.find((dev) => dev.checkAddress(address));
+    const device = this.devices.find((dev) => dev.hasAddress(address));
     if (device) {
-      let res = device.load(address, instrType);
+      let res = device.load(address);
       if (isUndefined(res)) {
         // Se non è stato ancora inizializzata quella cella di memoria la inizializzo con un valore
         // casuale e salvo quel valore in quella cella di memoria
@@ -99,51 +96,46 @@ export class Memory {
       }
       return res;
     } else {
-      throw new Error("Device not found");
+      throw new Error('Device not found');
     }
   }
 
   public store(address: number, word: number): number {
-    let device = this.devices.find((dev) => dev.checkAddress(address));
+    const device = this.devices.find((dev) => dev.hasAddress(address));
     if (device) {
       device.store(address, word);
     } else {
-      throw new Error("Device not found");
+      throw new Error('Device not found');
     }
     return word;
   }
 
-  public removePort(dev : Device){
-    this.Iports = this.Iports.filter(el => el != dev);
+  public removePort(dev: Device) {
+    this.inputPorts = this.inputPorts.filter(el => el !== dev);
   }
 
-  //setto i nomi in base a quante input port ho mappato
-  setNameExt(num : number) : string{
-    if(num == 0)
-      return "INPUT_PORT_A";
-    else if (num == 1)
-      return "INPUT_PORT_B";
-    else if (num == 2)
-      return "INPUT_PORT_C";
-    else if(num == 3)
-      return "INPUT_PORT_D";
-    else
-      return "INPUT_PORT_Nesima";
+  // setto i nomi in base a quante input port ho mappato
+  public setNameExt(num: number): string {
+    let result = 'INPUT_PORT_';
+
+    while (num >= 26) {
+      result += String.fromCharCode(65 + (num % 26));
+      num = Math.floor(num / 26) - 1;
+    }
+
+    result += String.fromCharCode(65 + num);
+    return result;
   }
 
-  //viene invocata solamente all'inizio, in ngAfterViewInit nell'editor component
-  popolaIPorts(){
-    let i=0;
+  // viene invocata solamente all'inizio, in ngAfterViewInit nell'editor component
+  popolaIPorts() {
+    let i = 0;
     this.devices.forEach(dev => {
-      if(dev.name.includes('INPUT_PORT')){
-        dev.updateName(this.setNameExt(i));
-        this.Iports.push((dev as InputPort));
+      if (dev.name.includes('INPUT_PORT')) {
+        dev.name = this.setNameExt(i);
+        this.inputPorts.push((dev as InputPort));
         i++;
       }
-    })
-    if(this.Iports.length > 0)
-      this.portmapped = true;
-    else
-      this.portmapped = false;
+    });
   }
 }

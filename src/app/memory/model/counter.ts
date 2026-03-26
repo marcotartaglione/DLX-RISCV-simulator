@@ -1,275 +1,233 @@
-import { Injector, Input, Inject, Injectable } from '@angular/core';
-import { LogicalNetwork } from './logical-network';
-import { MemoryService } from 'src/app/services/memory.service';
+import {Injectable} from '@angular/core';
+import {LogicalNetwork} from './logical-network';
+import {ChipSelect} from './ChipSelect';
 
 @Injectable()
 export class Counter extends LogicalNetwork {
-  //ffd( name, d, a_res, a_set, clk)
-  //mux( zero, one, sel)
-  //tri( in, en )
-  //bd0 = tri( ffd( start, mux( start.q, bd0, cs_write ), reset, null, memwr* ), cs_read )";
-  sampleValue: number; // rappresenta l'ultimo valore campionato effettuando una load a CS_READ_VALUE_COUNTER
-  currentValue: number ; // valore interno al contatore
-  counting_basis: number ; // base di conteggio del counter 
-  loadValue: number ; // valore che voglio caricare con la load
-  up_down_value: number; // valore corrente di up/down . 1=up, 0=down
-  a_res_value_ffd: string ; // valore a_res ffd che mantiene up/down
-  a_set_value_ffd: string ; // valore a_setffd che mantiene up/down
-  @Input() memoryService : MemoryService ;
-  
-  constructor(min_address: number, max_address: number, injector: Injector) {
-    super('COUNTER', min_address, max_address);
-    super.devType = "Counter";
-    this.clkType = "MEMWR*"; 
-    this.cs = [];
-    this.a_reset_value = "RESET";
-    this.a_res_value_ffd = "RESET" ; 
-    this.a_set_value_ffd = "0" ;
-    this.currentValue=0;
-    this.sampleValue=0;
-    this.counting_basis = 32 ;
-    this.loadValue = 0 ;
-    this.a_reset_value = "CS_A_RES_COUNTER" ;
-    this.up_down_value = 1; //1 up , 0 down
-    this.setCS("CS_READ_VALUE_COUNTER", this.min_address ,this.currentValue); // effettuando lettura a questo cs si ottiene currente value del counter
-    this.setCS("CS_A_RES_COUNTER", this.min_address + 0x00000001, 0);
-    this.setCS("CS_RES_COUNTER", this.min_address + 0x00000002, 0);
-    this.setCS("CS_ENABLE_COUNTER", this.min_address + 0x00000003, 1);
-    this.setCS("CS_UP_DOWN_COUNTER", this.min_address + 0x00000004, 1);
-    this.setCS("CS_LOAD_VALUE_COUNTER", this.min_address + 0x00000005, 0);
-  }
- 
-  // metodo che restituisce immagine contatore
 
-  public getImageName() {
-    const clk = this.clkType == "MEMWR*" ? 'memwr' : 'memrd';
-    return ("assets/img/counter/count/count_"+clk+"_"+this.a_reset_value+".png").toLowerCase();
-    
+  constructor(
+    minAddress: number,
+    maxAddress: number,
+    public countingBasis = 32,
+    public loadValue = 0,
+    public upCounting = true,
+    asyncSetSignal = 'RESET',
+    asyncResetSignal = '0',
+    clockType: 'MEMWR*' | 'MEMRD*' = 'MEMWR*',
+  ) {
+    super('COUNTER', minAddress, maxAddress, asyncSetSignal, asyncResetSignal,
+      `assets/img/counter/count/count_${clockType === 'MEMWR*' ? 'memwr' : 'memrd'}_${asyncResetSignal}.png`.toLowerCase(),
+      clockType);
+
+    // effettuando lettura a questo cs si ottiene currente value del counter
+    this.setChipSelect(ChipSelect.of('CS_READ_VALUE_COUNTER', this.minAddress), this._currentValue);
+    this.setChipSelect(ChipSelect.of('CS_A_RES_COUNTER', this.minAddress + 0x00000001), 0);
+    this.setChipSelect(ChipSelect.of('CS_RES_COUNTER', this.minAddress + 0x00000002), 0);
+    this.setChipSelect(ChipSelect.of('CS_ENABLE_COUNTER', this.minAddress + 0x00000003), 1);
+    this.setChipSelect(ChipSelect.of('CS_UP_DOWN_COUNTER', this.minAddress + 0x00000004), 1);
+    this.setChipSelect(ChipSelect.of('CS_LOAD_VALUE_COUNTER', this.minAddress + 0x00000005), 0);
   }
 
-  // metodo che restituisce immagine reti logiche collegate al contatore
+  // ffd( name, d, a_res, a_set, clk)
+  // mux( zero, one, sel)
+  // tri( in, en )
+  // bd0 = tri( ffd( start, mux( start.q, bd0, cs_write ), reset, null, memwr* ), cs_read )";
 
-  public getImageNameNetwork() {
-    return ("assets/img/counter/network/fcb_ffdr_"+this.a_res_value_ffd+"_ffds_"+this.a_set_value_ffd+".png").toLowerCase();
+  private _currentValue: number;
+
+  public get currentValue(): number {
+    return this._currentValue;
   }
 
-  // metodo chiamato quando si scrive/legge a cs_enable_counter.
+  public static fromJSON(json: any) {
+    const counter = super.fromJSON(json) as Counter;
 
-  updateCurrentValue() {
-   
-    if(this.up_down_value == 1) {  // se up/down==1 incremento valore contatore
-      this.increment();
-    } else {                       // altrimenti decremento
-      this.decrement();
+    counter.countingBasis = json.counting_basis;
+    counter.loadValue = json.load_value;
+    counter.upCounting = json.up_counting;
+
+    return counter;
+  }
+
+  private updateCurrentValue() {
+    this.upCounting ? this.increment() : this.decrement();
+    this.setChipSelect(ChipSelect.of('CS_READ_VALUE_COUNTER', this.minAddress), this._currentValue);
+  }
+
+  public increment() {
+    const max = Math.pow(2, this.countingBasis);
+    if (this._currentValue >= max) {
+      this._currentValue = 0;
+    } else {
+      this._currentValue++;
     }
   }
 
-  // Metodo che incrementa il valore del counter di "uno" ; Se si è raggiunto il valore massimo esprimibile dal counter
-  // riparte a contare da 0 ;
-
-  increment() {
-    let max = Math.pow(2,this.counting_basis);
-    if(this.currentValue === max )
-        this.currentValue = 0;
-    else {
-        this.currentValue ++ ;
-    }
-  }
-
-  // Metodo che decrementa il valore del counter di "uno" ; Se si è raggiunto il valore 0 del counter
-  // riparte a contare dal valore massimo esprimibile dal counter ;
-
-
-  decrement() {
-    let max = Math.pow(2,this.counting_basis);
-    if(this.currentValue === 0 )
-        this.currentValue = max;
-    else {
-        this.currentValue -- ;
+  public decrement() {
+    const max = Math.pow(2, this.countingBasis);
+    if (this._currentValue <= 0) {
+      this._currentValue = max;
+    } else {
+      this._currentValue--;
     }
 
   }
 
-  getCurrentValue() {
-    return this.currentValue;
+  public asyncReset() {
+    this._currentValue = 0;
+    this.setChipSelect(ChipSelect.of('CS_READ_VALUE_COUNTER', this.minAddress), this._currentValue);
   }
 
-  getCountingBasis() {
-    return this.counting_basis;
+  public startOperation() {
+    if (this.asyncResetSignal.includes('RESET')) {
+      this.asyncReset();
+    }
   }
 
-  // reset asicnrono del contatore
-  public a_reset() {
-    this.currentValue = 0 ;
-      /*aggiorno cs_read_value_counter con il nuovo valore di currentValue. Se non lo facessi facendo 
-        successivamente una lettura a cs_read_value_counter non otterrei il valore aggiornato di 
-        currentValue
-      */
-      this.setCS("CS_READ_VALUE_COUNTER", this.min_address ,this.currentValue); 
-  }
-
-   // reset asincrono del FFD
-   public a_reset_ffd(){
-    //asserendo il segnale di A_RESET, il FFD inizializza l'output a 0
-    this.up_down_value = 0;
-  }
-
-  // set asincrono del FFD
-  public a_set_ffd(){
-    //asserendo il segnale di A_SET, il FFD inizializza l'output a 1
-    this.up_down_value = 1;
-  }
-
-
-  //operazioni di avvio del Counter
-  public startOp() {
-    //pone a 0 il valore del counter
-    if(this.a_reset_value.includes("RESET"))
-      this.a_reset();
-    //pone a 0 il valore di output del FFD
-    if(this.a_set_value_ffd.includes("RESET"))
-      this.a_set_ffd();
-    //pone a 1 il valore di output del FFD
-    if(this.a_res_value_ffd.includes("RESET"))
-      this.a_reset_ffd();
-  }
-
-
-  // LOAD : metodo invocato quando si fa una lettura ad un certo indirizzo
-    public load(address: number, instrType?: string): number {
-
-    // Se l'indirizzo a cui si fa la load corrisponde ad un cs allora lavoro sul cs andando a leggere l'id e in
-    // base a questo decido cosa fare (switch(cs.id)). Se l'indirizzo non corrisponde ad alcun cs allora effettuo
-    // una lettura in memoria all'indirizzo specificato
-
-    // NB : Quando restituisco 0 è perchè i cs assumeranno il valore uno durante il fronte di salita e poi torneranno
-    // subito a zero. Quindi tranne per cs_up_down_counter e cs_read_value_counter , che mantengono un valore , restituisco
-    // sempre zero .
-
-    let cs = this.cs.find(el => el.address == address);
-    if (cs == null || instrType == "IS") return super.load(address);
-    else {
+  /**
+   * If the address corresponds to a chip select, perform the corresponding action based on the chip select ID.
+   * Otherwise, perform a standard memory load operation.
+   *
+   * The logic operates on the assumption of a rising edge for the load operation, meaning that the actions are
+   * triggered when a read operation is performed and the clock is at MEMWR*.
+   *
+   * @return The value read from the specified address, which may be influenced by the chip select logic if the address corresponds to a
+   * chip select. If the address does not correspond to any chip select or if the instruction type is "IS", a standard memory load
+   * operation is performed and its result is returned.
+   *
+   * @param address The memory address to store the word at.
+   * @param instrType The type of instruction being executed, which may affect the behavior of certain chip selects. For example,
+   * if the instruction type is "IS", the method will bypass the custom logic for chip selects and perform a standard memory load operation.
+   */
+  public load(address: number, instrType?: string): number {
+    const cs = this.chipSelects.find(el => el.address === address);
+    if (cs == null || instrType === 'IS') {
+      return super.load(address);
+    } else {
       switch (cs.id) {
 
-        // nel caso della load suppongo di avere un fronte di salita 
+        // nel caso della load suppongo di avere un fronte di salita
         // ogni volta che ho un ciclo di bus in lettura :
         // quindi quando viene fatta lettura e il clock vale MEMRD*
+        case 'CS_READ_VALUE_COUNTER':
+          // se ho un fronte di salita allora aggiorno il valore campionato con il currentValue e
+          // aggiorno il cs_read_value_counter
+          const readValue = this._currentValue;
+          this.setChipSelect(ChipSelect.of('CS_READ_VALUE_COUNTER', this.minAddress), this._currentValue);
 
-        case "CS_READ_VALUE_COUNTER":
-          //if(this.clkType == "MEMRD*" ){ 
-
-            // se ho un fronte di salita allora aggiorno il valore campionato con il currentValue e 
-            // aggiorno il cs_read_value_counter
-
-            this.sampleValue = this.currentValue;
-            this.setCS("CS_READ_VALUE_COUNTER",this.min_address,this.currentValue);
-          //}
-
-          // Restitutisco sempre sampleValue. Nel caso ci sia appena stato 
-          // un fronte di salita verrà restituito il valore 
+          // Restitutisco sempre sampleValue. Nel caso ci sia appena stato
+          // un fronte di salita verrà restituito il valore
           // aggiornato altrimenti verrà restituito l'ultimo valore campionato.
-
-          return this.sampleValue;
-        case "CS_ENABLE_COUNTER":
-          if(this.clkType == "MEMRD*"){
-
-            // se ho un fronte di salita aggiorno il currentValue
-
+          return readValue;
+        case 'CS_ENABLE_COUNTER':
+          if (this.clockType === 'MEMRD*') {
             this.updateCurrentValue();
-          }
-          return 0; 
-        
-        //reset sincrono : se ho un fronte di salita resetto il contatore
-        // e aggiorno il cs
-
-        case "CS_RES_COUNTER":
-          if(this.clkType == "MEMRD*")
-          this.currentValue = 0 ;
-          return 0 ;
-
-        // up/down : se ho un fronte di salita inverto il valore di up/down. Al successivo
-        // updateCurrentValue se questo valore sarà uno allora incrementerò altrimenti
-        // decrementerò . Aggiorno il valore del cs.
-
-        case "CS_UP_DOWN_COUNTER":
-          if(this.clkType == "MEMRD*") {
-          this.up_down_value = this.mux(this.up_down_value,!this.up_down_value,1);
-          this.setCS("CS_UP_DOWN_COUNTER", this.min_address + 0x00000004, this.up_down_value);
-          }
-          return this.up_down_value ;
-        
-        // load_value : se ho un fronte di salita carico nel contatore il valore presente sugli ingressi
-        // load . Aggiorno il cs.
-        
-        case "CS_LOAD_VALUE_COUNTER" :
-          if(this.clkType == "MEMRD*") {
-            this.currentValue = this.loadValue ;
-            this.setCS("CS_READ_VALUE_COUNTER", this.min_address ,this.currentValue);
           }
           return 0;
 
-        // a_res : in caso di fronte di salita resetto il contatore in modo asincrono
+        // reset sincrono: se ho un fronte di salita resetto il contatore
+        // e aggiorno il cs
+        case 'CS_RES_COUNTER':
+          if (this.clockType === 'MEMRD*') {
+            this._currentValue = 0;
+          }
+          return 0;
 
-        case "CS_A_RES_COUNTER" :
-          if(this.a_reset_value == "CS_A_RES_COUNTER")
-            this.a_reset();
+        // up/down: se ho un fronte di salita inverto il valore di up/down. Al successivo
+        // updateCurrentValue se questo valore sarà uno allora incrementerò altrimenti
+        // decrementerò. Aggiorno il valore del cs.
+
+        case 'CS_UP_DOWN_COUNTER':
+          if (this.clockType === 'MEMRD*') {
+            this.upCounting = this.mux(this.upCounting, !this.upCounting, 1);
+            this.setChipSelect(ChipSelect.of('CS_UP_DOWN_COUNTER', this.minAddress + 0x00000004), this.upCounting);
+          }
+          return this.upCounting ? 1 : 0;
+
+        // loadValue: se ho un fronte di salita carico nel contatore il valore presente sugli ingressi
+        // load. Aggiorno il cs.
+        case 'CS_LOAD_VALUE_COUNTER' :
+          if (this.clockType === 'MEMRD*') {
+            this._currentValue = this.loadValue;
+            this.setChipSelect( ChipSelect.of('CS_READ_VALUE_COUNTER', this.minAddress), this._currentValue);
+          }
+          return 0;
+
+        // a_res: in caso di fronte di salita resetto il contatore in modo asincrono
+        case 'CS_A_RES_COUNTER' :
+          if (this.asyncResetSignal === 'CS_A_RES_COUNTER') {
+            this.asyncReset();
+          }
           return 0;
       }
     }
 
   }
 
-  // Se l'indirizzo a cui si fa la store corrisponde ad un cs allora lavoro sul cs andando a leggere l'id e in
-  // base a questo decido cosa fare (switch(cs.id)). Se l'indirizzo non corrisponde ad alcun cs allora effettuo
-  // una scrittura in memoria all'indirizzo specificato
-
-
+  /**
+   * If the address corresponds to a chip select, perform the corresponding action based on the chip select ID.
+   * Otherwise, perform a standard memory store operation.
+   *
+   * The logic operates on the assumption of a rising edge for the store operation, meaning that the actions are
+   * triggered when a write operation is performed and the clock is at MEMWR*.
+   *
+   * @param address The memory address to store the word at.
+   * @param word The word to be stored at the specified address.
+   */
   public store(address: number, word: number): void {
-    let cs = this.cs.find(el => el.address == address);
-    if (cs == null) return super.store(address, word);
-    else {
+    const cs = this.chipSelects.find(el => el.address === address);
+    if (cs == null) {
+      return super.store(address, word);
+    } else {
 
-      // nel caso della store suppongo di avere un fronte di salita 
-      // ogni volta che ho un ciclo di bus in scrittura :
+      // nel caso della store suppongo di avere un fronte di salita
+      // ogni volta che ho un ciclo di bus in scrittura:
       // quindi quando viene fatta scrittuta e il clock vale MEMWR*
 
-      // VALGONO GLI STESSI DISCORSI PER LA LOAD MA INVERITI : quindi tutto quello 
-      // che prima accadeva andando ad effettuare una lettura al cs con clock a MEMRD* 
-      // ora nella store succederà andando ad effettuare una scrittura al cs e con
+      // VALGONO GLI STESSI DISCORSI PER LA LOAD MA INVERITI: quindi tutto quello
+      // che prima accadeva andando a effettuare una lettura al cs con clock a MEMRD*
+      // ora nella store succederà andando a effettuare una scrittura al cs e con
       // clock a MEMWR*
-
       switch (cs.id) {
-        case "CS_ENABLE_COUNTER":
-          if(this.clkType == "MEMWR*"){
+        case 'CS_ENABLE_COUNTER':
+          if (this.clockType === 'MEMWR*') {
             this.updateCurrentValue();
           }
           break;
-        case "CS_A_RES_COUNTER":
-          if (this.a_reset_value == "CS_A_RES_COUNTER")
-                this.a_reset();
-            break;
-        case "CS_RES_COUNTER":
-          if(this.clkType == "MEMWR*") {
-            this.currentValue = 0;
-            this.setCS("CS_READ_VALUE_COUNTER", this.min_address ,this.currentValue);
+        case 'CS_A_RES_COUNTER':
+          if (this.asyncResetSignal === 'CS_A_RES_COUNTER') {
+            this.asyncReset();
           }
           break;
-        case "CS_UP_DOWN_COUNTER":
-          if(this.clkType == "MEMWR*")  {
-            this.up_down_value = this.mux(this.up_down_value,!this.up_down_value,1);
-            this.setCS("CS_UP_DOWN_COUNTER", this.min_address + 0x00000004, this.up_down_value);
+        case 'CS_RES_COUNTER':
+          if (this.clockType === 'MEMWR*') {
+            this._currentValue = 0;
+            this.setChipSelect(ChipSelect.of('CS_READ_VALUE_COUNTER', this.minAddress), this._currentValue);
           }
           break;
-        case "CS_LOAD_VALUE_COUNTER":
-          if(this.clkType == "MEMWR*") {
-            this.currentValue = this.loadValue;
-            this.setCS("CS_READ_VALUE_COUNTER", this.min_address ,this.currentValue);
+        case 'CS_UP_DOWN_COUNTER':
+          if (this.clockType === 'MEMWR*') {
+            this.upCounting = this.mux(this.upCounting, !this.upCounting, 1);
+            this.setChipSelect(ChipSelect.of('CS_UP_DOWN_COUNTER', this.minAddress + 0x00000004), this.upCounting);
           }
           break;
-      } 
+        case 'CS_LOAD_VALUE_COUNTER':
+          if (this.clockType === 'MEMWR*') {
+            this._currentValue = this.loadValue;
+            this.setChipSelect(ChipSelect.of('CS_READ_VALUE_COUNTER', this.minAddress), this._currentValue);
+          }
+          break;
+      }
     }
   }
 
-  
+  public toJSON(): any {
+    const json = super.toJSON();
 
+    json.counting_basis = this.countingBasis;
+    json.load_value = this.loadValue;
+    json.up_counting = this.upCounting;
+
+    return json;
+  }
 }
