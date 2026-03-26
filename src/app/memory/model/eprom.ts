@@ -1,21 +1,8 @@
-import {Injector} from '@angular/core';
-import {CodeService} from 'src/app/services/code.service';
 import {Device} from './device';
 
 export class Eprom extends Device {
-  private codeService: CodeService;
-
-  public get min_address(): number {
-    return 0;
-  }
-
-  public set min_address(v: number) {
-  }
-
-  constructor(min_address: number, max_address: number, injector: Injector) {
-    super('EPROM', min_address, max_address);
-    this.codeService = injector.get(CodeService);
-    super.devType = "EPROM";
+  constructor(minAddress: number, maxAddress: number) {
+    super('EPROM', minAddress, maxAddress);
   }
 
   public load(address: number): number {
@@ -23,6 +10,6 @@ export class Eprom extends Device {
   }
 
   public store(address: number, word: number): void {
-    super.store(address,word);
+    super.store(address, word);
   }
 }

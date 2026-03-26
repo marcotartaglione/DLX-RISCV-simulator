@@ -1,161 +1,210 @@
-import { Injector } from '@angular/core';
-import { MatDialog } from '@angular/material';
-import { ErrorDialogComponent } from 'src/app/dialogs/error-dialog.component';
+import {IAddressableStorage} from './IAddressableStorage';
+import {ChipSelect} from './ChipSelect';
 
-export interface IDevice {
-  new(min_address: number, max_address: number, injector: Injector): Device;
-}
+/**
+ * Represents a memory-mapped device with addressable storage and chip select management.
+ */
+export class Device implements IAddressableStorage {
+  readonly chipSelects: ChipSelect[];
+  readonly memory: Uint8Array;
 
-export class Device {
-  name: string;
-  private memory: number[];
-  min_address: number;
-  max_address: number;
-  cs: Array<{ id: string, address: number, hexAddress: string }>;
-  devType: string;
-  dialog : MatDialog;
+  constructor(
+    public name: string,
+    private _minAddress: number,
+    private _maxAddress: number,
+  ) {
+    const size = _maxAddress - _minAddress + 1;
+    if (size < 0) {
+      throw new Error('Invalid address for device: ' + name);
+    }
 
-  public get min_address_hex(): string {
-    return "0x"+((this.min_address << 2) >>> 0).toString(16).toUpperCase().padStart(8, '0');
+    this.chipSelects = [];
+    this.memory = new Uint8Array(size);
+    this.memory.forEach((_, i) => this.memory[i] = Math.floor(Math.random() * 256)); // Simulate uninitialized memory with random data
   }
 
-  getCsValue(csId) {
-    if (null == this.cs) return 0;
-    let cs = this.cs.find(el => el.id == csId);
-    return cs ? this.memory[cs.address - this.min_address] : 0;
+  public get minAddress(): number {
+    return this._minAddress;
   }
 
-  public isALedNetwork() {
-    return null != this.cs.find(el => el.id == "CS_READ_LED");
+  /**
+   * Sets the minimum address of the device based on a hexadecimal string input or a number.
+   * If the input is a hexadecimal string, it should start with "0x" and be 10 characters long (including "0x").
+   *
+   *  @param value A number or a hexadecimal string representing the new minimum address for the device.
+   */
+  public set minAddress(value: number) {
+    const lastMinAddress = this._minAddress;
+    this._minAddress = value;
+    this.updateChipSelectMin(lastMinAddress);
   }
 
-  public isACounter() {
-    return null != this.cs.find(el => el.id == "CS_READ_VALUE_COUNTER");
+  public get maxAddress(): number {
+    return this._maxAddress;
   }
 
-  public isAInputPort() {
-    return null != this.cs.find(el => el.id == "CS_INPUT_PORT");
+  /**
+   * Sets the maximum address of the device based on a hexadecimal string input or a number.
+   * If the input is a hexadecimal string, it should start with "0x" and be 10 characters long (including "0x").
+   *
+   * @param value A number or a hexadecimal string representing the new maximum address for the device.
+   */
+  public set maxAddress(value: number) {
+    const lastMaxAddress = this._maxAddress;
+    this._maxAddress = value;
+    this.updateChipSelectMax(lastMaxAddress);
   }
 
-  public isAStartNetwork() {
-    return null != this.cs.find(el => el.id == "CS_READ_STARTUP");
+  /**
+   * Creates a new Device instance from a JSON object.
+   *
+   * @param json The JSON object containing the properties of the device. It must include the "proto" property with the value "Device".
+   */
+  public static fromJSON(json: any): Device {
+    if (json.proto !== this.constructor.name) {
+      throw new Error(`Invalid proto for Device: ${json.proto}`);
+    }
+
+    return new Device(json.name, json.min_address, json.max_address);
   }
 
-  public set min_address_hex(v: string) {
-    let last_min_address = this.min_address;
-    if (v.length == 10) {
-      let iv = parseInt(v, 16);
-      if (iv || iv === 0) {
-        this.min_address = iv >>> 2;
+  /**
+   * Calculates the size of the device's memory
+   */
+  public size(unit: 'B' | 'KB' | 'MB' | 'GB'): number {
+    const size = this._maxAddress - this._minAddress + 1;
+
+    switch (unit) {
+      case 'B':
+        return size / 4;
+      case 'KB':
+        return size / 1024 / 4;
+      case 'MB':
+        return size / (1024 * 1024) / 4;
+      case 'GB':
+        return size / (1024 * 1024 * 1024) / 4;
+      default:
+        throw new Error('Invalid unit for size: ' + unit);
+    }
+  }
+
+  /**
+   * Sets a chip select with the given name, address, and value. If a chip select with the same name already exists,
+   * it updates its address and hexAddress. Otherwise, it creates a new chip select and adds it to the list.
+   * Finally, it stores the value at the given address.
+   *
+   * @param chipSelect The chip select object containing the id and address to be set or updated.
+   * @param value The value to be stored at the chip selects address after setting or updating it.
+   */
+  public setChipSelect = (chipSelect: ChipSelect, value: number | boolean) => {
+    const existingChipSelect = this.getChipSelect(chipSelect.id);
+
+    if (existingChipSelect) {
+      existingChipSelect.address = chipSelect.address;
+    } else {
+      this.chipSelects.push(chipSelect);
+    }
+
+    if (typeof value === 'boolean') {
+      value = value ? 1 : 0;
+    }
+
+    // === IMPORTART ===
+    // Can't just use this.store because it would call the overridden method in the child class,
+    // which may have different logic for handling chip selects
+    // =================
+    Device.prototype.store.call(this, chipSelect.address, value);
+  }
+
+  /**
+   * Retrieves a chip select based on the provided value, which can be either a string (id) or a number (address).
+   *
+   * @param value The value used to search for the chip select. It can be either a string representing the chip select
+   * id or a number representing its address.
+   */
+  public getChipSelect(value: string | number): ChipSelect | undefined {
+    if (typeof value === 'number') {
+      return this.chipSelects.find(el => el.address === value);
+    }
+    return this.chipSelects.find(el => el.id === value);
+  }
+
+  /**
+   * Checks if the provided address is within the valid range defined by the device's minimum and maximum addresses.
+   *
+   * @param address The address to be validated against the device's address range.
+   */
+  public hasAddress(address: number): boolean {
+    return address >= this.minAddress && address <= this.maxAddress;
+  }
+
+  /**
+   * Reads a byte from the device's memory at the specified address. If the address is out of bounds
+   * (less than the minimum address or greater than the maximum address), it throws a MemoryOutOfBoundsError.
+   *
+   * @param address The memory address to read from. It must be within the range defined by the device's minimum and maximum addresses.
+   */
+  public load(address: number): number {
+    if (address < this.minAddress || address > this.maxAddress) {
+      throw new Error('Memory out of bound at address: ' + address);
+    }
+
+    return this.memory[address - (this._minAddress)];
+  }
+
+  /**
+   * Writes a byte to the device's memory at the specified address. If the address is out of bounds (less than the
+   * minimum address or greater than the maximum address), it throws a MemoryOutOfBoundsError
+   */
+  public store(address: number, byte: number): void {
+    if (address < this.minAddress || address > this._maxAddress) {
+      throw new Error('Memory out of bound at address: ' + address);
+    }
+
+    this.memory[address - (this._minAddress)] = byte;
+  }
+
+  /**
+   * Converts the device instance into a JSON object representation.
+   */
+  public toJSON(): any {
+    return {
+      proto: this.constructor.name,
+      name: this.name,
+      min_address: this.minAddress,
+      max_address: this.maxAddress
+    };
+  }
+
+  /**
+   * Updates the addresses of chip selects that are above the new maximum address.
+   * For each chip select with an address greater than the new maximum,
+   * it adjusts the address by subtracting the difference between the old maximum and the new maximum from it,
+   * effectively shifting it down to be within the new valid range.
+   *
+   * @param lastMax The previous maximum address before the update. This is used to calculate how much to shift the chip select addresses.
+   */
+  private updateChipSelectMax(lastMax: number) {
+    this.chipSelects.forEach(el => {
+      if (el.address > this.maxAddress) {
+        el.address = this._minAddress - (lastMax - el.address);
       }
-    }
-    if (last_min_address)
-      this.updateCsMin(last_min_address);
+    });
   }
 
-  public get max_address_hex(): string {
-    if (this.max_address.toString(16).substring(4, 8) == "ffff" || this.max_address.toString(16).substring(4, 8) == "fff")
-      return "0x"+((this.max_address << 2) + 3 >>> 0).toString(16).toUpperCase().padStart(8, '0');
-    else
-      return ((this.max_address << 2) >>> 0).toString(16).toUpperCase().padStart(8, '0');
-  }
-
-  public set max_address_hex(v: string) {
-    let last_max_address = this.max_address;
-    if (v.length == 10) {
-      let iv = parseInt(v, 16);
-      if (iv || iv === 0) {
-        this.max_address = iv >>> 2;
+  /**
+   * Updates the addresses of chip selects that are below the new minimum address.
+   * For each chip select with an address less than the new minimum,
+   * it adjusts the address by adding the difference between the new minimum and the old minimum to it,
+   * effectively shifting it up to be within the new valid range.
+   *
+   * @param lastMin The previous minimum address before the update. This is used to calculate how much to shift the chip select addresses.
+   */
+  private updateChipSelectMin(lastMin: number) {
+    this.chipSelects.forEach(el => {
+      if (el.address < this.minAddress) {
+        el.address = this._minAddress + (el.address - lastMin);
       }
-    }
-    if (last_max_address)
-      this.updateCsMax(last_max_address);
-  }
-
-  public get size(): string {
-    //1 address = 4 byte so
-    //262144 = 1024 * 1024 / 4
-    return Math.ceil(((this.max_address - this.min_address + 1) / 262144)) + 'MB';
-  }
-
-  constructor(name: string, min_address: number, max_address: number) {
-    this.name = name;
-    this.memory = [];
-    this.min_address = min_address;
-    this.max_address = max_address;
-    this.cs = [];
-    this.devType = "RAM";
-  }
-
-  public updateName(name_ext: string){
-    this.name = name_ext;
-  }
-
-  public setMaxAddress(v: number) {
-    let last_max_address = this.max_address;
-    this.max_address = v;
-    this.updateCsMax(last_max_address);
-  }
-
-  public setMinAddress(v: number) {
-    let last_min_address = this.min_address;
-    this.min_address = v;
-    this.updateCsMin(last_min_address);
-  }
-
-  private updateCsMax(last_max_address: number) {
-    if (this.cs) {
-      this.cs.forEach(el => {
-        if (el.address > this.max_address) {
-          el.address = this.max_address - (last_max_address - el.address);
-          el.hexAddress = this.getAddressHex(el.address);
-        }
-      })
-    }
-  }
-
-  private updateCsMin(last_min_address: number) {
-    if (this.cs)
-      this.cs.forEach(el => {
-        if (el.address < this.min_address) {
-          el.address = this.min_address + (el.address - last_min_address);
-          el.hexAddress = this.getAddressHex(el.address);
-        }
-      })
-  }
-
-  public getAddressHex = (addr) => {
-    return ((addr << 2) >>> 0).toString(16).toUpperCase().padStart(8, '0');
-  }
-
-  public getAddressHexInstr  = (addr) => {
-    return (addr >>> 0).toString(16).toUpperCase().padStart(8, '0');
-  }
-
-  public setCS = (name, addr, value) => {
-    let val = this.cs.find(el => el.id == name);
-    if (val) val.address = addr;
-    else this.cs.push({ id: name, address: addr, hexAddress: this.getAddressHex(addr) });
-    this.memory[addr - this.min_address] = value;
-  }
-
-  public checkAddress(address: number): boolean {
-    return this.min_address <= address && address <= this.max_address;
-  }
-
-  // nella load inserisco il tipo di istruzione(instrType). Perche altrimenti nelle reti logiche non
-  // riesco a distinguere se viene fatta una load vera e propria oppure viene fatta una load all'
-  // interno di una store . Infatti nel contatore se vedo una load che deriva da una store non
-  // leggo i cs ma faccio una super.load(address). Questo perchè nella store viene anche fatta una load.
-  // Non è una cosa facile da spiegare in un commento. Per chiarimenti potete contattarmi all'indirizzo mail
-  // filippo.comastri2@studio.unibo.it
-
-  public load(address: number,instrType?: string): number {
-    let res = this.memory[address - this.min_address];
-    return res;
-  }
-
-  public store(address: number, word: number): void {
-    this.memory[address - this.min_address] = word;
+    });
   }
 }
