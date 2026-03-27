@@ -3,17 +3,17 @@ import {
   AfterViewInit,
   ApplicationRef,
   Component,
+  ElementRef,
   EventEmitter,
   HostListener,
   Input,
   OnDestroy,
-  OnInit,
   Output,
   ViewChild
 } from '@angular/core';
 import {NgForm} from '@angular/forms';
 import {MatDialog} from '@angular/material/dialog';
-import {CodemirrorComponent} from '@ctrl/ngx-codemirror';
+import * as CodeMirror from 'codemirror';
 import {EditorFromTextArea} from 'codemirror';
 import 'codemirror/addon/selection/active-line';
 import {Subscription} from 'rxjs';
@@ -25,7 +25,6 @@ import {DiagramService} from '../services/diagram.service';
 import {MemoryService} from '../services/memory.service.js';
 import './modes/dlx.js';
 import './modes/rv32i.js';
-import {InputPort} from '../memory/model/input-port';
 import {LogicalNetwork} from '../memory/model/logical-network';
 
 @Component({
@@ -57,9 +56,8 @@ import {LogicalNetwork} from '../memory/model/logical-network';
 })
 export class EditorComponent implements AfterViewInit, OnDestroy {
 
-  @ViewChild('codeEditor', {static: false}) codeEditor: CodemirrorComponent;
+  @ViewChild('hostElement', {static: false}) hostElement: ElementRef;
   @ViewChild('form', {static: false}) form: NgForm;
-
   @Input() public codeService: CodeService;
   @Input() memoryService: MemoryService;
   @Input() diagramService: DiagramService;
@@ -71,6 +69,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   start = 'init';
   interval = 1000;
   isInterruptDisabled = true;
+  private codeMirrorInstance: EditorFromTextArea;
   private formStatusChangeSub: Subscription;
   private timeout;
   private previousLine = 0;
@@ -103,6 +102,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     if (this.doc && (val !== this._pc || !this.running)) {
       const pre = Math.floor(this._pc / 4);
       const cur = Math.floor(val / 4);
+
       if (!this.running) {
         this.doc.removeLineClass(this.previousLine, 'wrap', 'runned');
         this.doc.removeLineClass(pre, 'wrap', 'next');
@@ -139,7 +139,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   }
 
   get doc(): EditorFromTextArea {
-    return this.codeEditor && this.codeEditor.codeMirror;
+    return this.codeMirrorInstance;
   }
 
   get currentLine(): number {
@@ -172,9 +172,17 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    this.storeCode();
+    const textArea = this.hostElement.nativeElement.querySelector('textarea');
+
+    this.codeMirrorInstance = CodeMirror.fromTextArea(textArea, this.options);
+
+    this.doc.setValue(this.codeService.content || '');
+
     this.doc.on('change', (event) => {
-      console.log(event);
+      const newValue = event.getValue();
+      this.codeService.content = newValue;
+      this.form.form.markAsDirty();
+
       if (this.running) {
         this.onStop();
       }
@@ -183,8 +191,10 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
         this.errorMessage = undefined;
       }
     });
+
     this.formStatusChangeSub = this.form.statusChanges.subscribe(v => this.formDirtyChange.emit(this.form.dirty));
 
+    this.storeCode();
   }
 
   continuousRun() {
@@ -320,6 +330,9 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    if (this.codeMirrorInstance) {
+      this.codeMirrorInstance.toTextArea();
+    }
     if (this.formStatusChangeSub) {
       this.formStatusChangeSub.unsubscribe();
     }

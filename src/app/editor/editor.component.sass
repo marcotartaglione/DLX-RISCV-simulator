@@ -1,61 +1,80 @@
 @import '@angular/material/theming'
 
 :host
-    width: 100%
-    height: 100%
+  width: 100%
+  height: 100%
 
 form
-    width: 100%
-    height: 100%
-    display: flex
-    flex-direction: column
-    ngx-codemirror
-        flex: 1 1 auto
-        transition: all 300ms
+  width: 100%
+  height: 100%
+  display: flex
+  flex-direction: column
+
+  ngx-codemirror
+    flex: 1 1 auto
+    transition: all 300ms
+
+.editor-host
+  flex: 1 1 auto
+  display: flex
+  flex-direction: column
+
+  .CodeMirror
+    flex: 1 1 auto
+    height: auto
+    min-height: 300px
 
 .error-message
-    z-index: -1
-    margin-top: .5rem
-    mat-card
-        background-color: map-get($mat-red, 900)
+  z-index: -1
+  margin-top: .5rem
+
+  mat-card
+    background-color: map-get($mat-red, 900)
 
 .btn
-    display: flex
-    align-items: center
-    svg
-        margin-left: .5em
+  display: flex
+  align-items: center
+
+  svg
+    margin-left: .5em
+
 .red
-    color: #ff0000
+  color: #ff0000
+
 .green
-    color: #00ff00
+  color: #00ff00
+
 .amber
-    color: #ffcc00
+  color: #ffcc00
 
 button[disabled=true] svg
-    opacity: 0.5
+  opacity: 0.5
 
 .btn-container
-    margin-top: 1rem
-    .right
-        float: right
+  margin-top: 1rem
 
-    .mat-raised-button
-        height: fit-content
-        margin: 13.5px 0
+  .right
+    float: right
+
+  .mat-raised-button
+    height: fit-content
+    margin: 13.5px 0
 
 .input-interval, .input-label
-    min-width: 2rem
-    max-width: 6rem
+  min-width: 2rem
+  max-width: 6rem
+
 .input-interval, .input-label, .mr
-    margin-right: .5rem !important
+  margin-right: .5rem !important
 
 input[type=number]
-    -webkit-appearance: textfield
-    -moz-appearance: textfield
-    appearance: textfield
-    &::-webkit-inner-spin-button, &::-webkit-outer-spin-button
-        -webkit-appearance: none
-        margin: 0
+  -webkit-appearance: textfield
+  -moz-appearance: textfield
+  appearance: textfield
+
+  &::-webkit-inner-spin-button, &::-webkit-outer-spin-button
+    -webkit-appearance: none
+    margin: 0
 
 
 @media (prefers-reduced-motion: no-preference)

@@ -1,5 +1,7 @@
 <form #form="ngForm">
-  <ngx-codemirror #codeEditor name="content" [(ngModel)]="codeService.content" [options]="options"></ngx-codemirror>
+  <div #hostElement class="editor-host">
+    <textarea name="content" style="display: none"></textarea>
+  </div>
   <div class="error-message" *ngIf="errorMessage" @showHideTrigger>
     <mat-card>{{errorMessage}}</mat-card>
   </div>
