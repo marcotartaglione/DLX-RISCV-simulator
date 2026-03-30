@@ -1,5 +1,4 @@
-import {NgModule} from '@angular/core';
-import {RouterModule, Routes} from '@angular/router';
+import {Routes} from '@angular/router';
 import {AboutPageComponent} from './about-page/about-page.component';
 import {DLXDocumentation} from './documentation/dlx.documentation';
 import {RV32IDocumentation} from './documentation/rv32i.documentation';
@@ -11,7 +10,7 @@ import {DLXRegisters} from './registers/dlx.registers';
 import {RV32IRegisters} from './registers/rv32i.registers';
 
 
-const routes: Routes = [
+export const routes: Routes = [
   {path: '', redirectTo: '/dlx', pathMatch: 'full'},
   {
     path: 'dlx',
@@ -43,20 +42,3 @@ const routes: Routes = [
     }
   }
 ];
-
-@NgModule({
-  imports: [
-    RouterModule.forRoot(routes, {
-      paramsInheritanceStrategy: 'always',
-      canceledNavigationResolution: 'replace',
-    })
-  ],
-  exports: [
-    RouterModule
-  ],
-  providers: [
-    CanDeactivateGuard
-  ]
-})
-export class AppRoutingModule {
-}

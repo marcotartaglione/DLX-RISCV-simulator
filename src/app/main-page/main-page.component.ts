@@ -1,18 +1,35 @@
 import {BreakpointObserver} from '@angular/cdk/layout';
 import {Component, EventEmitter, Input, OnDestroy, Output, ViewChild} from '@angular/core';
-import {MatSidenav} from '@angular/material/sidenav';
+import {MatSidenav, MatSidenavContainer, MatSidenavContent} from '@angular/material/sidenav';
 import {ActivatedRoute} from '@angular/router';
 import {Subscription} from 'rxjs';
 import {Registers} from '../registers/registers';
 import {CodeService} from '../services/code.service';
 import { DiagramService } from '../services/diagram.service';
 import {MemoryService} from '../services/memory.service';
+import {DocumentationComponent} from '../documentation/documentation.component';
+import {EditorComponent} from '../editor/editor.component';
+import {MatButton} from '@angular/material/button';
+import {MemoryComponent} from '../memory/memory.component';
+import {DiagramComponent} from '../diagram/diagram.component';
+import {RegistersComponent} from '../registers/registers.component';
 
 @Component({
-    selector: 'app-main-page',
-    templateUrl: './main-page.component.html',
-    styleUrls: ['./main-page.component.sass'],
-    standalone: false
+  selector: 'app-main-page',
+  templateUrl: './main-page.component.html',
+  styleUrls: ['./main-page.component.sass'],
+  standalone: true,
+  imports: [
+    MatSidenavContainer,
+    MatSidenav,
+    DocumentationComponent,
+    EditorComponent,
+    MatButton,
+    MemoryComponent,
+    DiagramComponent,
+    RegistersComponent,
+    MatSidenavContent
+  ]
 })
 export class MainPageComponent implements OnDestroy{
 
@@ -21,7 +38,7 @@ export class MainPageComponent implements OnDestroy{
   private diagramsOpened: boolean = false;//mi dice se i diagrammi sono visibili o no
 
   registers: Registers;
-  sidebarMode: string = 'side';
+  sidebarMode: 'over' | 'push' | 'side' = 'side';
 
   @ViewChild('sidenav', {static: true}) sidenav: MatSidenav;
 

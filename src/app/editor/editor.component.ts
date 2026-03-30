@@ -11,9 +11,9 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import {NgForm} from '@angular/forms';
+import {FormsModule, NgForm} from '@angular/forms';
 import {MatDialog} from '@angular/material/dialog';
-import * as CodeMirror from 'codemirror';
+import CodeMirror from 'codemirror';
 import {EditorFromTextArea} from 'codemirror';
 import 'codemirror/addon/selection/active-line';
 import {Subscription} from 'rxjs';
@@ -26,34 +26,50 @@ import {MemoryService} from '../services/memory.service.js';
 import './modes/dlx.js';
 import './modes/rv32i.js';
 import {LogicalNetwork} from '../memory/model/logical-network';
+import {MatCard} from '@angular/material/card';
+import {MatButton} from '@angular/material/button';
+import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
+import {MatFormField, MatInput} from '@angular/material/input';
+import {MatLabel} from '@angular/material/form-field';
 
 @Component({
-    selector: 'app-editor',
-    templateUrl: './editor.component.html',
-    styleUrls: ['./editor.component.sass'],
-    animations: [
-        trigger('showHideTrigger', [
-            transition(':enter', [
-                group([
-                    style({ height: '0' }),
-                    animate('200ms ease-out', style({ height: '*' })),
-                    query('mat-card', [
-                        style({ transform: 'translateY(-100%)' }),
-                        animate('200ms ease-out', style({ transform: 'translateY(0)' })),
-                    ])
-                ])
-            ]),
-            transition(':leave', [
-                group([
-                    animate('200ms ease-out', style({ height: '0' })),
-                    query('mat-card', [
-                        animate('200ms ease-out', style({ transform: 'translateY(-100%)' }))
-                    ])
-                ])
-            ])
+  selector: 'app-editor',
+  templateUrl: './editor.component.html',
+  styleUrls: ['./editor.component.sass'],
+  animations: [
+    trigger('showHideTrigger', [
+      transition(':enter', [
+        group([
+          style({height: '0'}),
+          animate('200ms ease-out', style({height: '*'})),
+          query('mat-card', [
+            style({transform: 'translateY(-100%)'}),
+            animate('200ms ease-out', style({transform: 'translateY(0)'})),
+          ])
         ])
-    ],
-    standalone: false
+      ]),
+      transition(':leave', [
+        group([
+          animate('200ms ease-out', style({height: '0'})),
+          query('mat-card', [
+            animate('200ms ease-out', style({transform: 'translateY(-100%)'}))
+          ])
+        ])
+      ])
+    ])
+  ],
+  standalone: true,
+  imports: [
+    FormsModule,
+    MatCard,
+    MatButton,
+    MatMenuTrigger,
+    MatMenu,
+    MatMenuItem,
+    MatInput,
+    MatFormField,
+    MatLabel
+  ]
 })
 export class EditorComponent implements AfterViewInit, OnDestroy {
 

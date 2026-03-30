@@ -4,6 +4,7 @@
     @for (el of data.values; track el) {
       <mat-grid-tile>
         <mat-card><h4>0x{{el.hexAddress}}</h4>
+<!-- TODO: controllare event.target.value         -->
         <input matInput (input)="onInputChange($event.target.value,el)" value="{{el.value | format:fType}}" minlength="0" maxlength="10" />
       </mat-card>
     </mat-grid-tile>

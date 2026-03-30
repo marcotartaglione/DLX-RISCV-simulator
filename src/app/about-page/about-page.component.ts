@@ -1,17 +1,16 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
+import {MatCard} from '@angular/material/card';
 
 @Component({
-    selector: 'app-about-page',
-    templateUrl: './about-page.component.html',
-    styleUrls: ['./about-page.component.sass'],
-    standalone: false
+  selector: 'app-about-page',
+  templateUrl: './about-page.component.html',
+  styleUrls: ['./about-page.component.sass'],
+  imports: [
+    MatCard
+  ],
+  standalone: true
 })
-export class AboutPageComponent implements OnInit {
-
+export class AboutPageComponent {
   constructor() {
   }
-
-  ngOnInit() {
-  }
-
 }
