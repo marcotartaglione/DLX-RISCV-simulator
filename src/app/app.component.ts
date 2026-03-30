@@ -1,12 +1,25 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {MainPageComponent} from './main-page/main-page.component';
+import {MatToolbar} from '@angular/material/toolbar';
+import {MatButton, MatIconButton} from '@angular/material/button';
+import {MatTooltip} from '@angular/material/tooltip';
+import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
 
 @Component({
-    selector: 'app-root',
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.sass'],
-    standalone: false
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.sass'],
+  standalone: true,
+  imports: [
+    MatToolbar,
+    MatIconButton,
+    MatTooltip,
+    MatButton,
+    RouterLink,
+    RouterLinkActive,
+    RouterOutlet
+  ]
 })
 export class AppComponent implements OnInit, OnDestroy {
 

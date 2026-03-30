@@ -1,11 +1,41 @@
 import {Component, Inject} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogActions,
+  MatDialogClose,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle
+} from '@angular/material/dialog';
 import {MemoryService} from '../services/memory.service';
 import {FormatPipe} from '../pipes/format.pipe';
+import {MatGridList, MatGridTile} from '@angular/material/grid-list';
+import {MatCard} from '@angular/material/card';
+import {FormatBytePipe} from '../pipes/formatByte.pipe';
+import {MatButton} from '@angular/material/button';
+import {MatTooltip} from '@angular/material/tooltip';
+import {MatButtonToggle, MatButtonToggleGroup} from '@angular/material/button-toggle';
+import {FormsModule} from '@angular/forms';
 
 @Component({
-    templateUrl: './instruction-dialog.component.html',
-    standalone: false
+  templateUrl: './instruction-dialog.component.html',
+  standalone: true,
+  imports: [
+    MatDialogTitle,
+    MatDialogContent,
+    MatGridList,
+    MatGridTile,
+    MatCard,
+    FormatBytePipe,
+    MatButton,
+    MatTooltip,
+    MatButtonToggleGroup,
+    MatButtonToggle,
+    FormsModule,
+    MatDialogActions,
+    MatDialogClose
+  ]
 })
 export class InstructionDialogComponent {
   fType: string;

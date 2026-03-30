@@ -1,11 +1,31 @@
 import {Component, Inject} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialog} from '@angular/material/dialog';
+import {MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent} from '@angular/material/dialog';
 import {Counter} from '../memory/model/counter';
-import {ErrorDialogComponent} from '../dialogs/error-dialog.component';
+import {ErrorDialogComponent} from './error-dialog.component';
+import {MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatInput} from '@angular/material/input';
+import {FormsModule} from '@angular/forms';
+import {MatSelect} from '@angular/material/select';
+import {MatOption} from '@angular/material/core';
+import {MatButton} from '@angular/material/button';
+import {FormatPipe} from '../pipes/format.pipe';
 
 @Component({
-    templateUrl: './counter-dialog.component.html',
-    standalone: false
+  templateUrl: './counter-dialog.component.html',
+  standalone: true,
+  imports: [
+    MatDialogContent,
+    MatFormField,
+    MatInput,
+    FormsModule,
+    MatSelect,
+    MatOption,
+    MatDialogActions,
+    MatButton,
+    MatDialogClose,
+    FormatPipe,
+    MatLabel
+  ]
 })
 export class CounterDialogComponent {
 

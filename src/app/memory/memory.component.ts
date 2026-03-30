@@ -20,23 +20,47 @@ import {FormatPipe} from '../pipes/format.pipe';
 import {Ram} from './model/ram';
 import {Eprom} from './model/eprom';
 import {StartLogicalNetwork} from './model/logicalNetworks/start.logical-network';
+import {MatButton} from '@angular/material/button';
+import {MatTooltip} from '@angular/material/tooltip';
+import {MatRipple} from '@angular/material/core';
+import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
+import {MatFormField, MatLabel} from '@angular/material/form-field';
+import {FormsModule} from '@angular/forms';
+import {MatInput} from '@angular/material/input';
+import {MatSelect} from '@angular/material/select';
+import {MatOption} from '@angular/material/core';
 
 @Component({
-    selector: 'app-memory',
-    templateUrl: './memory.component.html',
-    styleUrls: ['./memory.component.sass'],
-    animations: [
-        trigger('showHideTrigger', [
-            transition(':enter', [
-                style({ transform: 'translateY(-100%)' }),
-                animate('200ms ease-out', style({ transform: 'translateY(0)' })),
-            ]),
-            transition(':leave', [
-                animate('200ms ease-out', style({ transform: 'translateY(-100%)' }))
-            ])
-        ])
-    ],
-    standalone: false
+  selector: 'app-memory',
+  templateUrl: './memory.component.html',
+  styleUrls: ['./memory.component.sass'],
+  animations: [
+    trigger('showHideTrigger', [
+      transition(':enter', [
+        style({transform: 'translateY(-100%)'}),
+        animate('200ms ease-out', style({transform: 'translateY(0)'})),
+      ]),
+      transition(':leave', [
+        animate('200ms ease-out', style({transform: 'translateY(-100%)'}))
+      ])
+    ])
+  ],
+  standalone: true,
+  imports: [
+    MatButton,
+    MatTooltip,
+    MatRipple,
+    MatMenuTrigger,
+    MatFormField,
+    FormsModule,
+    FormatPipe,
+    MatInput,
+    MatSelect,
+    MatOption,
+    MatMenu,
+    MatMenuItem,
+    MatLabel
+  ]
 })
 
 export class MemoryComponent implements OnInit {
