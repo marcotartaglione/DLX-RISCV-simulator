@@ -2,60 +2,68 @@
   <div #hostElement class="editor-host">
     <textarea name="content" style="display: none"></textarea>
   </div>
-  <div class="error-message" *ngIf="errorMessage" @showHideTrigger>
-    <mat-card>{{errorMessage}}</mat-card>
-  </div>
+  @if (errorMessage) {
+    <div class="error-message" @showHideTrigger>
+      <mat-card>{{errorMessage}}</mat-card>
+    </div>
+  }
   <div class="btn-container">
     <div class="right">
       <button mat-raised-button class="mr" [disabled]="isInterruptDisabled" (click)="onInterrupt()">
         <span class="btn">Int (Led) <i class="fas fa-bolt amber"></i></span>
       </button>
-      <button mat-raised-button class="mr" *ngIf="memoryService.memory.inputPorts.length > 0" [matMenuTriggerFor]="menuInputPort" [disabled]="isInterruptDisabled">
-        <span class="btn">Int (Input Port) <i class="fas fa-bolt amber"></i></span>
-      </button>
+      @if (memoryService.memory.inputPorts.length > 0) {
+        <button mat-raised-button class="mr" [matMenuTriggerFor]="menuInputPort" [disabled]="isInterruptDisabled">
+          <span class="btn">Int (Input Port) <i class="fas fa-bolt amber"></i></span>
+        </button>
+      }
       <mat-menu #menuInputPort="matMenu">
-        <ng-container *ngFor="let device of memoryService.memory.inputPorts">
+        @for (device of memoryService.memory.inputPorts; track device) {
           <button mat-menu-item (click)="onInterruptPort(device.name)">{{ device.name }}</button>
-        </ng-container>
+        }
       </mat-menu>
 
       <!-- <span>IEN</span>
-        <div class="diagram">
+      <div class="diagram">
             <img class="{{diagramService.dlxDiagrams.ien.getAnimationClass()}}" [ngStyle]="{  'animation-duration': diagramService.dlxDiagrams.clock.getAnimationDuration() + 'ms',
                                                                                                 'animation-play-state': diagramService.dlxDiagrams.ien.getPlayState(),
                                                                                                 'animation-iteration-count': '1',
                                                                                                 'animation-fill-mode': 'initial'}" src="{{diagramService.dlxDiagrams.ien.getImageName()}}" width="855" height="75" alt="memrd-signal" />
         </div> -->
-      <button mat-raised-button class="mr" [matMenuTriggerFor]="menu">
-        <span class="btn">Save code<i class="fas fa-save"></i></span>
+        <button mat-raised-button class="mr" [matMenuTriggerFor]="menu">
+          <span class="btn">Save code<i class="fas fa-save"></i></span>
+        </button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item (click)="onSave()">Save As</button>
+          <button mat-menu-item (click)="browserSave()">Save</button>
+        </mat-menu>
+        <button mat-raised-button class="mr" (click)="onClear()">
+          <span class="btn">Restore default code<i class="fas fa-trash"></i></span>
+        </button>
+      </div>
+      <button mat-raised-button class="mr" (click)="onRun()" [disabled]="isRunDisabled">
+        <span class="btn">Step <i class="fas fa-step-forward fa-lg green"></i></span>
       </button>
-      <mat-menu #menu="matMenu">
-        <button mat-menu-item (click)="onSave()">Save As</button>
-        <button mat-menu-item (click)="browserSave()">Save</button>
-      </mat-menu>
-      <button mat-raised-button class="mr" (click)="onClear()">
-        <span class="btn">Restore default code<i class="fas fa-trash"></i></span>
+      <button mat-raised-button class="mr" (click)="continuousRunning ? onPause() : continuousRun()"
+        [disabled]="isContinuousRunDisabled">
+        @if (!continuousRunning) {
+          <span class="btn">Run <i class="fas fa-play green"></i></span>
+        }
+        @if (continuousRunning) {
+          <span class="btn">Pause <i class="fas fa-pause green"></i></span>
+        }
       </button>
+      <mat-form-field class="input-interval">
+        <mat-label>Interval (ms)</mat-label>
+        <input matInput type="number" name="interval" [(ngModel)]="interval" min="1">
+      </mat-form-field>
+      <button mat-raised-button class="mr" (click)="onStop()" [disabled]="isStopDisabled">
+        <span class="btn">Stop <i class="fas fa-square red"></i></span>
+      </button>
+      <mat-form-field class="input-label">
+        <mat-label>Start tag</mat-label>
+        <input matInput type="text" name="start" [(ngModel)]="start">
+      </mat-form-field>
+      <div style="clear:both"></div>
     </div>
-    <button mat-raised-button class="mr" (click)="onRun()" [disabled]="isRunDisabled">
-      <span class="btn">Step <i class="fas fa-step-forward fa-lg green"></i></span>
-    </button>
-    <button mat-raised-button class="mr" (click)="continuousRunning ? onPause() : continuousRun()"
-      [disabled]="isContinuousRunDisabled">
-      <span class="btn" *ngIf="!continuousRunning">Run <i class="fas fa-play green"></i></span>
-      <span class="btn" *ngIf="continuousRunning">Pause <i class="fas fa-pause green"></i></span>
-    </button>
-    <mat-form-field class="input-interval">
-      <mat-label>Interval (ms)</mat-label>
-      <input matInput type="number" name="interval" [(ngModel)]="interval" min="1">
-    </mat-form-field>
-    <button mat-raised-button class="mr" (click)="onStop()" [disabled]="isStopDisabled">
-      <span class="btn">Stop <i class="fas fa-square red"></i></span>
-    </button>
-    <mat-form-field class="input-label">
-      <mat-label>Start tag</mat-label>
-      <input matInput type="text" name="start" [(ngModel)]="start">
-    </mat-form-field>
-    <div style="clear:both"></div>
-  </div>
-</form>
+  </form>

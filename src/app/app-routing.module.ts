@@ -1,19 +1,19 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { AboutPageComponent } from './about-page/about-page.component';
-import { DLXDocumentation } from './documentation/dlx.documentation';
-import { RV32IDocumentation } from './documentation/rv32i.documentation';
-import { CanDeactivateGuard } from './guards/can-deactivate-guard';
-import { DLXInterpreter } from './interpreters/dlx/dlx.interpreter';
-import { RV32Interpreter } from './interpreters/rv32i.interpreter';
-import { MainPageComponent } from './main-page/main-page.component';
-import { DLXRegisters } from './registers/dlx.registers';
-import { RV32IRegisters } from './registers/rv32i.registers';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
+import {AboutPageComponent} from './about-page/about-page.component';
+import {DLXDocumentation} from './documentation/dlx.documentation';
+import {RV32IDocumentation} from './documentation/rv32i.documentation';
+import {CanDeactivateGuard} from './guards/can-deactivate-guard';
+import {DLXInterpreter} from './interpreters/dlx/dlx.interpreter';
+import {RV32Interpreter} from './interpreters/rv32i.interpreter';
+import {MainPageComponent} from './main-page/main-page.component';
+import {DLXRegisters} from './registers/dlx.registers';
+import {RV32IRegisters} from './registers/rv32i.registers';
 
 
 const routes: Routes = [
-  { path: '', redirectTo: '/dlx', pathMatch: 'full' },
-  { 
+  {path: '', redirectTo: '/dlx', pathMatch: 'full'},
+  {
     path: 'dlx',
     component: MainPageComponent,
     data: {
@@ -24,7 +24,7 @@ const routes: Routes = [
     },
     canDeactivate: [CanDeactivateGuard]
   },
-  { 
+  {
     path: 'rv32i',
     component: MainPageComponent,
     data: {
@@ -45,8 +45,18 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule],
-  providers: [CanDeactivateGuard]
+  imports: [
+    RouterModule.forRoot(routes, {
+      paramsInheritanceStrategy: 'always',
+      canceledNavigationResolution: 'replace',
+    })
+  ],
+  exports: [
+    RouterModule
+  ],
+  providers: [
+    CanDeactivateGuard
+  ]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {
+}

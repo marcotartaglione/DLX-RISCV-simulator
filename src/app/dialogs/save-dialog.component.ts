@@ -4,7 +4,8 @@ import { CustomErrorStateMatcher } from './custom-state-matcher';
 import {FormControl, Validators} from '@angular/forms';
 
 @Component({
-  templateUrl: './save-dialog.component.html',
+    templateUrl: './save-dialog.component.html',
+    standalone: false
 })
 export class SaveDialogComponent {
 

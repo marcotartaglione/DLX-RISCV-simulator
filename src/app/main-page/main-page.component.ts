@@ -9,9 +9,10 @@ import { DiagramService } from '../services/diagram.service';
 import {MemoryService} from '../services/memory.service';
 
 @Component({
-  selector: 'app-main-page',
-  templateUrl: './main-page.component.html',
-  styleUrls: ['./main-page.component.sass']
+    selector: 'app-main-page',
+    templateUrl: './main-page.component.html',
+    styleUrls: ['./main-page.component.sass'],
+    standalone: false
 })
 export class MainPageComponent implements OnDestroy{
 

@@ -3,7 +3,8 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MemoryService } from '../services/memory.service';
 
 @Component({
-  templateUrl: './memory-address-dialog.component.html',
+    templateUrl: './memory-address-dialog.component.html',
+    standalone: false
 })
 export class MemoryAddressDialogComponent{
   fType : string;

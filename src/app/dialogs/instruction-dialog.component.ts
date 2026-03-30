@@ -4,7 +4,8 @@ import {MemoryService} from '../services/memory.service';
 import {FormatPipe} from '../pipes/format.pipe';
 
 @Component({
-  templateUrl: './instruction-dialog.component.html'
+    templateUrl: './instruction-dialog.component.html',
+    standalone: false
 })
 export class InstructionDialogComponent {
   fType: string;

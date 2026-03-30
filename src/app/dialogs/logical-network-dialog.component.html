@@ -1,62 +1,91 @@
 <mat-dialog-content>
-    <img style="background-color:white" src="{{data.network.imagePath}}" width="850px"/>
-    <br />
+  <img style="background-color:white" src="{{data.network.imagePath}}" width="850px"/>
+  <br />
+  <div>
+    @if (data.network.clockType) {
+      <div style="display:inline-block; margin:10px;">
+        <mat-form-field appearance="fill">
+          <mat-label>Clock Type</mat-label>
+          <mat-select [(value)]="data.network.clockType">
+            <mat-option value="MEMWR*">MEMWR*</mat-option>
+            <mat-option value="MEMRD*">MEMRD*</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    }
+    @if (data.network.asyncSetSignal) {
+      <div style="display:inline-block; margin:10px;">
+        <mat-form-field appearance="fill">
+          <mat-label>A_SET</mat-label>
+          <mat-select  [(value)]="data.network.asyncSetSignal"> <!-- [disabled]="data.isReadOnly" -->
+            <mat-option value="RESET">RESET</mat-option>
+            @if (null != isLedActive(data.network) ) {
+              <mat-option value="CS_A_SET_LED">CS_A_SET_LED</mat-option>
+            }
+            @if (null != isStartupActive(data.network)) {
+              <mat-option value="CS_A_SET_STARTUP">CS_A_SET_STARTUP</mat-option>
+            }
+            <mat-option value="0">0</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    }
+    @if (data.network.asyncResetSignal) {
+      <div style="display:inline-block; margin:10px;">
+        <mat-form-field appearance="fill">
+          <mat-label>A_RES</mat-label>
+          <mat-select [(value)]="data.network.asyncResetSignal"> <!--  [disabled]="data.isReadOnly" -->
+            <mat-option value="RESET">RESET</mat-option>
+            @if (null != isLedActive(data.network)) {
+              <mat-option value="CS_A_RES_LED">CS_A_RES_LED</mat-option>
+            }
+            @if (null != isStartupActive(data.network)) {
+              <mat-option value="CS_A_RES_STARTUP">CS_A_RES_STARTUP</mat-option>
+            }
+            <mat-option value="0">0</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    }
+  </div>
+
+  <br />
+  @if (data.network.chipSelects.length > 0) {
     <div>
-        <div style="display:inline-block; margin:10px;" *ngIf="data.network.clockType">
-            <mat-form-field appearance="fill">
-                <mat-label>Clock Type</mat-label>
-                <mat-select [(value)]="data.network.clockType">
-                    <mat-option value="MEMWR*">MEMWR*</mat-option>
-                    <mat-option value="MEMRD*">MEMRD*</mat-option>
-                </mat-select>
-            </mat-form-field>
-        </div>
-        <div style="display:inline-block; margin:10px;" *ngIf="data.network.asyncSetSignal">
-            <mat-form-field appearance="fill">
-                <mat-label>A_SET</mat-label>
-                <mat-select  [(value)]="data.network.asyncSetSignal"> <!-- [disabled]="data.isReadOnly" -->
-                    <mat-option value="RESET">RESET</mat-option>
-                    <mat-option *ngIf="null != isLedActive(data.network) " value="CS_A_SET_LED">CS_A_SET_LED</mat-option>
-                    <mat-option *ngIf="null != isStartupActive(data.network)" value="CS_A_SET_STARTUP">CS_A_SET_STARTUP</mat-option>
-                    <mat-option value="0">0</mat-option>
-                </mat-select>
-            </mat-form-field>
-        </div>
-        <div style="display:inline-block; margin:10px;" *ngIf="data.network.asyncResetSignal">
-            <mat-form-field appearance="fill">
-                <mat-label>A_RES</mat-label>
-                <mat-select [(value)]="data.network.asyncResetSignal"> <!--  [disabled]="data.isReadOnly" -->
-                    <mat-option value="RESET">RESET</mat-option>
-                    <mat-option *ngIf="null != isLedActive(data.network)" value="CS_A_RES_LED">CS_A_RES_LED</mat-option>
-                    <mat-option *ngIf="null != isStartupActive(data.network)" value="CS_A_RES_STARTUP">CS_A_RES_STARTUP</mat-option>
-
-                    <mat-option value="0">0</mat-option>
-                </mat-select>
-            </mat-form-field>
-        </div>
-    </div>
-
-    <br />
-    <div *ngIf="data.network.chipSelects.length > 0">
-        <b>Chip-Select</b><br />
-        <span *ngFor="let cs of data.network.chipSelects">
-            {{cs.id}} - {{cs.address | format: 'hex'}}<br />
+      <b>Chip-Select</b><br />
+      @for (cs of data.network.chipSelects; track cs) {
+        <span>
+          {{cs.id}} - {{cs.address | format: 'hex'}}<br />
         </span>
+      }
     </div>
-    <br />
-<!-- TODO dovrebbe controllare che l'elemento sia o meno LedLogicalNetwork -->
-    <div *ngIf="null != isLedActive(data.network)">
-        <b>LED</b><br />
-        <span *ngIf="isLedActive(data.network)">ON</span>
-        <span *ngIf="!isLedActive(data.network)">OFF</span>
+  }
+  <br />
+  <!-- TODO dovrebbe controllare che l'elemento sia o meno LedLogicalNetwork -->
+  @if (null != isLedActive(data.network)) {
+    <div>
+      <b>LED</b><br />
+      @if (isLedActive(data.network)) {
+        <span>ON</span>
+      }
+      @if (!isLedActive(data.network)) {
+        <span>OFF</span>
+      }
     </div>
-<!-- TODO dovrebbe controllare che l'elemento sia o meno StartUpLogicalNetwork -->
-    <div *ngIf="null != isStartupActive(data.network)">
-        <b>STARTUP</b><br />
-        <span *ngIf="isStartupActive(data.network)">ON</span>
-        <span *ngIf="!isStartupActive(data.network)">OFF</span>
+  }
+  <!-- TODO dovrebbe controllare che l'elemento sia o meno StartUpLogicalNetwork -->
+  @if (null != isStartupActive(data.network)) {
+    <div>
+      <b>STARTUP</b><br />
+      @if (isStartupActive(data.network)) {
+        <span>ON</span>
+      }
+      @if (!isStartupActive(data.network)) {
+        <span>OFF</span>
+      }
     </div>
+  }
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-    <button mat-button mat-dialog-close>Ok</button>
+  <button mat-button mat-dialog-close>Ok</button>
 </mat-dialog-actions>

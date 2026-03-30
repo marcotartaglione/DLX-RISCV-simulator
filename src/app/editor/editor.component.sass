@@ -1,4 +1,4 @@
-@import '@angular/material/theming'
+@use '@angular/material' as mat
 
 :host
   width: 100%
@@ -29,7 +29,7 @@ form
   margin-top: .5rem
 
   mat-card
-    background-color: map-get($mat-red, 900)
+    background-color: map-get(mat.$m2-red-palette, 900)
 
 .btn
   display: flex

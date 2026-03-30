@@ -28,31 +28,32 @@ import './modes/rv32i.js';
 import {LogicalNetwork} from '../memory/model/logical-network';
 
 @Component({
-  selector: 'app-editor',
-  templateUrl: './editor.component.html',
-  styleUrls: ['./editor.component.sass'],
-  animations: [
-    trigger('showHideTrigger', [
-      transition(':enter', [
-        group([
-          style({height: '0'}),
-          animate('200ms ease-out', style({height: '*'})),
-          query('mat-card', [
-            style({transform: 'translateY(-100%)'}),
-            animate('200ms ease-out', style({transform: 'translateY(0)'})),
-          ])
+    selector: 'app-editor',
+    templateUrl: './editor.component.html',
+    styleUrls: ['./editor.component.sass'],
+    animations: [
+        trigger('showHideTrigger', [
+            transition(':enter', [
+                group([
+                    style({ height: '0' }),
+                    animate('200ms ease-out', style({ height: '*' })),
+                    query('mat-card', [
+                        style({ transform: 'translateY(-100%)' }),
+                        animate('200ms ease-out', style({ transform: 'translateY(0)' })),
+                    ])
+                ])
+            ]),
+            transition(':leave', [
+                group([
+                    animate('200ms ease-out', style({ height: '0' })),
+                    query('mat-card', [
+                        animate('200ms ease-out', style({ transform: 'translateY(-100%)' }))
+                    ])
+                ])
+            ])
         ])
-      ]),
-      transition(':leave', [
-        group([
-          animate('200ms ease-out', style({height: '0'})),
-          query('mat-card', [
-            animate('200ms ease-out', style({transform: 'translateY(-100%)'}))
-          ])
-        ])
-      ])
-    ])
-  ],
+    ],
+    standalone: false
 })
 export class EditorComponent implements AfterViewInit, OnDestroy {
 

@@ -1,4 +1,4 @@
-@import '@angular/material/theming'
+@use '@angular/material' as mat
 
 :host
     display: flex
@@ -16,11 +16,11 @@
         overflow: hidden
         border-radius: 5px
         margin: .5rem 0
-        @include mat-elevation(2)
+        @include mat.elevation(2)
         .register
             border-radius: 0
         &>:not(:last-of-type)
-            border-bottom: 1px solid map-get($mat-gray, 700)
+            border-bottom: 1px solid map-get(mat.$m2-grey-palette, 700)
         .gpr-row
             display: grid
             grid-template-columns: auto auto
@@ -34,7 +34,7 @@
         padding: .2rem
         border-radius: 5px
         &.special
-            @include mat-elevation(2)
+            @include mat.elevation(2)
             margin: .5rem 0
 
 
@@ -51,7 +51,7 @@
         width: 22ch
 
 #fType
-    @include mat-elevation(2)
+    @include mat.elevation(2)
     border: none
     width: 100%
 

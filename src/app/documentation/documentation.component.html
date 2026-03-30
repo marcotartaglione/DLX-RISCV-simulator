@@ -1,26 +1,28 @@
 <body link="white" vlink="red">
-<mat-form-field class="search-field">
-  <input matInput placeholder="Search" name="search" autocomplete="0" [(ngModel)]="search">
-</mat-form-field>
-<div class="mat-accordion-container">
-  <div class="info-documentation">
-    <span>
-      Formato delle istruzioni DLX compatibile con il materiale del corso di Calcolatori Elettronici T (Stefano
-      Mattoccia), Corso di Laurea in Ingegneria Informatica, Università di Bologna.<br />
-      Per segnalazioni di errori o suggerimenti:<br /> Stefano Mattoccia: stefano.mattoccia@unibo.it
-      <br><br>
-      Click <a href="https://www.csd.uoc.gr/~hy425/2002s/dlxmap.html">here</a> to view operational codes 
-    </span>
+  <mat-form-field class="search-field">
+    <input matInput placeholder="Search" name="search" autocomplete="0" [(ngModel)]="search">
+  </mat-form-field>
+  <div class="mat-accordion-container">
+    <div class="info-documentation">
+      <span>
+        Formato delle istruzioni DLX compatibile con il materiale del corso di Calcolatori Elettronici T (Stefano
+        Mattoccia), Corso di Laurea in Ingegneria Informatica, Università di Bologna.<br />
+        Per segnalazioni di errori o suggerimenti:<br /> Stefano Mattoccia: stefano.mattoccia&#64;unibo.it
+        <br><br>
+        Click <a href="https://www.csd.uoc.gr/~hy425/2002s/dlxmap.html">here</a> to view operational codes
+      </span>
+    </div>
+    <mat-accordion>
+      @for (instr of documentationFiltered; track instr) {
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title class="name">{{instr.name}}</mat-panel-title>
+            <mat-panel-description class="type">{{instr.type}}</mat-panel-description>
+            <mat-panel-description class="syntax">{{instr.syntax}}</mat-panel-description>
+          </mat-expansion-panel-header>
+          <p class="description" [innerHTML]="instr.description"></p>
+        </mat-expansion-panel>
+      }
+    </mat-accordion>
   </div>
-  <mat-accordion>
-    <mat-expansion-panel *ngFor="let instr of documentationFiltered">
-      <mat-expansion-panel-header>
-        <mat-panel-title class="name">{{instr.name}}</mat-panel-title>
-        <mat-panel-description class="type">{{instr.type}}</mat-panel-description>
-        <mat-panel-description class="syntax">{{instr.syntax}}</mat-panel-description>
-      </mat-expansion-panel-header>
-      <p class="description" [innerHTML]="instr.description"></p>
-    </mat-expansion-panel>
-  </mat-accordion>
-</div>
 </body>
