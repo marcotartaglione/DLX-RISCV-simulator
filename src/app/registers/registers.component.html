@@ -1,81 +1,93 @@
 <div class="registers {{fType}}">
   <div class="gpr">
     <span>GPR</span>
-    <div class="gpr-back" *ngIf="isDLX">
-      <div class="gpr-row" *ngFor="let r of dlxRegisters.r; index as i;">
-        <div class="index">R{{i}}</div>
-        <div class="register" [ngStyle]="{'font-weight': dlxRegisters.rBold[i], 'background-color': (dlxRegisters.rBold[i]=='bold') ? '#5a5a5a' : ''}">
-          {{r | format: fType}}
-        </div>
+    @if (isDLX) {
+      <div class="gpr-back">
+        @for (r of dlxRegisters.r; track r; let i = $index) {
+          <div class="gpr-row">
+            <div class="index">R{{i}}</div>
+            <div class="register" [ngStyle]="{'font-weight': dlxRegisters.rBold[i], 'background-color': (dlxRegisters.rBold[i]=='bold') ? '#5a5a5a' : ''}">
+              {{r | format: fType}}
+            </div>
+          </div>
+        }
       </div>
-    </div>
-    <div class="gpr-back" *ngIf="isRV32I">
-      <div class="gpr-row" *ngFor="let x of rv32iRegisters.x; index as i">
-        <div class="index">x{{i}}</div>
-        <div class="register">{{x | format: fType}}</div>
+    }
+    @if (isRV32I) {
+      <div class="gpr-back">
+        @for (x of rv32iRegisters.x; track x; let i = $index) {
+          <div class="gpr-row">
+            <div class="index">x{{i}}</div>
+            <div class="register">{{x | format: fType}}</div>
+          </div>
+        }
       </div>
-    </div>
+    }
   </div>
-  <div *ngIf="isDLX">
-    <span>PC</span>
-    <div class="register special" [ngStyle]="{'font-weight': 'bold', 'background-color': '#5a5a5a'}">{{registers.pc | format: fType}}</div>
-    <span>IAR</span>
-    <div class="register special" [ngStyle]="{'font-weight': dlxRegisters.iarBold, 'background-color': (dlxRegisters.iarBold=='bold') ? '#5a5a5a' : ''}">
-      {{dlxRegisters.iar | format: fType}}
+  @if (isDLX) {
+    <div>
+      <span>PC</span>
+      <div class="register special" [ngStyle]="{'font-weight': 'bold', 'background-color': '#5a5a5a'}">{{registers.pc | format: fType}}</div>
+      <span>IAR</span>
+      <div class="register special" [ngStyle]="{'font-weight': dlxRegisters.iarBold, 'background-color': (dlxRegisters.iarBold=='bold') ? '#5a5a5a' : ''}">
+        {{dlxRegisters.iar | format: fType}}
+      </div>
+      <span>IEN</span>
+      <div class="register special" [ngStyle]="{'font-weight': dlxRegisters.ienBold, 'background-color': (dlxRegisters.ienBold=='bold') ? '#5a5a5a' : ''}">
+        {{dlxRegisters.ien | format: 'dec'}}
+      </div>
+      <span>MAR</span>
+      <div class="register special" [ngStyle]="{'font-weight': dlxRegisters.marBold, 'background-color': (dlxRegisters.marBold=='bold') ? '#5a5a5a' : ''}">
+        {{dlxRegisters.mar | format: fType}}
+      </div>
+      <span>IR</span>
+      <div class="register special" [ngStyle]="{'font-weight': 'bold', 'background-color': '#5a5a5a'}">{{dlxRegisters.ir | format: fType}}</div>
+      <span>MDR</span>
+      <div class="register special" [ngStyle]="{'font-weight': dlxRegisters.mdrBold, 'background-color': (dlxRegisters.mdrBold=='bold') ? '#5a5a5a' : ''}">
+        {{dlxRegisters.mdr | format: fType}}
+      </div>
+      <br />
+      <mat-form-field appearance="fill">
+        <mat-label>Format values</mat-label>
+        <mat-select [(value)]="fType">
+          <mat-option value="hex">Hexadecimal</mat-option>
+          <mat-option value="dec">Decimal</mat-option>
+          <mat-option value="oct">Octal</mat-option>
+          <mat-option value="bin">Binary</mat-option>
+        </mat-select>
+      </mat-form-field>
     </div>
-    <span>IEN</span>
-    <div class="register special" [ngStyle]="{'font-weight': dlxRegisters.ienBold, 'background-color': (dlxRegisters.ienBold=='bold') ? '#5a5a5a' : ''}">
-      {{dlxRegisters.ien | format: 'dec'}}
+  }
+  @if (isRV32I) {
+    <div>
+      <span>PC</span>
+      <div class="register special">{{rv32iRegisters.pc | format: fType}}</div>
+      <span>Opcode</span>
+      <div class="register special">{{rv32iRegisters.opcode | format: fType: 7}}</div>
+      <span>RD</span>
+      <div class="register special">{{rv32iRegisters.rd | format: fType: 5}}</div>
+      <span>RS1</span>
+      <div class="register special">{{rv32iRegisters.rs1 | format: fType: 5}}</div>
+      <span>RS2</span>
+      <div class="register special">{{rv32iRegisters.rs2 | format: fType: 5}}</div>
+      <span>Func3</span>
+      <div class="register special">{{rv32iRegisters.func3 | format: fType: 3}}</div>
+      <span>Func7</span>
+      <div class="register special">{{rv32iRegisters.func7 | format: fType: 7}}</div>
+      <span>Immediate</span>
+      <div class="register special">{{rv32iRegisters.immediate | format: fType: 20}}</div>
+      <span>Jump-Offset</span>
+      <div class="register special">{{rv32iRegisters.jumpOffset | format: fType: 20}}</div>
+      <br />
+      <mat-form-field appearance="fill">
+        <mat-label>Formato valori</mat-label>
+        <mat-select [(value)]="fType">
+          <mat-option value="hex">Hexadecimal</mat-option>
+          <mat-option value="dec">Decimal</mat-option>
+          <mat-option value="oct">Octal</mat-option>
+          <mat-option value="bin">Binary</mat-option>
+        </mat-select>
+      </mat-form-field>
     </div>
-    <span>MAR</span>
-    <div class="register special" [ngStyle]="{'font-weight': dlxRegisters.marBold, 'background-color': (dlxRegisters.marBold=='bold') ? '#5a5a5a' : ''}">
-      {{dlxRegisters.mar | format: fType}}
-    </div>
-    <span>IR</span>
-    <div class="register special" [ngStyle]="{'font-weight': 'bold', 'background-color': '#5a5a5a'}">{{dlxRegisters.ir | format: fType}}</div>
-    <span>MDR</span>
-    <div class="register special" [ngStyle]="{'font-weight': dlxRegisters.mdrBold, 'background-color': (dlxRegisters.mdrBold=='bold') ? '#5a5a5a' : ''}">
-      {{dlxRegisters.mdr | format: fType}}
-    </div>
-    <br />
-    <mat-form-field appearance="fill">
-      <mat-label>Format values</mat-label>
-      <mat-select [(value)]="fType">
-        <mat-option value="hex">Hexadecimal</mat-option>
-        <mat-option value="dec">Decimal</mat-option>
-        <mat-option value="oct">Octal</mat-option>
-        <mat-option value="bin">Binary</mat-option>
-      </mat-select>
-    </mat-form-field>
-  </div>
-  <div *ngIf="isRV32I">
-    <span>PC</span>
-    <div class="register special">{{rv32iRegisters.pc | format: fType}}</div>
-    <span>Opcode</span>
-    <div class="register special">{{rv32iRegisters.opcode | format: fType: 7}}</div>
-    <span>RD</span>
-    <div class="register special">{{rv32iRegisters.rd | format: fType: 5}}</div>
-    <span>RS1</span>
-    <div class="register special">{{rv32iRegisters.rs1 | format: fType: 5}}</div>
-    <span>RS2</span>
-    <div class="register special">{{rv32iRegisters.rs2 | format: fType: 5}}</div>
-    <span>Func3</span>
-    <div class="register special">{{rv32iRegisters.func3 | format: fType: 3}}</div>
-    <span>Func7</span>
-    <div class="register special">{{rv32iRegisters.func7 | format: fType: 7}}</div>
-    <span>Immediate</span>
-    <div class="register special">{{rv32iRegisters.immediate | format: fType: 20}}</div>
-    <span>Jump-Offset</span>
-    <div class="register special">{{rv32iRegisters.jumpOffset | format: fType: 20}}</div>
-    <br />
-    <mat-form-field appearance="fill">
-      <mat-label>Formato valori</mat-label>
-      <mat-select [(value)]="fType">
-        <mat-option value="hex">Hexadecimal</mat-option>
-        <mat-option value="dec">Decimal</mat-option>
-        <mat-option value="oct">Octal</mat-option>
-        <mat-option value="bin">Binary</mat-option>
-      </mat-select>
-    </mat-form-field>
-  </div>
+  }
 </div>

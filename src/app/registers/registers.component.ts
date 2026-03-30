@@ -4,9 +4,10 @@ import {Registers} from './registers';
 import {RV32IRegisters} from './rv32i.registers';
 
 @Component({
-  selector: 'app-registers',
-  templateUrl: './registers.component.html',
-  styleUrls: ['./registers.component.sass']
+    selector: 'app-registers',
+    templateUrl: './registers.component.html',
+    styleUrls: ['./registers.component.sass'],
+    standalone: false
 })
 export class RegistersComponent {
 

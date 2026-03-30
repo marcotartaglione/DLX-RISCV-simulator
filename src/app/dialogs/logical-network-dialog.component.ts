@@ -5,7 +5,8 @@ import {LedLogicalNetwork} from '../memory/model/logicalNetworks/led.logical-net
 import {StartLogicalNetwork} from '../memory/model/logicalNetworks/start.logical-network';
 
 @Component({
-  templateUrl: './logical-network-dialog.component.html',
+    templateUrl: './logical-network-dialog.component.html',
+    standalone: false
 })
 export class LogicalNetworkDialogComponent {
 

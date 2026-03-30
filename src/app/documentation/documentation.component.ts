@@ -5,9 +5,10 @@ import { Subscription } from 'rxjs';
 export type Documentation = {name: string, type: string, syntax: string, description: string};
 
 @Component({
-  selector: 'app-documentation',
-  templateUrl: './documentation.component.html',
-  styleUrls: ['./documentation.component.sass']
+    selector: 'app-documentation',
+    templateUrl: './documentation.component.html',
+    styleUrls: ['./documentation.component.sass'],
+    standalone: false
 })
 export class DocumentationComponent implements OnInit, OnDestroy {
 

@@ -1,10 +1,9 @@
-import {HttpClientModule} from '@angular/common/http';
+import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatNativeDateModule} from '@angular/material/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {CodemirrorModule} from '@ctrl/ngx-codemirror';
 import '../polyfills';
 import {AboutPageComponent} from './about-page/about-page.component';
 import {AppRoutingModule} from './app-routing.module';
@@ -37,50 +36,48 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {NgOptimizedImage} from '@angular/common';
 
 @NgModule({
-    declarations: [
-        AppComponent,
-        EditorComponent,
-        MainPageComponent,
-        RegistersComponent,
-        FormatPipe,
-        MemoryComponent,
-        DocumentationComponent,
-        MessageDialogComponent,
-        LogicalNetworkDialogComponent,
-        MemoryAddressDialogComponent,
-        ConfirmDialogComponent,
-        ImageDialogComponent,
-        AboutPageComponent,
-        ErrorDialogComponent,
-        SaveDialogComponent,
-        InstructionDialogComponent,
-        FormatBytePipe,
-        CounterDialogComponent,
-        DiagramComponent,
-        InputPortDialogComponent
-    ],
-    imports: [
-        BrowserModule,
-        FormsModule,
-        AppRoutingModule,
-        CodemirrorModule,
-        BrowserAnimationsModule,
-        ReactiveFormsModule,
-        MatNativeDateModule,
-        HttpClientModule,
-        MatMenuModule,
-        MaterialModule,
-        MatSelectModule,
-        MatIconModule,
-        MatGridListModule,
-        MatInputModule,
-        MatFormFieldModule,
-        NgOptimizedImage
-    ],
-    providers: [],
-    bootstrap: [
-        AppComponent
-    ]
+  declarations: [
+    AppComponent,
+    EditorComponent,
+    MainPageComponent,
+    RegistersComponent,
+    FormatPipe,
+    MemoryComponent,
+    DocumentationComponent,
+    MessageDialogComponent,
+    LogicalNetworkDialogComponent,
+    MemoryAddressDialogComponent,
+    ConfirmDialogComponent,
+    ImageDialogComponent,
+    AboutPageComponent,
+    ErrorDialogComponent,
+    SaveDialogComponent,
+    InstructionDialogComponent,
+    FormatBytePipe,
+    CounterDialogComponent,
+    DiagramComponent,
+    InputPortDialogComponent
+  ],
+  bootstrap: [
+    AppComponent
+  ], imports: [BrowserModule,
+    FormsModule,
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    ReactiveFormsModule,
+    MatNativeDateModule,
+    MatMenuModule,
+    MaterialModule,
+    MatSelectModule,
+    MatIconModule,
+    MatGridListModule,
+    MatInputModule,
+    MatIconModule,
+    MatFormFieldModule,
+    NgOptimizedImage],
+  providers: [
+    provideHttpClient(withInterceptorsFromDi())
+  ]
 })
 export class AppModule {
 }

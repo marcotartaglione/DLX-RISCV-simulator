@@ -5,7 +5,8 @@ import {InputPort} from '../memory/model/input-port';
 
 
 @Component({
-  templateUrl: './input-port-dialog.component.html',
+    templateUrl: './input-port-dialog.component.html',
+    standalone: false
 })
 export class InputPortDialogComponent implements OnInit {
 

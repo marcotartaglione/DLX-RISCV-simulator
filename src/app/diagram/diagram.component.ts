@@ -3,9 +3,10 @@ import { DLXRegisters } from '../registers/dlx.registers';
 import { DiagramService } from '../services/diagram.service';
 
 @Component({
-  selector: 'app-diagram',
-  templateUrl: './diagram.component.html',
-  styleUrls: ['./diagram.component.sass']
+    selector: 'app-diagram',
+    templateUrl: './diagram.component.html',
+    styleUrls: ['./diagram.component.sass'],
+    standalone: false
 })
 
 export class DiagramComponent implements OnInit{

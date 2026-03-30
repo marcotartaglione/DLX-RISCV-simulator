@@ -4,7 +4,8 @@ import {Counter} from '../memory/model/counter';
 import {ErrorDialogComponent} from '../dialogs/error-dialog.component';
 
 @Component({
-  templateUrl: './counter-dialog.component.html',
+    templateUrl: './counter-dialog.component.html',
+    standalone: false
 })
 export class CounterDialogComponent {
 

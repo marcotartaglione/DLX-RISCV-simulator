@@ -22,20 +22,21 @@ import {Eprom} from './model/eprom';
 import {StartLogicalNetwork} from './model/logicalNetworks/start.logical-network';
 
 @Component({
-  selector: 'app-memory',
-  templateUrl: './memory.component.html',
-  styleUrls: ['./memory.component.sass'],
-  animations: [
-    trigger('showHideTrigger', [
-      transition(':enter', [
-        style({transform: 'translateY(-100%)'}),
-        animate('200ms ease-out', style({transform: 'translateY(0)'})),
-      ]),
-      transition(':leave', [
-        animate('200ms ease-out', style({transform: 'translateY(-100%)'}))
-      ])
-    ])
-  ],
+    selector: 'app-memory',
+    templateUrl: './memory.component.html',
+    styleUrls: ['./memory.component.sass'],
+    animations: [
+        trigger('showHideTrigger', [
+            transition(':enter', [
+                style({ transform: 'translateY(-100%)' }),
+                animate('200ms ease-out', style({ transform: 'translateY(0)' })),
+            ]),
+            transition(':leave', [
+                animate('200ms ease-out', style({ transform: 'translateY(-100%)' }))
+            ])
+        ])
+    ],
+    standalone: false
 })
 
 export class MemoryComponent implements OnInit {
