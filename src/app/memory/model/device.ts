@@ -61,10 +61,6 @@ export class Device implements IAddressableStorage {
    * @param json The JSON object containing the properties of the device. It must include the "proto" property with the value "Device".
    */
   public static fromJSON(json: any): Device {
-    if (json.proto !== this.constructor.name) {
-      throw new Error(`Invalid proto for Device: ${json.proto}`);
-    }
-
     return new Device(json.name, json.min_address, json.max_address);
   }
 
