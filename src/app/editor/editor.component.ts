@@ -3,18 +3,22 @@ import {
   AfterViewInit,
   ApplicationRef,
   Component,
+  computed,
+  effect,
   ElementRef,
-  EventEmitter,
   HostListener,
-  Input,
+  inject,
+  input,
+  model,
   OnDestroy,
-  Output,
-  ViewChild
+  output,
+  signal,
+  untracked,
+  viewChild
 } from '@angular/core';
 import {FormsModule, NgForm} from '@angular/forms';
 import {MatDialog} from '@angular/material/dialog';
-import CodeMirror from 'codemirror';
-import {EditorFromTextArea} from 'codemirror';
+import CodeMirror, {EditorFromTextArea} from 'codemirror';
 import 'codemirror/addon/selection/active-line';
 import {Subscription} from 'rxjs';
 import {SaveDialogComponent} from '../dialogs/save-dialog.component';
@@ -73,286 +77,299 @@ import {MatLabel} from '@angular/material/form-field';
 })
 export class EditorComponent implements AfterViewInit, OnDestroy {
 
-  @ViewChild('hostElement', {static: false}) hostElement: ElementRef;
-  @ViewChild('form', {static: false}) form: NgForm;
-  @Input() public codeService: CodeService;
-  @Input() memoryService: MemoryService;
-  @Input() diagramService: DiagramService;
-  @Input() registers: Registers;
-  @Output() pcChange: EventEmitter<number> = new EventEmitter();
-  @Output() formDirtyChange: EventEmitter<boolean> = new EventEmitter();
-  continuousRunning = false;
-  errorMessage: string;
-  start = 'init';
-  interval = 1000;
-  isInterruptDisabled = true;
-  private codeMirrorInstance: EditorFromTextArea;
-  private formStatusChangeSub: Subscription;
-  private timeout;
-  private previousLine = 0;
-  private runnedLine = 0;
-  private running = false;
+  public registers = input.required<Registers>();
+  public pc = model<number>(0, {alias: 'pc'});
+  public wasContentModified = output<boolean>();
 
-  constructor(
-    private appRef: ApplicationRef,
-    private dialog: MatDialog
-  ) {
+  protected errorMessage = signal('');
+  protected startTag = signal('init');
+  protected isInterruptDisabled = signal(true);
+  protected intervalTime = signal(1000);
+
+  private _codeService = inject(CodeService);
+  private _memoryService = inject(MemoryService);
+  private _diagramService = inject(DiagramService);
+  private _appRef = inject(ApplicationRef);
+  private _dialog = inject(MatDialog);
+
+  private _hostElement = viewChild<ElementRef>('hostElement');
+  private _form = viewChild<NgForm>('form');
+  private _codeMirror = signal<EditorFromTextArea | null>(null);
+  private _isRunning = signal(false);
+
+  private _formStatusChangeSub: Subscription;
+  private _timeout: any;
+  private _exRunnedInstruction = -1;
+  private _runnedInstruction = -1;
+  private _keepRunning = false;
+
+
+  constructor() {
+    this.initEditorSettings();
+
+    effect(() => {
+      if (!this._codeMirror()) {
+        return;
+      }
+
+      this.updateVisuals(this._exRunnedInstruction, this._runnedInstruction, this.pc());
+    });
+  }
+
+  protected isRunDisabled = computed(() =>
+    this._codeMirror() ? (this.addressToLine(this.pc()) >= this._codeMirror().lineCount()) || this._keepRunning : false
+  );
+
+  protected isStopDisabled = computed(() =>
+    !this._isRunning()
+  );
+
+  protected readonly isContinuousRunDisabled = computed(() =>
+    this._codeMirror() ? (this.addressToLine(this.pc()) >= this._codeMirror().lineCount()) : false
+  );
+
+  public get keepRunning() {
+    return this._keepRunning;
+  }
+
+  public get inputPorts() {
+    return this._memoryService.memory.inputPorts;
+  }
+
+  public get options(): CodeMirror.EditorConfiguration {
+    return {
+      lineNumbers: true,
+      firstLineNumber: 0,
+      lineNumberFormatter: (line: number) => (line * 4).toString(16).toUpperCase(),
+      theme: 'dlx-riscv-theme',
+      mode: this._codeService.editorMode,
+      styleActiveLine: true,
+      viewportMargin: Infinity,
+      extraKeys: {
+        'Ctrl-S': () => {
+          this.save();
+          this._appRef.tick();
+        }
+      }
+    };
+  }
+
+  ngAfterViewInit() {
+    const textArea = this._hostElement().nativeElement.querySelector('textarea');
+
+    this._codeMirror.set(CodeMirror.fromTextArea(textArea, this.options));
+    this._codeMirror().setValue(this._codeService.content || '');
+
+    this._codeMirror().on('change', (event) => {
+      this._codeService.content = event.getValue();
+      this._form()?.form.markAsDirty();
+
+      if (this._isRunning()) {
+        this.stop();
+      }
+
+      if (this.errorMessage()) {
+        this._codeMirror().removeLineClass(this.addressToLine(this._runnedInstruction), 'wrap', 'error');
+        this.errorMessage.set(undefined);
+      }
+    });
+
+    this._formStatusChangeSub = this._form()?.statusChanges?.subscribe(() =>
+      this.wasContentModified.emit(this._form()?.dirty ?? false)
+    );
+
+    this.storeCodeInEprom();
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  unloadNotification($event: any) {
+    if (this._form()?.dirty) {
+      $event.returnValue = true;
+    }
+  }
+
+  ngOnDestroy() {
+    if (this._codeMirror()) {
+      this._codeMirror().toTextArea();
+    }
+
+    if (this._formStatusChangeSub) {
+      this._formStatusChangeSub.unsubscribe();
+    }
+
+    if (this._timeout) {
+      clearInterval(this._timeout);
+    }
+  }
+
+  protected run() {
+    this._keepRunning = true;
+
+    if (this.pc() >= this._codeService.linesCount * 4) {
+      this.pc.set(0);
+    }
+
+    if (this._timeout) {
+      clearTimeout(this._timeout);
+    }
+
+    this.executeNextInstruction();
+    this._timeout = setTimeout(() => this.run(), this.intervalTime());
+  }
+
+  protected executeNextInstruction() {
+    if (!this._isRunning()) {
+      this._codeMirror().removeLineClass(this.addressToLine(this._runnedInstruction), 'wrap', 'error');
+      this.errorMessage.set(undefined);
+
+      this._memoryService.devices.forEach(el => {
+        if (el instanceof LogicalNetwork) {
+          (el as LogicalNetwork).startOperation();
+        }
+      });
+
+      this._codeService.interpreter.parseTags(this._codeService.content, this.startTag());
+      this.pc.set(this._codeService.interpreter.getTag('start_tag'));
+      this._isRunning.set(true);
+
+      if (this._diagramService.isAuto()) {
+        this._diagramService.setAnimationDuration(this.intervalTime());
+        this._diagramService.idle();
+      }
+    }
+
+    this._exRunnedInstruction = this._runnedInstruction;
+    this._runnedInstruction = this.pc();
+
+    if (this._diagramService.isAuto()) {
+      this._diagramService.setAnimationDuration(this.intervalTime());
+      this._diagramService.resume();
+    }
+    try {
+      const newPc = this._codeService.interpreter.run(
+        this._codeMirror().getLine(this.addressToLine(this.pc())),
+        this.registers(),
+        this._memoryService.memory
+      );
+
+      this.pc.set(newPc);
+    } catch (error) {
+      this.stop();
+      this._codeMirror().addLineClass(this._runnedInstruction, 'wrap', 'error');
+      this.errorMessage.set(error.message);
+    }
+
+    this._memoryService.devices.forEach(el => {
+      if (el instanceof StartLogicalNetwork) {
+        this.isInterruptDisabled.set((el as StartLogicalNetwork).startup);
+      }
+    });
+  }
+
+  protected pause() {
+    if (this._timeout) {
+      clearTimeout(this._timeout);
+    }
+
+    this._keepRunning = false;
+
+    if (this._diagramService.isAuto()) {
+      this._diagramService.pause();
+      this._diagramService.setAnimationDuration(this.intervalTime());
+    }
+  }
+
+  protected stop() {
+    this._isRunning.set(false);
+    this.pause();
+
+    this._exRunnedInstruction = -1;
+    this._runnedInstruction = -1;
+
+    // Dummy update to trigger visuals update and remove runned/next highlights
+    this.pc.set(0);
+  }
+
+  protected save(download: boolean = false) {
+    if (download) {
+      this._dialog.open(SaveDialogComponent);
+    } else {
+      this._codeService.save();
+    }
+
+    this.storeCodeInEprom();
+    this.persistSettings();
+  }
+
+  protected clear() {
+    this._memoryService.removeFromMemory();
+    this._codeService.clear();
+    this._memoryService.init();
+    this._codeService.load();
+    this.storeCodeInEprom();
+
+    if (this._diagramService.isAuto()) {
+      this._diagramService.stop();
+    }
+  }
+
+  protected onInterrupt() {
+    this._exRunnedInstruction = this._runnedInstruction;
+    this._runnedInstruction = this.pc();
+    this._codeService.interpreter.interrupt(this.registers());
+  }
+
+  protected onInterruptPort() {
+    this._codeService.interpreter.interrupt(this.registers());
+  }
+
+  private storeCodeInEprom() {
+    this._codeService.interpreter.parseTags(this._codeService.content, this.startTag());
+    for (let i = 0; i < this._codeService.linesCount; i++) {
+      this._memoryService.getEprom().store(i, this._codeService.encode(i));
+    }
+  }
+
+  private initEditorSettings() {
     try {
       const editorSettings = JSON.parse(window.localStorage.getItem('editor_settings'));
       if (editorSettings && editorSettings.start && editorSettings.interval) {
-        this.start = editorSettings.start;
-        this.interval = editorSettings.interval;
+        this.startTag = editorSettings.start;
+        this.intervalTime.set(editorSettings.interval);
       }
     } catch (error) {
       window.localStorage.removeItem('editor_settings');
     }
   }
 
-  private _pc: number;
-
-  get pc(): number {
-    return this._pc;
+  private persistSettings() {
+    const settings = {start: this.startTag(), _interval: this.intervalTime()};
+    window.localStorage.setItem('editor_settings', JSON.stringify(settings));
   }
 
-  @Input()
-  set pc(val: number) {
-    if (this.doc && (val !== this._pc || !this.running)) {
-      const pre = Math.floor(this._pc / 4);
-      const cur = Math.floor(val / 4);
+  private addressToLine(address: number): number {
+    return address / 4;
+  }
 
-      if (!this.running) {
-        this.doc.removeLineClass(this.previousLine, 'wrap', 'runned');
-        this.doc.removeLineClass(pre, 'wrap', 'next');
-      } else {
-        this.doc.removeLineClass(this.previousLine, 'wrap', 'runned');
-        this.doc.removeLineClass(pre, 'wrap', 'next');
-        this.doc.addLineClass(this.runnedLine, 'wrap', 'runned');
-        if (cur < this.doc.lineCount()) {
-          this.doc.addLineClass(cur, 'wrap', 'next');
-        }
-        this.previousLine = this.runnedLine;
-      }
+  private updateVisuals(prevAddr: number, currentAddr: number, nextAddr: number) {
+    if (!this._codeMirror()) {
+      return;
     }
-    this._pc = val;
-  }
 
-  get options() {
-    return {
-      lineNumbers: true,
-      firstLineNumber: 0,
-      lineNumberFormatter: (line: number) => (line * 4).toString(16).toUpperCase(),
-      theme: 'dlx-riscv-theme',
-      mode: this.codeService.editorMode,
-      styleActiveLine: true,
-      viewportMargin: Infinity,
-      extraKeys: {
-        // associa allo shortcut Ctrl + S la funzione onSave e forza un refresh della view ad Angular.
-        'Ctrl-S': cm => {
-          this.onSave();
-          this.appRef.tick();
-        }
+    if (!this._isRunning()) {
+      for (let i = 0; i < this._codeMirror().lineCount(); i++) {
+        this._codeMirror().removeLineClass(i, 'wrap', 'error');
+        this._codeMirror().removeLineClass(i, 'wrap', 'runned');
+        this._codeMirror().removeLineClass(i, 'wrap', 'next');
       }
-    };
-  }
-
-  get doc(): EditorFromTextArea {
-    return this.codeMirrorInstance;
-  }
-
-  get currentLine(): number {
-    return this.pc / 4;
-  }
-
-  set currentLine(val: number) {
-    this.pc = val * 4;
-    this.pcChange.emit(this.pc);
-  }
-
-  get isContinuousRunDisabled(): boolean {
-    if (this.doc) {
-      return (this.currentLine >= this.doc.lineCount());
     } else {
-      return false;
+      this._codeMirror().removeLineClass(this.addressToLine(prevAddr), 'wrap', 'runned');
+      this._codeMirror().removeLineClass(this.addressToLine(prevAddr), 'wrap', 'next');
+      this._codeMirror().removeLineClass(this.addressToLine(currentAddr), 'wrap', 'runned');
+      this._codeMirror().removeLineClass(this.addressToLine(currentAddr), 'wrap', 'next');
+
+      this._codeMirror().addLineClass(this.addressToLine(currentAddr), 'wrap', 'runned');
+      this._codeMirror().addLineClass(this.addressToLine(nextAddr), 'wrap', 'next');
     }
   }
-
-  get isRunDisabled(): boolean {
-    if (this.doc) {
-      return (this.currentLine >= this.doc.lineCount()) || this.continuousRunning;
-    } else {
-      return false;
-    }
-  }
-
-  get isStopDisabled(): boolean {
-    return !this.running;
-  }
-
-  ngAfterViewInit() {
-    const textArea = this.hostElement.nativeElement.querySelector('textarea');
-
-    this.codeMirrorInstance = CodeMirror.fromTextArea(textArea, this.options);
-
-    this.doc.setValue(this.codeService.content || '');
-
-    this.doc.on('change', (event) => {
-      const newValue = event.getValue();
-      this.codeService.content = newValue;
-      this.form.form.markAsDirty();
-
-      if (this.running) {
-        this.onStop();
-      }
-      if (this.errorMessage) {
-        this.doc.removeLineClass(this.runnedLine, 'wrap', 'error');
-        this.errorMessage = undefined;
-      }
-    });
-
-    this.formStatusChangeSub = this.form.statusChanges.subscribe(v => this.formDirtyChange.emit(this.form.dirty));
-
-    this.storeCode();
-  }
-
-  continuousRun() {
-    this.continuousRunning = true;
-    if (this.timeout) {
-      clearTimeout(this.timeout);
-    }
-    this.onRun();
-    this.timeout = setInterval(() => {
-      if (this._pc >= this.codeService.content.split('\n').length * 4) {
-        clearTimeout(this.timeout);
-      }
-      this.onRun();
-    }, this.interval);
-  }
-
-  onPause() {
-    if (this.timeout) {
-      clearTimeout(this.timeout);
-    }
-    this.continuousRunning = false;
-    if (this.diagramService.isAuto()) {
-      this.diagramService.pause();
-      this.diagramService.setAnimationDuration(this.interval);
-    }
-  }
-
-  startResetSignal() {
-    // WHEN THE APPLICATION START SEND THE RESET SIGNAL TO THE LOGICAL NETWORKS
-    this.memoryService.devices.forEach(el => {
-      if (el instanceof LogicalNetwork) {
-        (el as LogicalNetwork).startOperation();
-      }
-    });
-  }
-
-  onRun() {
-    /*se l'interprete non sta eseguendo
-    inizia da capo, ovvero va a cercare il tag di avvio ed inizia l'esecuzione dal tag
-    */
-    if (!this.running) {
-      this.doc.removeLineClass(this.runnedLine, 'wrap', 'error');
-      this.errorMessage = undefined;
-      this.codeService.interpreter.parseTags(this.codeService.content, this.start);
-      this.startResetSignal();
-      this._pc = this.codeService.interpreter.getTag('start_tag');
-      this.running = true;
-      if (this.diagramService.isAuto()) {
-        this.diagramService.setAnimationDuration(this.interval);
-        this.diagramService.idle();
-      }
-    }
-    /*Altrimenti riprendo da una pausa e quindi l'esecuzione riprende dalla linea in cui era stata messa in pausa */
-    this.runnedLine = this.currentLine;
-    this.currentLine++;
-    if (this.diagramService.isAuto()) {
-      this.diagramService.setAnimationDuration(this.interval);
-      this.diagramService.resume();
-    }
-    try {
-      this.codeService.interpreter.run(this.doc.getLine(this.runnedLine), this.registers, this.memoryService.memory);
-    } catch (error) {
-      this.onStop();
-      this.doc.addLineClass(this.runnedLine, 'wrap', 'error');
-      this.errorMessage = error.message;
-    }
-
-    this.memoryService.devices.forEach(el => {
-      if (el instanceof StartLogicalNetwork) {
-        this.isInterruptDisabled = (el as StartLogicalNetwork).startup;
-      }
-    });
-  }
-
-  onStop() {
-    this.running = false;
-    this.currentLine = 0;
-    clearTimeout(this.timeout);
-    this.continuousRunning = false;
-    if (this.diagramService.isAuto()) {
-      this.diagramService.stop();
-      this.diagramService.setAnimationDuration(this.interval);
-    }
-  }
-
-  onSave() {
-    this.dialog.open(SaveDialogComponent);
-    this.storeCode();
-    window.localStorage.setItem('editor_settings', `{"start": "${this.start}", "interval": ${this.interval}}`);
-  }
-
-  browserSave() {
-    this.storeCode();
-    this.codeService.browserSave();
-    window.localStorage.setItem('editor_settings', `{"start": "${this.start}", "interval": ${this.interval}}`);
-  }
-
-  onClear() {
-    this.memoryService.removeFromMemory();
-    this.codeService.clear();
-    this.memoryService.init();
-    this.codeService.load();
-    this.storeCode();
-    if (this.diagramService.isAuto()) {
-      this.diagramService.stop();
-    }
-  }
-
-  onInterrupt() {
-    this.codeService.interpreter.interrupt(this.registers);
-  }
-
-  onInterruptPort(devName: string) {
-    this.codeService.interpreter.interrupt(this.registers);
-  }
-
-  // METODO CHE SALVA IL CODICE IN MEMORIA (nella EPROM)
-  // Per ogni riga invoca il metodo encode che restituisce la codifica di quella riga di comando
-
-  storeCode() {
-    this.codeService.interpreter.parseTags(this.codeService.content, this.start);
-    let lines = this.codeService.content.split('\n');
-    for (let i = 0; i < lines.length; i++) {
-      this.memoryService.getEprom().store(i, this.codeService.encode(i));
-    }
-  }
-
-  @HostListener('window:beforeunload', ['$event'])
-  unloadNotification($event: any) {
-    if (this.form.dirty) {
-      $event.returnValue = true;
-    }
-  }
-
-  ngOnDestroy() {
-    if (this.codeMirrorInstance) {
-      this.codeMirrorInstance.toTextArea();
-    }
-    if (this.formStatusChangeSub) {
-      this.formStatusChangeSub.unsubscribe();
-    }
-  }
-
 }

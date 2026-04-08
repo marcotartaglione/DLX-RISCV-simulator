@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, DestroyRef, effect, inject, OnDestroy, OnInit, signal} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {MainPageComponent} from './main-page/main-page.component';
 import {MatToolbar} from '@angular/material/toolbar';
@@ -21,64 +21,56 @@ import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
     RouterOutlet
   ]
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnInit {
+  protected readonly theme = signal<'light' | 'dark'>('light');
+  protected readonly currentTheme = signal<'light' | 'dark'>('dark');
+  protected readonly isSidebarOpened = signal(false);
 
-  private mainPageComponent: MainPageComponent;
-  private _theme: 'light' | 'dark';
-  private sideBarOpenedSub: Subscription;
-
-  sidebarOpened: boolean = false;
-
-  public get theme(): 'light' | 'dark' {
-    return this._theme;
-  }
-
-  public set theme(v: 'light' | 'dark') {
-    this._theme = v;
-    const overlayContainerClasses = document.getElementsByTagName('html').item(0).classList;
-    const themeClassesToRemove = Array.from(overlayContainerClasses).filter((item: string) => item.includes('-theme'));
-    if (themeClassesToRemove.length) {
-      overlayContainerClasses.remove(...themeClassesToRemove);
-    }
-    overlayContainerClasses.add(v + '-theme');
-  }
+  private _activeMainPage: MainPageComponent = null;
 
   constructor() {
-  }
-
-  public onRouterOutletActivate(event: MainPageComponent) {
-      if (event instanceof MainPageComponent) {
-      this.mainPageComponent = event;
-      this.mainPageComponent.sidebarOpened = this.sidebarOpened;
-      if (this.sideBarOpenedSub) {
-        this.sideBarOpenedSub.unsubscribe();
-      }
-      this.sideBarOpenedSub = this.mainPageComponent.sidebarOpenedChange.subscribe((val: boolean) => {
-        this.sidebarOpened = val;
-      });
-    }
+    effect(() => {
+      const theme = this.theme();
+      this.applyTheme(theme);
+    });
   }
 
   ngOnInit() {
-    this.theme = 'dark';
+    this.theme.set('dark');
   }
 
-  ngOnDestroy() {
-    if (this.sideBarOpenedSub) {
-      this.sideBarOpenedSub.unsubscribe();
-    }
-  }
+  public onRouterOutletActivate(component: any) {
+    if (component instanceof MainPageComponent) {
+      this._activeMainPage = component;
+      component.sidebarOpened.set(this.isSidebarOpened());
 
-  toggleSidenav() {
-    this.sidebarOpened = !this.sidebarOpened;
-    this.mainPageComponent.toggleSidenav();
-  }
-
-  toggleTheme() {
-    if (this._theme == 'dark') {
-      this.theme = 'light';
+      component.sidebarOpened.subscribe(val => {
+        this.isSidebarOpened.set(val);
+      })
     } else {
-      this.theme = 'dark';
+      this._activeMainPage = null;
+      throw new Error('Activated component is not an instance of MainPageComponent');
     }
+  }
+
+  protected toggleSidenav() {
+    this.isSidebarOpened.update(val => !val);
+    this._activeMainPage?.toggleSidenav();
+  }
+
+  protected toggleTheme() {
+    this.currentTheme.update(theme => theme === 'light' ? 'dark' : 'light');
+  }
+
+  private applyTheme(theme: 'light' | 'dark') {
+    const htmlElement = document.documentElement;
+    const classes = htmlElement.classList;
+
+    const toRemove = Array.from(classes).filter(c => c.includes('-theme'));
+    if (toRemove.length) {
+      classes.remove(...toRemove);
+    }
+
+    classes.add(`${theme}-theme`);
   }
 }

@@ -1,17 +1,19 @@
-import { Injectable } from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { CanDeactivate } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { ConfirmDialogComponent } from '../dialogs/confirm-dialog.component';
 import { MainPageComponent } from '../main-page/main-page.component';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class CanDeactivateGuard implements CanDeactivate<MainPageComponent> {
 
-  constructor(private dialog: MatDialog) {}
+  private dialog = inject(MatDialog);
 
   canDeactivate(component: MainPageComponent): Observable<boolean> {
-    if(component.isFormDirty){
+    if(component.contentModified()){
       return this.dialog
         .open(ConfirmDialogComponent, {
           data: {

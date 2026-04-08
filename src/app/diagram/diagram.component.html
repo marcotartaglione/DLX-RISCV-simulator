@@ -1,96 +1,136 @@
 <div class="btn-container">
-  <!--
-  <button mat mat-raised-button class="mr" (click)="setAuto()">
-    <span class="btn">Auto Mode</span>
-  </button>
-  <button mat mat-raised-button class="mr" (click)="setManual()">
-    <span class="btn">Manual Mode</span>
-  </button>-->
-  <button mat-raised-button class="mr" (click)="diagramService.isAuto() ? diagramService.setManual() : diagramService.setAuto()">
+  <button mat-raised-button class="mr"
+          (click)="diagramService.isAuto() ? diagramService.setManual() : diagramService.setAuto()">
     @if (diagramService.isAuto()) {
       <span class="btn">Auto Mode <i class="fas fa-microchip"></i></span>
-    }
-    @if (!diagramService.isAuto()) {
+    } @else {
       <span class="btn"> Manual Mode <i class="fas fa-user"></i></span>
     }
   </button>
 </div>
 
-@if (this.isAuto() === false) {
+@if (!diagramService.isAuto()) {
   <div class="btn-container">
-    <!--
-    <button mat-raised-button class="mr" (click)="onPause()">
-      <span class="btn">Pause</span>
-    </button>
-    <button mat-raised-button class="mr" (click)="onResume()">
-      <span class="btn">Resume</span>
-    </button> -->
-    <button mat-raised-button class="mr" (click)="diagramService.isPauseEnabled() ? diagramService.pause() : diagramService.resume()"
-      [disabled]="!diagramService.isStopEnabled()">
+    <button mat-raised-button class="mr"
+            (click)="diagramService.isPauseEnabled() ? diagramService.pause() : diagramService.resume()"
+            [disabled]="!diagramService.isStopEnabled()">
       @if (!diagramService.isPauseEnabled()) {
-        <span class="btn" >Resume <i class="fas fa-play green"></i></span>
-      }
-      @if (diagramService.isPauseEnabled()) {
+        <span class="btn">Resume <i class="fas fa-play green"></i></span>
+      } @else {
         <span class="btn">Pause <i class="fas fa-pause green"></i></span>
       }
     </button>
-    <button mat-raised-button class="mr" (click)="onStop()" [disabled]="!diagramService.isStopEnabled()">
+
+    <button mat-raised-button
+            class="mr"
+            (click)="diagramService.stop()"
+            [disabled]="!diagramService.isStopEnabled()">
       <span class="btn">Stop<i class="fas fa-square red"></i></span>
     </button>
-    <button mat-raised-button class="mr" (click)="onLoad()">
+
+    <button mat-raised-button
+            class="mr"
+            (click)="diagramService.load()">
       <span class="btn">Lettura</span>
     </button>
-    <button mat-raised-button class="mr" (click)="onStore()">
+
+    <button mat-raised-button
+            class="mr"
+            (click)="diagramService.store()">
       <span class="btn">Scrittura</span>
     </button>
-    <!--
-    <button mat-raised-button class="mr" (click)="onIdle()">
-      <span class="btn">Idle</span>
-    </button>-->
+
     <mat-form-field class="input-interval">
       <mat-label>Interval (ms)</mat-label>
-      <input matInput type="number" name="animationDuration" [(ngModel)]="diagramService.dlxDiagrams.clock.animationDuration" min="1000">
+      <input matInput
+             type="number"
+             name="animationDuration"
+             [(ngModel)]="diagramService.dlxDiagrams.getDiagram('clock').animationDuration"
+             min="1000">
     </mat-form-field>
   </div>
 }
+
 <br>
-  <div class="diagrams">
-    <span>CLOCK</span>
-    <div class="diagram">
-            <img class="{{diagramService.dlxDiagrams.clock.getAnimationClass()}}" [ngStyle]="{  'animation-duration': diagramService.dlxDiagrams.clock.getAnimationDuration() + 'ms',
-                                                                                                'animation-play-state': diagramService.dlxDiagrams.clock.getPlayState(),
-                                                                                                'animation-iteration-count': 'infinite'}" src="{{diagramService.dlxDiagrams.clock.getImageName()}}" width="855" height="75" alt="clock-signal" />
-      </div>
-      <span>ADDRESS</span>@if (diagramService.isAddressVisible()) {
-      <span>    {{registers.mar | format: 'hex'}}h</span>
-    }
-    <div class="diagram">
-            <img class="{{diagramService.dlxDiagrams.address.getAnimationClass()}}" [ngStyle]="{'animation-duration': diagramService.dlxDiagrams.clock.getAnimationDuration() + 'ms',
-                                                                                                'animation-play-state': diagramService.dlxDiagrams.address.getPlayState(),
-                                                                                                'animation-iteration-count': '1',
-                                                                                                'animation-fill-mode': 'initial'}" src="{{diagramService.dlxDiagrams.address.getImageName()}}" width="855" height="75" alt="address-signal" />
-      </div>
-      <span>MEMRD</span>
-      <div class="diagram">
-            <img class="{{diagramService.dlxDiagrams.memrd.getAnimationClass()}}" [ngStyle]="{  'animation-duration': diagramService.dlxDiagrams.clock.getAnimationDuration() + 'ms',
-                                                                                                'animation-play-state': diagramService.dlxDiagrams.memrd.getPlayState(),
-                                                                                                'animation-iteration-count': '1',
-                                                                                                'animation-fill-mode': 'initial'}" src="{{diagramService.dlxDiagrams.memrd.getImageName()}}" width="855" height="75" alt="memrd-signal" />
-        </div>
-        <span>MEMWR</span>
-        <div class="diagram">
-            <img class="{{diagramService.dlxDiagrams.memwr.getAnimationClass()}}" [ngStyle]="{  'animation-duration': diagramService.dlxDiagrams.clock.getAnimationDuration() + 'ms',
-                                                                                                'animation-play-state': diagramService.dlxDiagrams.memwr.getPlayState(),
-                                                                                                'animation-iteration-count': '1',
-                                                                                                'animation-fill-mode': 'initial'}" src="{{diagramService.dlxDiagrams.memwr.getImageName()}}" width="855" height="75" alt="memwr-signal" />
-          </div>
-          <span>DATA</span>@if (diagramService.isAddressVisible()) {
-          <span>   {{registers.mdr | format: 'hex' }}h</span>
-        }
-        <div class="diagram">
-            <img class="{{diagramService.dlxDiagrams.data.getAnimationClass()}}" [ngStyle]="{   'animation-duration': diagramService.dlxDiagrams.clock.getAnimationDuration() + 'ms',
-                                                                                                'animation-play-state': diagramService.dlxDiagrams.data.getPlayState(),
-                                                                                                'animation-iteration-count': '1',
-                                                                                                'animation-fill-mode': 'initial'}" src="{{diagramService.dlxDiagrams.data.getImageName()}}" width="855" height="75" alt="data-signal" />
-          </div>
-        </div>
+
+<div class="diagrams">
+  <span>CLOCK</span>
+  <div class="diagram">
+    <img class="{{diagramService.dlxDiagrams.getDiagram('clock').animationClass}}"
+         [ngStyle]="{
+            'animation-duration': diagramService.dlxDiagrams.getDiagram('clock').animationDuration + 'ms',
+            'animation-play-state': diagramService.dlxDiagrams.getDiagram('clock').playState,
+            'animation-iteration-count': 'infinite'
+          }"
+         ngSrc="{{diagramService.dlxDiagrams.getDiagram('clock').imagePath}}"
+         width="855"
+         height="75"
+         alt="clock-signal"/>
+  </div>
+
+  <span>ADDRESS</span>
+  @if (diagramService.isAddressVisible()) {
+    <span>{{ registers().mar | format: 'hex' }}h</span>
+  }
+  <div class="diagram">
+    <img class="{{diagramService.dlxDiagrams.getDiagram('address').animationClass}}"
+         [ngStyle]="{
+            'animation-duration': diagramService.dlxDiagrams.getDiagram('clock').animationDuration + 'ms',
+            'animation-play-state': diagramService.dlxDiagrams.getDiagram('address').playState,
+            'animation-iteration-count': '1',
+            'animation-fill-mode': 'initial'
+         }"
+         ngSrc="{{diagramService.dlxDiagrams.getDiagram('address').imagePath}}"
+         width="855"
+         height="75"
+         alt="address-signal"/>
+  </div>
+
+  <span>MEMRD</span>
+  <div class="diagram">
+    <img class="{{diagramService.dlxDiagrams.getDiagram('memrd').animationClass}}"
+         [ngStyle]="{
+            'animation-duration': diagramService.dlxDiagrams.getDiagram('clock').animationDuration + 'ms',
+            'animation-play-state': diagramService.dlxDiagrams.getDiagram('memrd').playState,
+            'animation-iteration-count': '1',
+            'animation-fill-mode': 'initial'
+         }"
+         ngSrc="{{diagramService.dlxDiagrams.getDiagram('memrd').imagePath}}"
+         width="855"
+         height="75"
+         alt="memrd-signal"/>
+  </div>
+
+  <span>MEMWR</span>
+  <div class="diagram">
+    <img class="{{diagramService.dlxDiagrams.getDiagram('memwr').animationClass}}"
+         [ngStyle]="{
+            'animation-duration': diagramService.dlxDiagrams.getDiagram('clock').animationDuration + 'ms',
+            'animation-play-state': diagramService.dlxDiagrams.getDiagram('memwr').playState,
+            'animation-iteration-count': '1',
+            'animation-fill-mode': 'initial'
+         }"
+         ngSrc="{{diagramService.dlxDiagrams.getDiagram('memwr').imagePath}}"
+         width="855"
+         height="75"
+         alt="memwr-signal"/>
+  </div>
+
+  <span>DATA</span>
+  @if (diagramService.isAddressVisible()) {
+    <span>   {{ registers().mdr | format: 'hex' }}h</span>
+  }
+  <div class="diagram">
+    <img class="{{diagramService.dlxDiagrams.getDiagram('data').animationClass}}"
+         [ngStyle]="{
+            'animation-duration': diagramService.dlxDiagrams.getDiagram('clock').animationDuration + 'ms',
+            'animation-play-state': diagramService.dlxDiagrams.getDiagram('data').playState,
+            'animation-iteration-count': '1',
+            'animation-fill-mode': 'initial'
+         }"
+         ngSrc="{{diagramService.dlxDiagrams.getDiagram('data').imagePath}}"
+         width="855"
+         height="75"
+         alt="data-signal"/>
+  </div>
+</div>

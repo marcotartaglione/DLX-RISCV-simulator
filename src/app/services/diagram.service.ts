@@ -17,9 +17,9 @@ export class DiagramService {
     In quella automatica i diagrammi si muovono in base al codice
   */
 
-  constructor(appRef: ApplicationRef) {
+  constructor() {
     DiagramService.instance = this;
-    this.dlxDiagrams = new DLXDiagrams(appRef);
+    this.dlxDiagrams = new DLXDiagrams();
     this.stopEnabled = false;
     this.pauseEnabled = true;
     this.auto = true;

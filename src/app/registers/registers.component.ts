@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, computed, input, Input} from '@angular/core';
 import {DLXRegisters} from './dlx.registers';
 import {Registers} from './registers';
 import {RV32IRegisters} from './rv32i.registers';
@@ -8,6 +8,7 @@ import {MatFormField} from '@angular/material/input';
 import {MatSelect} from '@angular/material/select';
 import {MatOption} from '@angular/material/core';
 import {MatLabel} from '@angular/material/form-field';
+import {FormatByteType} from '../pipes/formatByte.pipe';
 
 @Component({
   selector: 'app-registers',
@@ -24,28 +25,17 @@ import {MatLabel} from '@angular/material/form-field';
   ]
 })
 export class RegistersComponent {
+  protected registers = input.required<Registers>();
+  protected fType: FormatByteType = 'hex';
 
-  @Input() registers: Registers;
+  protected dlxRegisters = computed(() => this.registers() instanceof DLXRegisters ? this.registers() as DLXRegisters : null);
+  protected rv32iRegisters = computed(() => this.registers() instanceof RV32IRegisters ? this.registers() as RV32IRegisters : null);
 
-  fType: 'dec' | 'bin' | 'hex' = 'hex';
-
-  get dlxRegisters(): DLXRegisters {
-    return this.registers as DLXRegisters;
+  public isDLX(registers: Registers): boolean {
+    return registers instanceof DLXRegisters;
   }
 
-  get rv32iRegisters(): RV32IRegisters {
-    return this.registers as RV32IRegisters;
+  public isRV32I(registers: Registers): boolean {
+    return registers instanceof RV32IRegisters;
   }
-
-  get isDLX(): boolean {
-    return this.registers.constructor.name === DLXRegisters.name;
-  }
-
-  get isRV32I(): boolean {
-    return this.registers.constructor.name === RV32IRegisters.name;
-  }
-
-  constructor() {
-  }
-
 }

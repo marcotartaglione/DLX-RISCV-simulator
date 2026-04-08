@@ -1,9 +1,9 @@
 <mat-toolbar id="navbar" color="primary">
   <button mat-icon-button matTooltip="Documentation" (click)="toggleSidenav()">
-    @if (!sidebarOpened) {
+    @if (!this.isSidebarOpened()) {
       <span><i class="fas fa-book"></i></span>
     }
-    @if (sidebarOpened) {
+    @else {
       <span><i class="fas fa-book-open"></i></span>
     }
   </button>
@@ -13,10 +13,10 @@
   <span class="spacer"></span>
   <a mat-button routerLink="/about" routerLinkActive="active">About</a>
   <button mat-icon-button matTooltip="Theme" (click)="toggleTheme()">
-    @if (theme == 'light') {
+    @if (this.theme() === 'light') {
       <span><i class="fas fa-lightbulb"></i></span>
     }
-    @if (theme == 'dark') {
+    @else {
       <span><i class="far fa-lightbulb"></i></span>
     }
   </button>

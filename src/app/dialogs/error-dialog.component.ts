@@ -1,6 +1,10 @@
-import { Component, Inject } from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
 import {MatButton} from '@angular/material/button';
+
+export interface ErrorDialogData {
+  message: string;
+}
 
 @Component({
   templateUrl: './error-dialog.component.html',
@@ -14,7 +18,5 @@ import {MatButton} from '@angular/material/button';
   ]
 })
 export class ErrorDialogComponent {
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: {message: string}) {}
-
+  protected data = inject<ErrorDialogData>(MAT_DIALOG_DATA);
 }

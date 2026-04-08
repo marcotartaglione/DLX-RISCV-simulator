@@ -1,7 +1,7 @@
 <div mat-dialog-content>
   <div>
     <div style="display:inline-block;">
-      <img style="background-color:white ; display: block; margin:0 auto;" ngSrc="{{urlImage}}" width="730px" height="500px" alt=""/>
+      <img style="background-color:white ; display: block; margin:0 auto;" src="{{urlImage}}" width="730px" height="500px" alt=""/>
     </div>
   </div>
   <br>
@@ -12,9 +12,16 @@
       </mat-form-field>
       <div style="display:inline-block; margin:10px;" >
         <mat-form-field appearance="outline">
-          <mat-label>Size Port Bit</mat-label>
-          <input matInput [(ngModel)]="this.data.network.dataSize" >
+          <mat-label>Port size</mat-label>
+          <mat-select [(value)]="this.data.network.dataSize">
+            @for (value of InputPortSizesArray; track value) {
+              <mat-option [value]="value">
+                {{ value }} bit
+              </mat-option>
+            }
+          </mat-select>
         </mat-form-field>
+
       </div>
       @if (data.network.clockType) {
         <div style="display:inline-block; margin:10px;">
@@ -39,5 +46,5 @@
 
   </div>
   <div mat-dialog-actions align="end">
-    <button mat-button mat-dialog-close (click)="onSubmit()">Ok</button>
+    <button mat-button mat-dialog-close>Ok</button>
   </div>

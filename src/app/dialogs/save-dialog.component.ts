@@ -1,6 +1,6 @@
-import { Component} from '@angular/core';
-import { CodeService } from '../services/code.service';
-import { CustomErrorStateMatcher } from './custom-state-matcher';
+import {Component, inject, signal} from '@angular/core';
+import {CodeService} from '../services/code.service';
+import {CustomErrorStateMatcher} from './custom-state-matcher';
 import {FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatDialogActions, MatDialogClose, MatDialogContent} from '@angular/material/dialog';
 import {MatError, MatFormField, MatLabel} from '@angular/material/form-field';
@@ -23,21 +23,16 @@ import {MatButton} from '@angular/material/button';
   ]
 })
 export class SaveDialogComponent {
+  private _codeService = inject(CodeService);
 
-  constructor(private service: CodeService) {
-  }
-
-  fileName: string="";
-
-  customErrorStateMatcher = new CustomErrorStateMatcher();
-  fileFormControl = new FormControl('', [
+  protected fileName = signal('');
+  protected customErrorStateMatcher = new CustomErrorStateMatcher();
+  protected fileFormControl = new FormControl('', [
     Validators.required,
     Validators.pattern(/\.txt$/),
   ]);
 
-
-  onSave(){
-    this.service.save(this.fileName);
+  protected onSave() {
+    this._codeService.save(this.fileName());
   }
-
 }

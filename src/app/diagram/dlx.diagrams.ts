@@ -1,134 +1,104 @@
-import { ApplicationRef } from "@angular/core";
-import { Diagram } from "./diagram";
+import {Diagram} from './diagram';
 
 export class DLXDiagrams {
 
-    //in futuro possibile estendere con altri gruppi di segnali oppure singoli segnali
-    clock: Diagram;
-    address: Diagram;
-    memrd: Diagram;
-    memwr: Diagram;
-    data: Diagram;
-    ien: Diagram;
+  private _diagrams = new Map<string, Diagram>();
 
-    constructor(private appRef: ApplicationRef) {
-        //creo i 5 diagram per i cicli di bus
-        this.clock = new Diagram('clock', 'clock', this.appRef);
-        this.address = new Diagram('address', 'general', this.appRef);
-        this.memrd = new Diagram('memrd', 'general', this.appRef);
-        this.memwr = new Diagram('memwr', 'general', this.appRef);
-        this.data = new Diagram('data_in', 'general', this.appRef);
-        this.ien = new Diagram('fronte_salita', 'general', this.appRef);
-    }
+  constructor() {
+    this._diagrams.set('clock', new Diagram('clock', 'clock'));
+    this._diagrams.set('address', new Diagram('address', 'general'));
+    this._diagrams.set('memrd', new Diagram('memrd', 'general'));
+    this._diagrams.set('memwr', new Diagram('memwr', 'general'));
+    this._diagrams.set('data', new Diagram('data_in', 'general'));
+    this._diagrams.set('ien', new Diagram('fronte_salita', 'general'));
+  }
 
-    /*METODI PUBBLICI INVOCATI DA DiagramService */
-    public resume() {
-        this.clock.resume();
-        this.address.resume();
-        this.memrd.resume();
-        this.memwr.resume();
-        this.data.resume();
-        this.ien.resume();
-    }
+  public getDiagram(diagram: string) {
+    return this._diagrams.get(diagram);
+  }
 
-    public stop() {
-        this.clock.stop();
-        this.address.stop();
-        this.memrd.stop();
-        this.memwr.stop();
-        this.data.stop();
-        this.ien.stop();
-    }
+  public resume() {
+    this.getDiagram('clock').resume();
+    this.getDiagram('address').resume();
+    this.getDiagram('memrd').resume();
+    this.getDiagram('memwr').resume();
+    this.getDiagram('data').resume();
+    this.getDiagram('ien').resume();
+  }
 
-    public pause() {
-        this.clock.pause();
-        this.address.pause();
-        this.memrd.pause();
-        this.memwr.pause();
-        this.data.pause();
-        this.ien.pause();
-    }
+  public stop() {
+    this.getDiagram('clock').stop();
+    this.getDiagram('address').stop();
+    this.getDiagram('memrd').stop();
+    this.getDiagram('memwr').stop();
+    this.getDiagram('data').stop();
+    this.getDiagram('ien').stop();
+  }
 
-    /*CICLO DI BUS DI LETTURA*/
-    public load() {
-      // console.log(this.memrd.getAnimationClass());
-      // console.log(this.memrd.getType());
-        //setto data come data_in
-        this.data.setType("data_in");
-        //resetto e faccio partire
-        //clock
-        this.clock.stop();
-        this.clock.start();
-        //address
-        this.address.stop();
-        this.address.start();
-        //memwr
-        this.memwr.stop();
-        //memrd
-        this.memrd.stop();
-        this.memrd.start();
-        //data
-        this.data.stop();
-        this.data.start();
-    }
+  public pause() {
+    this.getDiagram('clock').pause();
+    this.getDiagram('address').pause();
+    this.getDiagram('memrd').pause();
+    this.getDiagram('memwr').pause();
+    this.getDiagram('data').pause();
+    this.getDiagram('ien').pause();
+  }
 
-    /*CICLO DI BUS DI SCRITTURA */
-    public store() {
-        //setto data come data_out
-        this.data.setType("data_out");
-        //resetto e faccio partire
-        //clock
-        this.clock.stop();
-        this.clock.start();
-        //address
-        this.address.stop();
-        this.address.start();
-        //memwr
-        this.memwr.stop();
-        this.memwr.start();
-        //memrd
-        this.memrd.stop();
-        //data
-        this.data.stop();
-        this.data.start();
-    }
+  public load() {
+    this.getDiagram('data').type = 'data_in';
 
-    /*ANIMAZIONE DI IDLE*/
-    /*Quando non vengono fatte operazione di I/O*/
-    public idle() {
-        this.clock.stop();
-        this.clock.start();
-        //faccio un reset degli altri
-        this.address.stop();
-        this.memrd.stop();
-        this.memwr.stop();
-        this.data.stop();
-    }
-    /*Metodo per impostare la durata dell'animazione*/
-    public setAnimationDuration(animationDuration: number){
-        this.clock.setAnimationDuration(animationDuration);
-        this.address.setAnimationDuration(animationDuration);
-        this.memrd.setAnimationDuration(animationDuration);
-        this.memwr.setAnimationDuration(animationDuration);
-        this.data.setAnimationDuration(animationDuration);
-        this.ien.setAnimationDuration(animationDuration);
-    }
+    this.getDiagram('clock').step();
+    this.getDiagram('address').step();
 
-    public ienUp(){
-      this.ien.setType("fronte_salita");
-      this.ien.stop();
-      this.ien.start();
-      this.stableFronte("fronte_discesa");
-    }
+    this.getDiagram('memwr').stop();
 
-    public stableFronte(img: string){
-      this.ien.setType(img);
-    }
+    this.getDiagram('memrd').step()
+    this.getDiagram('data').step()
+  }
 
-    public ienDown(){
-      this.ien.setType("fronte_discesa");
-      this.ien.stop();
-      this.ien.start();
-      this.stableFronte("fronte_salita");
-    }
+  public store() {
+    this.getDiagram('data').type = 'data_out';
+
+    this.getDiagram('clock').step();
+    this.getDiagram('address').step();
+    this.getDiagram('memwr').step();
+
+    this.getDiagram('memrd').stop();
+
+    this.getDiagram('data').step()
+  }
+
+  public idle() {
+    this.getDiagram('clock').step();
+
+    this.getDiagram('address').stop();
+    this.getDiagram('memrd').stop();
+    this.getDiagram('memwr').stop();
+    this.getDiagram('data').stop();
+  }
+
+  public setAnimationDuration(animationDuration: number) {
+    this.getDiagram('clock').animationDuration = animationDuration;
+    this.getDiagram('address').animationDuration = animationDuration;
+    this.getDiagram('memrd').animationDuration = animationDuration;
+    this.getDiagram('memwr').animationDuration = animationDuration;
+    this.getDiagram('data').animationDuration = animationDuration;
+    this.getDiagram('ien').animationDuration = animationDuration;
+  }
+
+  public ienUp() {
+    this.getDiagram('ien').type = 'fronte_salita';
+    this.getDiagram('ien').step();
+    this.stableFronte('fronte_discesa');
+  }
+
+  public stableFronte(img: string) {
+    this.getDiagram('ien').type = img;
+  }
+
+  public ienDown() {
+    this.getDiagram('ien').type = 'fronte_discesa';
+    this.getDiagram('ien').step();
+    this.stableFronte('fronte_salita');
+  }
 }

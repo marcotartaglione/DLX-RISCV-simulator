@@ -1,20 +1,21 @@
-<h1 style="width:900px" mat-dialog-title>Memory values</h1>
+<h1 mat-dialog-title style="width:900px">Memory values</h1>
 <mat-dialog-content width="600px">
   <mat-grid-list cols="4" rowHeight="150px">
     @for (el of data.values; track el) {
       <mat-grid-tile>
-        <mat-card><h4>0x{{el.hexAddress}}</h4>
-<!-- TODO: controllare event.target.value         -->
-        <input matInput (input)="onInputChange($event.target.value,el)" value="{{el.value | format:fType}}" minlength="0" maxlength="10" />
-      </mat-card>
-    </mat-grid-tile>
-  }
-</mat-grid-list>
+        <mat-card><h4>0x{{ el.hexAddress }}</h4>
+          <!-- TODO: controllare event.target.value         -->
+          <input (input)="onInputChange($event.target.value,el)" matInput maxlength="10"
+                 minlength="0" value="{{el.value | format:formatType}}"/>
+        </mat-card>
+      </mat-grid-tile>
+    }
+  </mat-grid-list>
 </mat-dialog-content>
-<mat-button-toggle-group id="fType" name="fType" [(ngModel)]="fType">
-  <mat-button-toggle value="hex" style="width: 50%;margin:10px">Hexadecimal</mat-button-toggle>
-  <mat-button-toggle value="dec" style="width: 50%;margin:10px">Decimal</mat-button-toggle>
+<mat-button-toggle-group [(ngModel)]="formatType" id="fType" name="fType">
+  <mat-button-toggle style="width: 50%;margin:10px" value="hex">Hexadecimal</mat-button-toggle>
+  <mat-button-toggle style="width: 50%;margin:10px" value="dec">Decimal</mat-button-toggle>
 </mat-button-toggle-group>
 <mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close (click)="onSubmit()">Ok</button>
+  <button (click)="onSubmit()" mat-button mat-dialog-close>Ok</button>
 </mat-dialog-actions>

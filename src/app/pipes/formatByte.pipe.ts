@@ -1,20 +1,21 @@
 import {Pipe, PipeTransform} from '@angular/core';
 
+export type FormatByteType = 'dec' | 'bin' | 'hex';
+
 @Pipe({
   name: 'formatByte',
   standalone: true,
 })
 export class FormatBytePipe implements PipeTransform {
 
-  transform(n: string, type: 'dec' | 'bin' | 'hex' | string): any {
+  transform(n: string, type: FormatByteType): any {
     switch (type) {
       case 'dec':
-        return parseInt(n,2);
+        return parseInt(n, 2);
       case 'bin':
-        return n ;
+        return n;
       case 'hex':
-        return '0x' + parseInt(n,2).toString(16).padStart(2,'0').toUpperCase();
-
+        return '0x' + parseInt(n, 2).toString(16).padStart(2, '0').toUpperCase();
     }
   }
 
