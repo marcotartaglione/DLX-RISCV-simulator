@@ -1,5 +1,5 @@
 import {animate, style, transition, trigger} from '@angular/animations';
-import {Component, Input, OnInit, Type} from '@angular/core';
+import {Component, inject, input, signal, Type} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {MessageDialogComponent} from '../dialogs/message-dialog.component';
 import {MemoryService} from '../services/memory.service';
@@ -22,13 +22,14 @@ import {Eprom} from './model/eprom';
 import {StartLogicalNetwork} from './model/logicalNetworks/start.logical-network';
 import {MatButton} from '@angular/material/button';
 import {MatTooltip} from '@angular/material/tooltip';
-import {MatRipple} from '@angular/material/core';
+import {MatOption, MatRipple} from '@angular/material/core';
 import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {FormsModule} from '@angular/forms';
 import {MatInput} from '@angular/material/input';
 import {MatSelect} from '@angular/material/select';
-import {MatOption} from '@angular/material/core';
+import {ChipSelect} from './model/ChipSelect';
+import {NgOptimizedImage} from '@angular/common';
 
 @Component({
   selector: 'app-memory',
@@ -59,150 +60,148 @@ import {MatOption} from '@angular/material/core';
     MatOption,
     MatMenu,
     MatMenuItem,
-    MatLabel
+    MatLabel,
+    NgOptimizedImage
   ]
 })
 
-export class MemoryComponent implements OnInit {
-  inputAddr: any;
-  selectedCS: { id: string, address: number, hexAddress: string };
-  selected: Device;
-  @Input() memoryService: MemoryService;
-  @Input() counter: Counter;
+export class MemoryComponent {
+  protected memoryService = inject(MemoryService);
+  private _dialog = inject(MatDialog);
 
-  constructor(private dialog: MatDialog) {
-  }
+  protected formatPipe = new FormatPipe();
 
-  get canMoveSelectedLeft(): boolean {
+  protected readonly inputAddr = signal<string>('');
+  protected readonly selectedChipSelect = signal<ChipSelect>(null);
+  protected readonly selectedDevice = signal<Device>(null);
+
+  public get canSelectedMoveLeft(): boolean {
     const devices = this.memoryService.devices;
-    const index = devices.indexOf(this.selected);
-    return (this.selected.name !== 'EPROM' && this.selected.name !== 'RAM_B') &&
-      (index > 0);
+    const index = devices.indexOf(this.selectedDevice());
 
+    return (this.selectedDevice().name !== 'EPROM' && this.selectedDevice().name !== 'RAM_B') && (index > 0);
   }
 
-  get canMoveSelectedRight(): boolean {
+  public get canSelectedMoveRight(): boolean {
     const devices = this.memoryService.devices;
-    const index = devices.indexOf(this.selected);
-    return (this.selected.name !== 'EPROM') &&
-      (index < devices.length - 1);
+    const index = devices.indexOf(this.selectedDevice());
+
+    return (this.selectedDevice().name !== 'EPROM') && (index < devices.length - 1);
   }
 
-  ngOnInit() {
-
-  }
-
-  openDialogImage(n: Device) {
-    if (this.selected instanceof Counter) {
-      this.dialog.open(CounterDialogComponent, {
+  protected openDialogImage(n: Device) {
+    // TODO: costruire decoratore per i componenti che registri le relative finestre di dialogo,
+    //  così da evitare questo tipo di if-else e rendere più scalabile l'aggiunta di nuovi device
+    if (this.selectedDevice() instanceof Counter) {
+      this._dialog.open(CounterDialogComponent, {
         data: {network: n as Counter}
       });
-    } else if (this.selected instanceof InputPort) {
-      this.dialog.open(InputPortDialogComponent, {
+    } else if (this.selectedDevice() instanceof InputPort) {
+      this._dialog.open(InputPortDialogComponent, {
         data: {network: n as InputPort}
       });
     } else {
-      this.dialog.open(LogicalNetworkDialogComponent, {
+      this._dialog.open(LogicalNetworkDialogComponent, {
         data: {network: n}
       });
     }
   }
 
-  onAdd(type: Type<Device>) {
+  protected onAdd(type: Type<Device>) {
     const firstAdd = this.memoryService.firstFreeAddr() + 1;
     this.memoryService.add(new type(firstAdd, firstAdd + 0x01FFFFFF));
-    this.memoryService.storeInMemory();
+    this.memoryService.storeInLocalStorage();
   }
 
-  onDelete(dev: Device) {
+  protected onDelete(dev: Device) {
     this.memoryService.remove(dev);
-    this.selected = null;
-    this.memoryService.storeInMemory();
+    this.selectedDevice.set(null);
+    this.memoryService.storeInLocalStorage();
   }
 
-  onChangeCS(newValue: string, id: string) {
+  protected onChangeCS(newValue: string, id: string) {
     const devices = this.memoryService.devices;
-    const indexSelectedDevice = this.memoryService.devices.indexOf(this.selected);
-    const cs = devices[indexSelectedDevice].chipSelects.find(el => el.id === id);
+    const indexSelectedDevice = this.memoryService.devices.indexOf(this.selectedDevice());
+    const chipSelect = devices[indexSelectedDevice].chipSelects.find(el => el.id === id);
 
-    if (cs === null) {
+    if (chipSelect === null) {
       return;
     }
 
     if (newValue.length === 8) {
       const iv = parseInt(newValue, 16);
       if (iv || iv === 0) {
-        // tslint:disable-next-line:no-bitwise
-        cs.address = iv >>> 2;
+        chipSelect.address = iv >>> 2;
       }
     }
   }
 
-  onChange(event: any, side: string) {
+  protected onChange(event: any, side: string) {
     const devices = this.memoryService.devices;
-    const indexSelectedDevice = this.memoryService.devices.indexOf(this.selected);
+    const indexSelectedDevice = this.memoryService.devices.indexOf(this.selectedDevice());
+
     if (side === 'min') {
-      if (this.selected.minAddress <= devices[indexSelectedDevice - 1].maxAddress) {
-        this.selected.minAddress = devices[indexSelectedDevice - 1].maxAddress + 1;
+      if (this.selectedDevice().minAddress <= devices[indexSelectedDevice - 1].maxAddress) {
+        this.selectedDevice().minAddress = devices[indexSelectedDevice - 1].maxAddress + 1;
       }
     } else if (side === 'max') {
-      if (this.selected.maxAddress >= devices[indexSelectedDevice + 1].minAddress) {
-        this.selected.maxAddress = devices[indexSelectedDevice + 1].minAddress - 1;
+      if (this.selectedDevice().maxAddress >= devices[indexSelectedDevice + 1].minAddress) {
+        this.selectedDevice().maxAddress = devices[indexSelectedDevice + 1].minAddress - 1;
       }
     }
-    if (this.selected.size('MB') >= 128 || this.selected instanceof LogicalNetwork) {
-      this.memoryService.storeInMemory();
+
+    if (this.selectedDevice().size('MB') >= 128 || this.selectedDevice() instanceof LogicalNetwork) {
+      this.memoryService.storeInLocalStorage();
     } else {
-      this.dialog.open(MessageDialogComponent, {
+      this._dialog.open(MessageDialogComponent, {
         data: {message: 'Memory is less than 128MB'}
       });
     }
   }
 
-  moveSelectedLeft() {
+  protected moveSelectedLeft() {
     let endAddress = 0;
-    const indexSelectedDevice = this.memoryService.devices.indexOf(this.selected);
-    const sizeOfSelected = this.selected.maxAddress - this.selected.minAddress;
+    const indexSelectedDevice = this.memoryService.devices.indexOf(this.selectedDevice());
+    const sizeOfSelected = this.selectedDevice().maxAddress - this.selectedDevice().minAddress;
     const spaceBeforeFirstDevice =
       this.memoryService.devices[indexSelectedDevice].minAddress -
       this.memoryService.devices[indexSelectedDevice - 1].maxAddress;
 
     if (spaceBeforeFirstDevice >= 33554432) {
-      this.selected.maxAddress = this.selected.maxAddress - 33554432;
-      this.selected.minAddress = this.selected.minAddress - 33554432;
+      this.selectedDevice().maxAddress = this.selectedDevice().maxAddress - 33554432;
+      this.selectedDevice().minAddress = this.selectedDevice().minAddress - 33554432;
     } else {
       endAddress = this.spaceBetweenDevices(indexSelectedDevice, sizeOfSelected, 'left');
 
       if (endAddress !== 0) {
-        this.selected.maxAddress = endAddress - 1;
-        this.selected.minAddress = this.selected.maxAddress - sizeOfSelected;
+        this.selectedDevice().maxAddress = endAddress - 1;
+        this.selectedDevice().minAddress = this.selectedDevice().maxAddress - sizeOfSelected;
       }
     }
 
     this.memoryService.memory.devices = this.memoryService.devices.sort((a, b) => a.minAddress - b.minAddress);
-    this.memoryService.storeInMemory();
+    this.memoryService.storeInLocalStorage();
   }
 
-  moveSelectedRight() {
+  protected moveSelectedRight() {
     let startAddress = 0;
-    const indexSelectedDevice = this.memoryService.devices.indexOf(this.selected);
-    const sizeOfSelected = this.selected.maxAddress - this.selected.minAddress;
+    const indexSelectedDevice = this.memoryService.devices.indexOf(this.selectedDevice());
+    const sizeOfSelected = this.selectedDevice().maxAddress - this.selectedDevice().minAddress;
     const spaceBeforeFirstDevice =
       this.memoryService.devices[indexSelectedDevice + 1].minAddress -
       this.memoryService.devices[indexSelectedDevice].maxAddress;
 
     if (spaceBeforeFirstDevice >= 33554432) { // Muovi avanti 128Mb se c'è abbastanza spazio
-      this.selected.maxAddress = this.selected.maxAddress + 33554432;
-      this.selected.minAddress = this.selected.minAddress + 33554432;
+      this.selectedDevice().maxAddress = this.selectedDevice().maxAddress + 33554432;
+      this.selectedDevice().minAddress = this.selectedDevice().minAddress + 33554432;
     } else {
       startAddress = this.spaceBetweenDevices(indexSelectedDevice, sizeOfSelected, 'right');
       if (startAddress !== 0) { // Muovi tra due device avanti a me
-        this.selected.minAddress = startAddress + 1;
-        this.selected.maxAddress = this.selected.minAddress + sizeOfSelected;
+        this.selectedDevice().minAddress = startAddress + 1;
+        this.selectedDevice().maxAddress = this.selectedDevice().minAddress + sizeOfSelected;
       }
     }
-    this.memoryService.memory.devices = this.memoryService.devices.sort((a, b) => a.minAddress - b.minAddress);
-    this.memoryService.storeInMemory();
+    this.memoryService.storeInLocalStorage();
   }
 
   readMemoryDetail(addr) {
@@ -213,7 +212,7 @@ export class MemoryComponent implements OnInit {
     // si aprirà una finestra d'errore
 
     if ((!addr.startsWith('0x') && !addr.startsWith('0X')) || addr.length !== 10 || isNaN(addr)) {
-      this.dialog.open(ErrorDialogComponent, {
+      this._dialog.open(ErrorDialogComponent, {
         data: {message: 'Format Error : only hexadecimal value starting with 0x'}
       });
       return;
@@ -230,7 +229,7 @@ export class MemoryComponent implements OnInit {
 
     const d = this.memoryService.devices.find(el => el.minAddress <= finalAddr && el.maxAddress >= finalAddr);
     if (d == null) {
-      this.dialog.open(ErrorDialogComponent, {
+      this._dialog.open(ErrorDialogComponent, {
         data: {message: 'No memory allocated in this range'}
       });
       return;
@@ -275,7 +274,7 @@ export class MemoryComponent implements OnInit {
     // significativo a quello meno significativo
 
     arrData.reverse();
-    this.dialog.open(InstructionDialogComponent, {
+    this._dialog.open(InstructionDialogComponent, {
       data: {values: arrData, service: this.memoryService},
     });
   }
@@ -285,7 +284,7 @@ export class MemoryComponent implements OnInit {
   readMemoryAddressValues(addr) {
     let finalAddr;
     if ((!addr.startsWith('0x') && !addr.startsWith('0X')) || addr.length !== 10 || isNaN(addr)) {
-      this.dialog.open(ErrorDialogComponent, {
+      this._dialog.open(ErrorDialogComponent, {
         data: {message: 'Format Error : only hexadecimal value starting with 0x'}
       });
       return;
@@ -297,7 +296,7 @@ export class MemoryComponent implements OnInit {
     }
     const d = this.memoryService.devices.find(el => el.minAddress <= finalAddr && el.maxAddress >= finalAddr);
     if (d == null) {
-      this.dialog.open(ErrorDialogComponent, {
+      this._dialog.open(ErrorDialogComponent, {
         data: {message: 'No memory allocated in this range'}
       });
       return;
@@ -321,64 +320,30 @@ export class MemoryComponent implements OnInit {
     // Rovescio l'array per visualizzare a partire dall'indirizzo più
     // significativo a quello meno significativo
     arrData.reverse();
-    this.dialog.open(MemoryAddressDialogComponent, {
+    this._dialog.open(MemoryAddressDialogComponent, {
       data: {values: arrData, service: this.memoryService},
     });
 
   }
 
-  isLN(dev: Device) {
+  protected isLogicalNetwork(dev: Device): dev is LogicalNetwork {
     return dev instanceof LogicalNetwork;
   }
 
-  isLNActive(dev: Device) {
+  protected isLogicalNetworkActive(dev: Device) {
     if (dev instanceof LogicalNetwork) {
       return dev.ffd;
     }
+
     return false;
   }
 
-  isMemory(dev: Device) {
+  protected isMemory(dev: Device): dev is Ram | Eprom {
     return dev instanceof Ram || dev instanceof Eprom;
   }
 
-  isCounter(dev: Device) {
-    if (dev instanceof Counter) {
-      return dev as Counter;
-    }
-    return undefined;
-  }
-
-  isInputPort(dev: Device) {
-    if (dev instanceof InputPort) {
-      return dev as InputPort;
-    }
-    return undefined;
-  }
-
-  isFFD(dev: Device) {
-    if (dev instanceof FFDLogicalNetwork) {
-      return dev as FFDLogicalNetwork;
-    }
-    return undefined;
-  }
-
-  isLed(dev: Device) {
-    if (dev instanceof LedLogicalNetwork) {
-      return dev as LedLogicalNetwork;
-    }
-    return undefined;
-  }
-
-  isStart(dev: Device) {
-    if (dev instanceof StartLogicalNetwork) {
-      return dev as StartLogicalNetwork;
-    }
-    return undefined;
-  }
-
-  openImageInterrupt() {
-    this.dialog.open(ImageDialogComponent, {
+  protected openInterruptImage() {
+    this._dialog.open(ImageDialogComponent, {
       data: {src: 'assets/img/rete-interrupt2.jpg'}
     });
   }
@@ -389,19 +354,50 @@ export class MemoryComponent implements OnInit {
         return this.memoryService.devices[i + 1].maxAddress;
       }
     }
+
     for (let i = indexSelectedDevice; i > 1 && side === 'left'; i--) {
       if ((this.memoryService.devices[i - 1].minAddress - this.memoryService.devices[i - 2].maxAddress) >= sizeOfSelected) {
         return this.memoryService.devices[i - 1].minAddress;
       }
     }
+
     return 0;
   }
 
+  protected deviceImage(device: Device) {
+    if (device instanceof LedLogicalNetwork) {
+      return device.getChipSelect('CS_READ_LED') ?
+        'assets/img/led_on.png' :
+        'assets/img/led_off.png';
+    }
+    else if (device instanceof StartLogicalNetwork) {
+      return device.getChipSelect('CS_READ_STARTUP') ?
+        'assets/img/led_on.png' :
+        'assets/img/led_off.png';
+    }
+    else if (device instanceof Counter) {
+      return 'assets/img/counter/counter.png';
+    }
+    else if (device instanceof InputPort) {
+      return 'assets/img/icon_port.png';
+    }
+
+    return '';
+  }
+
+  protected isEprom(device: Device): device is Eprom {
+    return device instanceof LedLogicalNetwork;
+  }
+
+  protected isStartLogicalNetwork(device: Device): device is StartLogicalNetwork {
+    return device instanceof StartLogicalNetwork;
+  }
+
   protected readonly Ram = Ram;
-  protected readonly InputPort = InputPort;
-  protected readonly Counter = Counter;
-  protected readonly LedLogicalNetwork = LedLogicalNetwork;
   protected readonly FFDLogicalNetwork = FFDLogicalNetwork;
+  protected readonly LedLogicalNetwork = LedLogicalNetwork;
+  protected readonly Counter = Counter;
+  protected readonly InputPort = InputPort;
 }
 
 

@@ -1,6 +1,6 @@
 <body link="white" vlink="red">
   <mat-form-field class="search-field">
-    <input matInput placeholder="Search" name="search" autocomplete="0" [(ngModel)]="search">
+    <input matInput placeholder="Search" name="search" autocomplete="0" [(ngModel)]="searchQuery">
   </mat-form-field>
   <div class="mat-accordion-container">
     <div class="info-documentation">
@@ -13,7 +13,7 @@
       </span>
     </div>
     <mat-accordion>
-      @for (instr of documentationFiltered; track instr) {
+      @for (instr of documentationFiltered; track instr.name) {
         <mat-expansion-panel>
           <mat-expansion-panel-header>
             <mat-panel-title class="name">{{instr.name}}</mat-panel-title>

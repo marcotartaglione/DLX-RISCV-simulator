@@ -4,7 +4,7 @@ import {DLXDocumentation} from './documentation/dlx.documentation';
 import {RV32IDocumentation} from './documentation/rv32i.documentation';
 import {CanDeactivateGuard} from './guards/can-deactivate-guard';
 import {DLXInterpreter} from './interpreters/dlx/dlx.interpreter';
-import {RV32Interpreter} from './interpreters/rv32i.interpreter';
+import {RV32Interpreter} from './interpreters/rv32i/rv32i.interpreter';
 import {MainPageComponent} from './main-page/main-page.component';
 import {DLXRegisters} from './registers/dlx.registers';
 import {RV32IRegisters} from './registers/rv32i.registers';

@@ -1,7 +1,7 @@
-import {Memory} from '../memory/model/memory';
-import {Registers} from '../registers/registers';
-import {RV32IRegisters} from '../registers/rv32i.registers';
-import {Interpreter} from './interpreter';
+import {Memory} from '../../memory/model/memory';
+import {Registers} from '../../registers/registers';
+import {RV32IRegisters} from '../../registers/rv32i.registers';
+import {Interpreter} from '../interpreter';
 
 const BASE = 0;
 const instructions_R = 'ADD|SUB|SLL|SLT|SLTU|XOR|SRL|SRA|OR|AND';
@@ -304,7 +304,7 @@ export class RV32Interpreter extends Interpreter {
     }
   }
 
-  run(line: string, registers: Registers, memory: Memory): void {
+  run(line: string, registers: Registers, memory: Memory): number {
     let tokens: string[];
     let lineFixed: string;
 
@@ -366,6 +366,8 @@ export class RV32Interpreter extends Interpreter {
     if (this.instructions[instruction]) {
       this.instructions[instruction](argsFixed, registers as RV32IRegisters, memory);
     }
+
+    return registers.pc + 4;
   }
 
   encode(line: string): number {
@@ -379,7 +381,9 @@ export class RV32Interpreter extends Interpreter {
     }
   }
 
-  public interrupt(registers: Registers): void {
+  public interrupt(registers: Registers): number {
+    const beforeInterrupt = registers.pc;
+
     if (this.interruptEnabled) {
       this.interruptEnabled = false;
       (registers as RV32IRegisters).x[5] = registers.pc;
@@ -387,5 +391,7 @@ export class RV32Interpreter extends Interpreter {
       // in caso di VECTORED INTERRUPTS -> PC = BASE + ExcCode * 4
       // ExcCode = 11 (Machine external interrupt)
     }
+
+    return beforeInterrupt;
   }
 }

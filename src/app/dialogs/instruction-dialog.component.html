@@ -1,32 +1,38 @@
-<h1 style="width:900px" mat-dialog-title>Memory values</h1>
+<h1 mat-dialog-title style="width:900px">Memory values</h1>
 <h2 align="center" mat-dialog-title>Stored value : {{ instruction }}</h2>
+
 <mat-dialog-content width="1000px">
   <mat-grid-list cols="4" rowHeight="150px">
     @for (el of data.values; track el) {
       <mat-grid-tile>
-        <mat-card><h4>0x{{el.hexAddress}}</h4>
-        <span>{{el.value | formatByte: fType}}@if (fType=='bin') {
-          <sub>2</sub>
-        }</span>
-      </mat-card>
-    </mat-grid-tile>
-  }
-</mat-grid-list>
-<button mat-raised-button style="float: left;"id="pre" (click)="viewPreInstr()"
-  [disabled]="isPreDisabled()" matTooltip="Previous addresses" matTooltipPosition="right">
-  <i class="fas fa-arrow-left"></i>
-</button>
-<button style="float: right;" mat-raised-button id="next" (click)="viewNextInstr()"
-  [disabled]="isNextDisabled()" matTooltip="Next addresses" matTooltipPosition="left">
-  <i class="fas fa-arrow-right"></i>
-</button>
+        <mat-card><h4>0x{{ el.hexAddress }}</h4>
+          <span>{{ el.value | formatByte: formatByteType }}@if (formatByteType === 'bin') {
+            <sub>2</sub>
+          }</span>
+        </mat-card>
+      </mat-grid-tile>
+    }
+  </mat-grid-list>
+
+  <button (click)="viewPreInstr()" [disabled]="isInRange(this.iv - 4)" id="pre" mat-raised-button
+          matTooltip="Previous addresses" matTooltipPosition="right" style="float: left;">
+    <i class="fas fa-arrow-left"></i>
+  </button>
+
+  <button (click)="viewNextInstr()" [disabled]="isInRange(this.iv + 4)" id="next" mat-raised-button
+          matTooltip="Next addresses" matTooltipPosition="left" style="float: right;">
+    <i class="fas fa-arrow-right"></i>
+  </button>
 </mat-dialog-content>
+
 <br>
-  <mat-button-toggle-group id="fType" name="fType" [(ngModel)]="fType">
-    <mat-button-toggle value="bin" style="width: 50%;margin:10px">Binary</mat-button-toggle>
-    <mat-button-toggle value="hex" style="width: 50%;margin:10px">Hexadecimal</mat-button-toggle>
-    <mat-button-toggle value="dec" style="width: 50%;margin:10px">Decimal</mat-button-toggle>
-  </mat-button-toggle-group>
-  <mat-dialog-actions align="end">
-    <button mat-button mat-dialog-close>Ok</button>
-  </mat-dialog-actions>
+
+<mat-button-toggle-group [(ngModel)]="formatByteType" id="fType" name="fType">
+  <mat-button-toggle style="width: 50%;margin:10px" value="bin">Binary</mat-button-toggle>
+  <mat-button-toggle style="width: 50%;margin:10px" value="hex">Hexadecimal</mat-button-toggle>
+  <mat-button-toggle style="width: 50%;margin:10px" value="dec">Decimal</mat-button-toggle>
+</mat-button-toggle-group>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Ok</button>
+</mat-dialog-actions>

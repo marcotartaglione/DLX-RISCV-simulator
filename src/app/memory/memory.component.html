@@ -1,77 +1,53 @@
 <div class="btn-container">
-  @if (selected!=null && selected.chipSelects.length>0) {
-    <button (click)="openDialogImage(selected)" class="mr"
-      mat-raised-button>
-      <span class="btn">View logic circuit <i class="fa fa-code-branch"></i></span>
-    </button>
+  @if (selectedDevice(); as device) {
+    @if (selectedDevice().chipSelects.length > 0) {
+      <button (click)="openDialogImage(device)" class="mr" mat-raised-button>
+        <span class="btn">View logic circuit <i class="fa fa-code-branch"></i></span>
+      </button>
+    }
   }
 
   <div class="right">
-    <button (click)="openImageInterrupt()" class="mr" mat-raised-button>
+    <button (click)="openInterruptImage()" class="mr" mat-raised-button>
       <span class="btn">View interrupt circuit <i class="fa fa-bolt"></i></span>
     </button>
   </div>
 </div>
+
 <div class="main-container">
   <div class="memory">
+    <!--  // TODO: togliere tutti i magic numbers  -->
     @for (device of memoryService.devices; track device) {
-      @if (isLed(device)) {
-        <img (click)="selected === device ? selected = null : selected = device"
-          [class.selected]="selected === device"
-          [matTooltip]="device.name + ' ' + (isLNActive(device) ? '1' : '0')"
-          [style.left]="((device.minAddress / 1073741824) * 100 - 3.5).toFixed(2) + '%'"
-          alt=""
-          class=" icon_absolute"
-          matTooltipClass="device-size" matTooltipPosition="above"
-          src="{{device.getChipSelect('CS_READ_LED') ? 'assets/img/led_on.png' : 'assets/img/led_off.png'}}"
-          width="70px"/>
-      }
-      @if (isStart(device)) {
-        <img (click)="selected === device ? selected = null : selected = device"
-          [class.selected]="selected === device"
-          [matTooltip]="device.name + ' ' + (isLNActive(device) ? '1' : '0')"
-          [style.left]="((device.minAddress/1073741824)*100 -3.5).toFixed(2)+'%'"
-          alt="" class=" icon_absolute"
-          matTooltipClass="device-size" matTooltipPosition="above"
-          src="{{device.getChipSelect('CS_READ_STARTUP') ? 'assets/img/led_on.png':'assets/img/led_off.png'}}"
-          width="70px"/>
-      }
-      @if (isCounter(device)) {
-        <img (click)="selected == device ? selected = null : selected = device"
-          [class.selected]="selected == device"
-          [matTooltip]="device.name + ' ' + (isLNActive(device) ? '1' : '0')"
-          [style.left]="((device.minAddress/1073741824)*100 -3.5).toFixed(2)+'%'"
-          alt="" class=" icon_absolute"
-          matTooltipClass="device-size" matTooltipPosition="above"
-          ngSrc="assets/img/counter/counter.png"
-          width="70px"/>
-      }
-      @if (isInputPort(device)) {
-        <img (click)="selected == device ? selected = null : selected = device"
-          [class.selected]="selected == device"
-          [matTooltip]="device.name"
-          [style.left]="((device.minAddress/1073741824)*100 -3.5).toFixed(2)+'%'"
-          alt="" class=" icon_absolute"
-          matTooltipClass="device-size" matTooltipPosition="above"
-          ngSrc="assets/img/icon_port.png"
-          width="70px"/>
-      }
-      @if (!isLN(device)) {
-        <div (click)="selected == device ? selected = null : selected = device"
-          [class.selected]="selected == device"
-          [matTooltip]="device.size('MB') + ''"
-          [style.left]="((device.minAddress/1073741824)*100).toFixed(2)+'%'"
-          [style.right]="(100 - (device.maxAddress/1073741824)*100).toFixed(2)+'%'" class="dev"
-          matRipple matTooltipClass="device-size" matTooltipPosition="above">
+      @if (deviceImage(device) !== '') {
+        <img (click)="selectedDevice() === device ? selectedDevice.set(null) : selectedDevice.set(device)"
+             [class.selected]="selectedDevice() === device"
+             [matTooltip]="device.name + (isLogicalNetwork(device) ? ' ' + (device.ffd ? '1' : '0') : '')"
+             [style.left]="((device.minAddress / 1073741824) * 100 - 3.5).toFixed(2) + '%'"
+             alt="device icon"
+             class="icon_absolute"
+             matTooltipClass="device-size"
+             matTooltipPosition="above"
+             src="{{deviceImage(device)}}"
+             width="70px"/>
+
+        @if (isLogicalNetwork(device)) {
+          <div [matTooltip]="device.name + ' ' + (device.ffd ? '1' : '0')"
+               [style.left]="((device.minAddress / 1073741824) * 100).toFixed(2)+'%'"
+               class="ln"
+               matTooltipClass="device-size"
+               matTooltipPosition="above">
+          </div>
+        }
+      } @else {
+        <div (click)="selectedDevice() === device ? selectedDevice.set(null) : selectedDevice.set(device)"
+             [class.selected]="selectedDevice() == device"
+             [matTooltip]="device.size('MB') + 'MB'"
+             [style.left]="((device.minAddress/1073741824) * 100).toFixed(2)+'%'"
+             [style.right]="(100 - (device.maxAddress/1073741824) * 100).toFixed(2)+'%'" class="dev"
+             matRipple
+             matTooltipClass="device-size"
+             matTooltipPosition="above">
           <span>{{ device.name }}</span>
-        </div>
-      }
-      @if (isLN(device)) {
-        <div
-          [matTooltip]="device.name + ' ' + (isLNActive(device) ? '1' : '0')"
-          [style.left]="((device.minAddress / 1073741824) * 100).toFixed(2)+'%'"
-          class="ln" matTooltipClass="device-size"
-          matTooltipPosition="above">
         </div>
       }
     }
@@ -84,138 +60,144 @@
     </div>
   </div>
 
-  <button [matMenuTriggerFor]="menuAdd" id="add" mat-raised-button><i class="fas fa-plus"></i></button>
+  <button [matMenuTriggerFor]="menuAdd" id="add" mat-raised-button>
+    <i class="fas fa-plus"></i>
+  </button>
 
-  @if (selected) {
+  @if (selectedDevice()) {
     <div @showHideTrigger class="container">
       <div class="group">
         <button (click)="moveSelectedLeft()"
-          [disabled]="!canMoveSelectedLeft"
-          class="standard_margin_hor"
-          id="move-left"
-          mat-raised-button>
+                [disabled]="!canSelectedMoveLeft"
+                class="standard_margin_hor"
+                id="move-left"
+                mat-raised-button>
           <i class="fas fa-caret-left"></i>
         </button>
+
         <mat-form-field appearance="fill" id="min">
           <mat-label>Min</mat-label>
-          <!-- TODO: il valore in input deve passare da hex a dec -->
           <input (change)="onChange($event, 'min')"
-            [ngModel]="selected.minAddress | format: 'hex'"
-            (ngModelChange)="selected.minAddress = $event"
-            [disabled]="selected.name === 'EPROM'"
-            matInput
-            maxlength="10" minlength="10"/>
-          </mat-form-field>
-          <mat-form-field appearance="fill" class="standard_margin_hor" id="name">
-            <mat-label>Name</mat-label>
-            <input (change)="onChange($event, 'name')"
-              [(ngModel)]="selected.name"
-              [disabled]="selected.name === 'EPROM'"
-              matInput/>
-            </mat-form-field>
-          </div>
-          @if (selected.chipSelects.length > 0) {
-            <div class="group">
-              <mat-form-field appearance="fill">
-                <mat-label>Chip-Select</mat-label>
-                <mat-select [(value)]="selectedCS">
-                  @for (el of selected.chipSelects; track el) {
-                    <mat-option [value]="el">
-                      {{ el.id }}
-                    </mat-option>
-                  }
-                </mat-select>
-              </mat-form-field>
-              @if (selectedCS!=null && selectedCS.id.length>0) {
-                <mat-form-field
-                  appearance="fill"
-                  class="standard_margin_hor"
-                  id="csAddr">
-                  <mat-label>address</mat-label>
-                  <!--  TODO: Questo input deve prendere il valore e trasformarlo in decimale ->  (valueChange)="selectedCS.address = $event"    -->
-                  <!--  TODO: Da aggiungere: (change)="onChangeCS($event.target.value, selectedCS.id)"      -->
-                  <input
-                    [value]="selectedCS.address | format: 'hex'"
-                    matInput
-                    maxlength="8" minlength="8"/>
-                  </mat-form-field>
-                }
-              </div>
-            }
-            @if (isMemory(selected)) {
-              <div>
-                <mat-form-field appearance="fill">
-                  <mat-label>Address Value</mat-label>
-                  <input [(ngModel)]="inputAddr"
-                    matInput
-                    matTooltip="0x format"
-                    matTooltipClass="device-size"
-                    matTooltipPosition="below"
-                    maxlength="10" minlength="10"/>
-                  </mat-form-field>
-                  <button [matMenuTriggerFor]="menu"
-                    class="standard_margin_hor"
-                    mat-raised-button
-                    style="height:50px; position: relative; top: -10px;">
-                    <i class="fas fa-search"></i>
-                  </button>
-                  <mat-menu #menu="matMenu">
-                    <button (click)="readMemoryAddressValues(inputAddr)"
-                      mat-menu-item>
-                      Show
-                    </button>
-                    <button (click)="readMemoryDetail(inputAddr)"
-                      mat-menu-item>
-                      Show Detail
-                    </button>
-                  </mat-menu>
-                </div>
-              }
-              <div class="group">
-                <mat-form-field appearance="fill" id="max">
-                  <mat-label>Max</mat-label>
-                  <!-- TODO: il valore in input deve passare da hex a dec -->
-                  <input (change)="onChange($event, 'max')"
-                    [ngModel]="selected.maxAddress | format: 'hex'"
-                    (ngModelChange)="selected.minAddress = $event"
-                    matInput
-                    maxlength="10"
-                    minlength="10"/>
-                  </mat-form-field>
-                  <button (click)="moveSelectedRight()"
-                    [disabled]="!canMoveSelectedRight"
-                    id="move-right"
-                    mat-raised-button>
-                    <i class="fas fa-caret-right"></i>
-                  </button>
-                </div>
-              </div>
-            }
-            @if (selected) {
-              <button (click)="onDelete(selected)"
-                @showHideTrigger
-                [disabled]="selected.name === 'EPROM' || selected.name === 'Start'"
-                id="del"
-                mat-raised-button>
-                <i class="fas fa-trash"></i>
-              </button>
-            }
-          </div>
+                 (ngModelChange)="selectedDevice().minAddress = formatPipe.transform($event, 'dec')"
+                 [disabled]="selectedDevice()!.name === 'EPROM'"
+                 [ngModel]="selectedDevice().minAddress | format: 'hex'"
+                 matInput
+                 maxlength="10"
+                 minlength="10"/>
+        </mat-form-field>
 
-          <mat-menu #menuAdd="matMenu">
-            <button (click)="onAdd(Ram)" mat-menu-item>
-              <span>Memory</span>
-            </button>
-            <button (click)="onAdd(FFDLogicalNetwork)" mat-menu-item>
-              <span>FF-D</span>
-            </button>
-            <button (click)="onAdd(LedLogicalNetwork)" mat-menu-item>
-              <span>Led network</span>
-            </button>
-            <button (click)="onAdd(Counter)" mat-menu-item>
-              <span>Counter</span>
-            </button>
-            <button (click)="onAdd(InputPort)" mat-menu-item>
-              <span>Input-Port</span>
-            </button>
+        <mat-form-field appearance="fill" class="standard_margin_hor" id="name">
+          <mat-label>Name</mat-label>
+          <input (change)="onChange($event, 'name')"
+                 [(ngModel)]="selectedDevice().name"
+                 [disabled]="selectedDevice().name === 'EPROM'"
+                 matInput/>
+        </mat-form-field>
+      </div>
+
+      @if (selectedDevice().chipSelects.length > 0) {
+        <div class="group">
+          <mat-form-field appearance="fill">
+            <mat-label>Chip-Select</mat-label>
+            <mat-select (selectionChange)="selectedChipSelect.set($event.value)" [value]="selectedChipSelect()">
+              @for (el of selectedDevice().chipSelects; track el.id) {
+                <mat-option [value]="el">
+                  {{ el.id }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          @if (selectedChipSelect() && selectedChipSelect().id.length > 0) {
+            <mat-form-field appearance="fill"
+                            class="standard_margin_hor"
+                            id="csAddr">
+              <mat-label>address</mat-label>
+              <input (change)="onChangeCS($any($event.target).value, selectedChipSelect().id)"
+                     [value]="selectedChipSelect().address | format: 'hex'"
+                     matInput
+                     maxlength="10"
+                     minlength="10"/>
+            </mat-form-field>
+          }
+        </div>
+      }
+
+      @if (isMemory(selectedDevice())) {
+        <div class="group">
+          <mat-form-field appearance="fill">
+            <mat-label>Address Value</mat-label>
+            <input (ngModelChange)="inputAddr.set($event)"
+                   [ngModel]="inputAddr()"
+                   matInput
+                   matTooltip="0x format"
+                   matTooltipClass="device-size"
+                   matTooltipPosition="below"
+                   maxlength="10" minlength="10"/>
+          </mat-form-field>
+
+          <button [matMenuTriggerFor]="menuSearch"
+                  class="standard_margin_hor"
+                  mat-raised-button
+                  style="height:50px; position: relative; top: -10px;">
+            <i class="fas fa-search"></i>
+          </button>
+
+          <mat-menu #menuSearch="matMenu">
+            <button (click)="readMemoryAddressValues(inputAddr())" mat-menu-item>Show</button>
+            <button (click)="readMemoryDetail(inputAddr())" mat-menu-item>Show Detail</button>
           </mat-menu>
+        </div>
+      }
+
+      <div class="group">
+        <mat-form-field appearance="fill" id="max">
+          <mat-label>Max</mat-label>
+          <input (change)="onChange($event, 'max')"
+                 (ngModelChange)="selectedDevice().maxAddress = formatPipe.transform($event, 'dec')"
+                 [ngModel]="selectedDevice().maxAddress | format: 'hex'"
+                 matInput
+                 maxlength="10"
+                 minlength="10"/>
+        </mat-form-field>
+
+        <button (click)="moveSelectedRight()"
+                [disabled]="!canSelectedMoveRight"
+                id="move-right"
+                mat-raised-button>
+          <i class="fas fa-caret-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <button (click)="onDelete(selectedDevice())"
+            @showHideTrigger
+            [disabled]="isEprom(selectedDevice()) || isStartLogicalNetwork(selectedDevice())"
+            id="del"
+            mat-raised-button>
+      <i class="fas fa-trash"></i>
+    </button>
+  }
+</div>
+
+<mat-menu #menuAdd="matMenu">
+  <button (click)="onAdd(Ram)" mat-menu-item>
+    <span>Memory</span>
+  </button>
+
+  <button (click)="onAdd(FFDLogicalNetwork)" mat-menu-item>
+    <span>FF-D</span>
+  </button>
+
+  <button (click)="onAdd(LedLogicalNetwork)" mat-menu-item>
+    <span>Led network</span>
+  </button>
+
+  <button (click)="onAdd(Counter)" mat-menu-item>
+    <span>Counter</span>
+  </button>
+
+  <button (click)="onAdd(InputPort)" mat-menu-item>
+    <span>Input-Port</span>
+  </button>
+</mat-menu>

@@ -1,5 +1,6 @@
-<mat-dialog-content>{{data.message}}</mat-dialog-content>
+<mat-dialog-content>{{ data.message }}</mat-dialog-content>
+
 <mat-dialog-actions align="end">
-    <button mat-button [mat-dialog-close]="true">{{data.ok}}</button>
-    <button mat-button [mat-dialog-close]="false">{{data.ko}}</button>
+  <button [mat-dialog-close]="true" mat-button>{{ data.ok }}</button>
+  <button [mat-dialog-close]="false" mat-button>{{ data.ko }}</button>
 </mat-dialog-actions>

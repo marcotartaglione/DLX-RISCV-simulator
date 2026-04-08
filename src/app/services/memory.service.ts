@@ -88,7 +88,7 @@ export class MemoryService {
    * Stores the current memory configuration in localStorage, allowing it to be persisted across page reloads and browser sessions.
    * The memory configuration is serialized to JSON format before being stored.
    */
-  public storeInMemory() {
+  public storeInLocalStorage() {
     window.localStorage.setItem('memory', JSON.stringify(this._memory.devices.map(dev => {
       return {proto: dev.constructor.name, name: dev.name, min_address: dev.minAddress, max_address: dev.maxAddress};
     })));

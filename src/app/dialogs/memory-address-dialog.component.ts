@@ -1,6 +1,6 @@
-import { Component, Inject } from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
-import { MemoryService } from '../services/memory.service';
+import {MemoryService} from '../services/memory.service';
 import {MatGridList, MatGridTile} from '@angular/material/grid-list';
 import {MatCard} from '@angular/material/card';
 import {MatInput} from '@angular/material/input';
@@ -28,30 +28,23 @@ import {MatButton} from '@angular/material/button';
     MatDialogClose
   ]
 })
-export class MemoryAddressDialogComponent{
-  fType : string;
-  tmpVal : number[];
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private service: MemoryService) {
-    this.fType = 'hex'
-  }
+export class MemoryAddressDialogComponent {
+  protected formatType: string = 'hex';
+  protected data = inject<any>(MAT_DIALOG_DATA); // FIXME: cos'è sto 'data'?
+  private _service = inject(MemoryService);
 
-  onInputChange = (val,el) => {
-    if("hex"==this.fType && (val.length!=8 || val.includes("0x")) && val.length != 10) return;
-    let formattedVal = val;
-    /*f(val.includes("0x"))
-      formattedVal = parseInt(val);
-    else if("hex" == this.fType && val.length==8)
-      formattedVal = parseInt("0x".concat(val));*/
-     formattedVal = parseInt(val);
-     //console.log(formattedVal)
-     //console.log(this.data.values.find(x => x.address == el.address).value)
-    this.data.values.find(x => x.address == el.address).value = formattedVal;
-  }
+  protected onInputChange = (val, el) => {
+    if (this.formatType === 'hex' && (val.length != 8 || val.includes('0x')) && val.length != 10) {
+      return;
+    }
 
-  onSubmit = () => {
+    this.data.values.find(x => x.address == el.address).value = parseInt(val);
+  };
+
+  protected onSubmit = () => {
     this.data.values.forEach(el => {
-      this.service.memory.store(el.address,el.value);
-    })
+      this._service.memory.store(el.address, el.value);
+    });
   }
 }
 

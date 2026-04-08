@@ -1,13 +1,19 @@
-
-<mat-dialog-content  align="center">
+<mat-dialog-content align="center">
   <mat-form-field appearance="fill">
     <mat-label>Choose a filename</mat-label>
-    <input matInput [(ngModel)]="fileName" [errorStateMatcher]="customErrorStateMatcher" [formControl]="fileFormControl" placeholder="Ex. file.txt"/>
+    <input (change)="fileName.set($event.target.value)"
+           [errorStateMatcher]="customErrorStateMatcher"
+           [formControl]="fileFormControl"
+           [value]="fileName()"
+           matInput
+           placeholder="Ex. file.txt"/>
+
     @if (fileFormControl.hasError('pattern') && !fileFormControl.hasError('required')) {
       <mat-error>
         .txt file only accepted !
       </mat-error>
     }
+
     @if (fileFormControl.hasError('required')) {
       <mat-error>
         Please enter a file name
@@ -15,8 +21,8 @@
     }
   </mat-form-field>
 </mat-dialog-content>
+
 <mat-dialog-actions align="center">
   <button mat-button mat-dialog-close>Exit</button>
-  <button mat-button mat-dialog-close (click)="onSave()" [disabled]="!fileName.endsWith('.txt')">Save</button>
-
+  <button (click)="onSave()" [disabled]="!fileName().endsWith('.txt')" mat-button mat-dialog-close>Save</button>
 </mat-dialog-actions>

@@ -1,100 +1,81 @@
 import {Registers} from './registers';
 
 export class DLXRegisters extends Registers {
+  public readonly registersCount = 32;
 
-  r: [0, number, number, number, number, number, number, number,
-    number, number, number, number, number, number, number, number,
-    number, number, number, number, number, number, number, number,
-    number, number, number, number, number, number, number, number];
+  public registersValue = Array<number>(this.registersCount);
+  public registersBoldness = Array<string>(this.registersCount);
 
-  rBold: [any, string, string, string, string, string, string, string, string, string,
-    string, string, string, string, string, string, string, string, string, string,
-    string, string, string, string, string, string, string, any, string, string, string];
+  private _previousRegister: number = 0;
 
-  previous_register: number;
+  public iar: number = 0;
+  public mar: number = 0;
+  public ir: number = 0;
+  public temp: number = 0;
+  public mdr: number = 0;
+  public ien: number = 0;
+  public a: number = 0;
+  public b: number = 0;
+  public c: number = 0;
 
-  iar: number;
-  mar: number;
-  ir: number;
-  temp: number;
-  mdr: number;
-  ien: number;
-  a: number;
-  b: number;
-  c: number;
-
-  marBold : string;
-  mdrBold : string;
-  iarBold : string;
-  ienBold : string;
+  public marBoldness: string = 'normal';
+  public mdrBoldness: string = 'normal';
+  public iarBoldness: string = 'normal';
+  public ienBoldness: string = 'normal';
 
   constructor() {
     super();
-    this.r = [0, Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296),
-      Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296),
-      Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296),
-      Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296),
-      Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296),
-      Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296),
-      Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296),
-      Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296),
-      Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296),
-      Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296), Math.floor(Math.random()*4294967296),
-      Math.floor(Math.random()*4294967296)];
 
-    this.rBold = ['normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal',
-    'normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal',
-    'normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal'];
+    this.registersValue[0] = 0;
+    for (let i = 0; i < this.registersCount; i++) {
+      if (i === 0) {
+        this.registersValue[i] = 0;
+      } else {
+        this.registersValue[i] = Math.floor(Math.random() * 0x100000000);
+      }
 
-    this.previous_register = 0;
-
-    this.iar = 0;
-    this.mar = 0;
-    this.ir = 0;
-    this.temp = 0;
-    this.mdr = 0;
-    this.a = 0;
-    this.b = 0;
-    this.ien = 0;
-
-    this.marBold = 'normal';
-    this.mdrBold = 'normal';
-    this.iarBold = 'normal';
-    this.ienBold = 'normal';
+      this.registersBoldness[i] = 'normal';
+    }
   }
 
-  public setBold(registroNum : number){
+  public setBold(registerIndex: number) {
+    if (registerIndex < 0 || registerIndex >= this.registersCount) {
+      throw new Error(`Invalid register index: ${registerIndex}. It must be between 0 and ${this.registersCount - 1}.`);
+    }
 
-    this.rBold[this.previous_register] = 'normal';
-    this.previous_register = registroNum;
-
-    if(registroNum > 0)
-      this.rBold[registroNum] = 'bold';
+    this.registersBoldness[this._previousRegister] = 'normal';
+    this._previousRegister = registerIndex;
+    this.registersBoldness[registerIndex] = 'bold';
   }
 
-  public resetBoldReg(){
-    this.marBold = 'normal';
-    this.mdrBold = 'normal';
-    this.iarBold = 'normal';
-    // this.ienBold = 'normal';
-  }
-  public setBoldMar(){
-    this.marBold = 'bold';
+  public resetRegistersBoldness() {
+    for (let i = 0; i < this.registersCount; i++) {
+      this.registersBoldness[i] = 'normal';
+    }
+
+    this.marBoldness = 'normal';
+    this.mdrBoldness = 'normal';
+    this.iarBoldness = 'normal';
+    this.ienBoldness = 'normal';
   }
 
-  public setBoldMdr(){
-    this.mdrBold = 'bold';
+  public setMarBold() {
+    this.marBoldness = 'bold';
   }
 
-  public setBoldIar(){
-    this.iarBold = 'bold';
+  public setMdrBold() {
+    this.mdrBoldness = 'bold';
   }
 
-  public setBoldIen(){
-    this.ienBold = 'bold';
+  public setIarBold() {
+    this.iarBoldness = 'bold';
   }
 
-  public resetBoldIen(){
-    this.ienBold = 'normal'
+  public setIenBold() {
+    this.ienBoldness = 'bold';
+  }
+
+  public resetIenBold() {
+    this.ienBoldness = 'normal'
   }
 }

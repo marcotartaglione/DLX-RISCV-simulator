@@ -1,7 +1,11 @@
-import { Component, Inject } from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent} from '@angular/material/dialog';
 import {MatButton} from '@angular/material/button';
 import {NgOptimizedImage} from '@angular/common';
+
+export interface ImageDialogData {
+  src: string;
+}
 
 @Component({
   templateUrl: './image-dialog.component.html',
@@ -15,7 +19,5 @@ import {NgOptimizedImage} from '@angular/common';
   ]
 })
 export class ImageDialogComponent {
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: {src: string}) {}
-
+  protected data = inject<ImageDialogData>(MAT_DIALOG_DATA);
 }

@@ -51,22 +51,25 @@ export class CodeService {
       ;
   }
 
-  save(fileName: string) { // saves the code locally on a file
+  save(fileName?: string) { // saves the code locally on a file
     window.localStorage.setItem(`code-${this.editorMode}`, this.content);
-    var text = this.content;
-    var blob = new Blob([text], { type: "text/plain"});
-    var anchor = document.createElement("a");
+
+    if (fileName && fileName.trim() !== '') {
+      this.download(fileName);
+    }
+  }
+
+  download(fileName: string) { // downloads the code as a file
+    const text = this.content;
+    const blob = new Blob([text], { type: "text/plain" });
+    const anchor = document.createElement("a");
     anchor.download = fileName;
     anchor.href = window.URL.createObjectURL(blob);
-    anchor.target ="_blank";
+    anchor.target = "_blank";
     anchor.style.display = "none";
     document.body.appendChild(anchor);
     anchor.click();
     document.body.removeChild(anchor);
-  }
-
-  browserSave(){  // saves the code in browser local storage
-    window.localStorage.setItem(`code-${this.editorMode}`, this.content);
   }
 
   clear() {
@@ -75,5 +78,9 @@ export class CodeService {
 
   encode(lineN: number): number {
     return this.interpreter.encode(this.content.split('\n')[lineN]);
+  }
+
+  public get linesCount(): number {
+    return this.content.split('\n').length;
   }
 }

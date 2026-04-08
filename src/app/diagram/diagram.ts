@@ -1,124 +1,118 @@
-import {ApplicationRef, Input} from '@angular/core';
+import {ApplicationRef, inject} from '@angular/core';
 
-/*
-export interface IDiagram{
-  new(animationDuration: number, running: boolean, paused: boolean, type: string, loop:boolean, injector: Injector): Diagram;
-}*/
+export class Diagram {
+  private _appRef = inject(ApplicationRef);
 
-export class Diagram{
+  constructor(
+    private _type: string,
+    private _animationClass: string) {
+  }
 
-  type: string; //indica il tipo di diagramma
-  running: boolean; //indica lo stato dell'animazione, se sta scorrendo oppure no
-  paused: boolean; //indica se l'animazione è stata messa in pausa
-  animationClass: string; //indica la classe dell'animazione
-  animationDuration: number; //velocità di scorrimento
-  appRef: ApplicationRef;
+  private _animationDuration = 4000;
 
-  constructor(type: string, animationClass: string, appRef: ApplicationRef) {
-    this.type = type;
+  public get animationDuration() {
+    return this._animationDuration;
+  }
+
+  public set animationDuration(animationDuration: number) {
+    if (animationDuration < 0) {
+      throw new Error('Animation duration must be a non-negative number');
+    }
+
+    this._animationDuration = animationDuration;
+  }
+
+  public get type() {
+    return this._type;
+  }
+
+  public set type(type: string) {
+    if (type === '') {
+      throw new Error('Type cannot be an empty string');
+    }
+
+    this._type = type;
+  }
+
+  public get animationClass() {
+    return this._animationClass;
+  }
+
+  private set animationClass(animationClass: string) {
+    if (animationClass === '') {
+      throw new Error('Animation class cannot be an empty string');
+    }
+
+    this._animationClass = animationClass;
+  }
+
+  public get isRunning() {
+    return this._running;
+  }
+
+  public get isPaused() {
+    return this._paused;
+  }
+
+  public get imagePath() {
+    return ('assets/img/diagram/' + this.type + '.png');
+  }
+
+  public get playState() {
+    if (!this.isPaused && this.isRunning) {
+      return 'running';
+    } else {
+      return 'paused';
+    }
+  }
+
+  private _running = false;
+
+  private set running(running: boolean) {
+    this._running = running;
+  }
+
+  private _paused = false;
+
+  private set paused(paused: boolean) {
+    this._paused = paused;
+  }
+
+  public pause() {
+    this.paused = true;
+  }
+
+  public start() {
+    this.paused = false;
+    this.running = true;
+  }
+
+  public resume() {
+    this.paused = false;
+  }
+
+  public stop() {
     this.running = false;
     this.paused = false;
-    this.animationClass = animationClass;
-    this.animationDuration = 4000;
-    this.appRef = appRef;
+
+    this.animationClass = 'none';
+
+    // Force refresh
+    this._appRef.tick();
+
+    this.animationClass = this.animationClassFromType;
   }
 
-  /*METODI GETTER */
-  public getType(){
-    return this.type;
+  public step() {
+    this.stop();
+    this.start();
   }
 
-  public isRunning(){
-    return this.running;
-  }
-
-  public isPaused(){
-    return this.paused;
-  }
-
-  public getAnimationClass(){
-    return this.animationClass;
-  }
-
-  public getAnimationDuration(){
-    return this.animationDuration;
-  }
-
-  /*METODI SETTER*/
-  public setType(type: string){
-    if(type != ''){
-        this.type = type;
+  private get animationClassFromType() {
+    if (this.type === 'clock') {
+      return 'clock';
+    } else {
+      return 'general';
     }
-  }
-
-  private setRunning(running: boolean){
-    this.running = running;
-  }
-
-  private setPaused(paused: boolean){
-    this.paused = paused;
-  }
-
-  private setAnimationClass(animationClass: string){
-    if(animationClass != "")
-      this.animationClass = animationClass;
-  }
-
-  public setAnimationDuration(animationDuration: number){
-    //controllo
-    if(animationDuration > 0){
-        this.animationDuration = animationDuration;
-    }
-  }
-
-  /*METODI PER IL CONTROLLO DELLE ANIMAZIONI */
-
-  /*Per mettere in pausa l'animazione*/
-  public pause(){
-    this.setPaused(true);
-  }
-
-  /*Per far partire l'animazione*/
-  public start(){
-    if(this.isPaused()){
-      this.setPaused(false);
-    }
-    this.setRunning(true);
-  }
-
-  /*Per riprendere l'animazione*/
-  public resume(){
-    if(this.isPaused()){
-      this.setPaused(false);
-    }
-  }
-
-  /*Per fare lo stop dell'animazione*/
-  public stop(){
-    this.setRunning(false);
-    this.setPaused(false);
-    //setto la classe a 'none'
-    this.setAnimationClass("none");
-    //triggero il refresh
-    this.appRef.tick();
-    //rimetto la classe giusta
-    this.setAnimationClass(this.getAnimationClassFromType());
-  }
-
-  /*Metodo che ritorna la classe dell'animazione in base al tipo*/
-  private getAnimationClassFromType(){
-    if(this.getType() === 'clock') return 'clock';
-    else return 'general';
-  }
-
-  /*Metodo che ritorna il nome dell'immagine del componente */
-  public getImageName() {
-    return ("assets/img/diagram/"+this.getType()+".png");
-  }
-
-  public getPlayState(){
-    if(!this.isPaused() && this.isRunning())
-      return 'running';
-    else return 'paused';
   }
 }

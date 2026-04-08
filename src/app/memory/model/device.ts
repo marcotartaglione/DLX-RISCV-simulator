@@ -74,11 +74,11 @@ export class Device implements IAddressableStorage {
       case 'B':
         return size / 4;
       case 'KB':
-        return size / 1024 / 4;
+        return size / 4 / 1024;
       case 'MB':
-        return size / (1024 * 1024) / 4;
+        return size / 4 / 1024 / 1024;
       case 'GB':
-        return size / (1024 * 1024 * 1024) / 4;
+        return size / 4 / 1024 / 1024 / 1024;
       default:
         throw new Error('Invalid unit for size: ' + unit);
     }

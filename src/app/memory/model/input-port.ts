@@ -1,12 +1,15 @@
 import {LogicalNetwork} from './logical-network';
 import {ChipSelect} from './ChipSelect';
 
+export const InputPortSizesArray = [8, 16, 32] as const;
+type InputPortSize = typeof InputPortSizesArray[number];
+
 export class InputPort extends LogicalNetwork {
   constructor(
     minAddress: number,
     maxAddress: number,
     private _data = 0,
-    private _dataSize: 8 | 16 | 32 = 8,
+    private _dataSize: InputPortSize = 8,
     private _interrupt = false,
     asyncSetSignal = 'RESET',
     asyncResetSignal = '0',
@@ -23,11 +26,11 @@ export class InputPort extends LogicalNetwork {
     return this._data;
   }
 
-  public get dataSize(): 8 | 16 | 32 {
+  public get dataSize(): InputPortSize {
     return this._dataSize;
   }
 
-  public set dataSize(value: 8 | 16 | 32) {
+  public set dataSize(value: InputPortSize) {
     this._dataSize = value;
     this.imagePath = 'assets/img/input-port/input_port_bit_' + this._dataSize + '.jpg';
   }

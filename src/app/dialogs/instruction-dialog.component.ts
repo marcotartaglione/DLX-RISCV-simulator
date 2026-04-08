@@ -1,4 +1,4 @@
-import {Component, Inject} from '@angular/core';
+import {Component, inject, Inject} from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
@@ -12,7 +12,7 @@ import {MemoryService} from '../services/memory.service';
 import {FormatPipe} from '../pipes/format.pipe';
 import {MatGridList, MatGridTile} from '@angular/material/grid-list';
 import {MatCard} from '@angular/material/card';
-import {FormatBytePipe} from '../pipes/formatByte.pipe';
+import {FormatBytePipe, FormatByteType} from '../pipes/formatByte.pipe';
 import {MatButton} from '@angular/material/button';
 import {MatTooltip} from '@angular/material/tooltip';
 import {MatButtonToggle, MatButtonToggleGroup} from '@angular/material/button-toggle';
@@ -38,47 +38,26 @@ import {FormsModule} from '@angular/forms';
   ]
 })
 export class InstructionDialogComponent {
-  fType: string;
-  instruction: string;
-  iv: number;
+  public data = inject(MAT_DIALOG_DATA);
+  private service = inject(MemoryService);
+  private dialog = inject(MatDialog);
+  private dialogRef = inject(MatDialogRef<InstructionDialogComponent>);
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private service: MemoryService,
-              private dialog: MatDialog, private dialogRef: MatDialogRef<InstructionDialogComponent>) {
-    this.fType = 'bin';
-    this.instruction = '0x' + data.values[0].instruction;
-    this.iv = data.values[0].iv;
+  protected formatByteType: FormatByteType = 'bin';
+  protected instruction: string;
+  protected readonly iv: number;
+
+  constructor() {
+    this.instruction = '0x' + this.data.values[0].instruction;
+    this.iv = this.data.values[0].iv;
   }
 
-  // I seguenti due metodi verificano che ci siano dei dispositivi mappati nel range di 4 byte successivo.
-  // In caso negativo i button per scorrere avanti o indietro vengono disabilitati
+  protected isInRange(address: number): boolean {
+    if (address < 0)
+      return;
 
-  isNextDisabled(): boolean {
-    const next = this.iv + 4; // il range che visualizzo con la "show detail" è di 4 byte
-    let finalAddr;
-    if (next || next === 0) {
-      // tslint:disable-next-line:no-bitwise
-      finalAddr = next >>> 2;
-    }
-    if (this.service.devices.find(el => el.minAddress <= finalAddr && el.maxAddress >= finalAddr) == null) {
-      return true;
-    }
-
-    return false;
-  }
-
-  isPreDisabled(): boolean {
-    const pre = this.iv - 4;
-    let finalAddr;
-    if (pre || pre === 0) {
-      // tslint:disable-next-line:no-bitwise
-      finalAddr = pre >>> 2;
-    }
-
-    if (this.service.devices.find(el => el.minAddress <= finalAddr && el.maxAddress >= finalAddr) == null) {
-      return true;
-    }
-
-    return false;
+    const finalAddr = address >>> 2;
+    return this.service.devices.find(el => el.minAddress <= finalAddr && el.maxAddress >= finalAddr) === null;
   }
 
   // Metodo che apre un nuovo componente dialog (chiudendo quello corrente) per visualizzare la codifica byte per byte
