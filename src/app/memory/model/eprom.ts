@@ -12,4 +12,14 @@ export class Eprom extends Device {
   public store(address: number, word: number): void {
     super.store(address, word);
   }
+
+  public static fromJSON(json: any): Eprom {
+    const eprom = new Eprom(json.minAddress, json.maxAddress);
+    eprom.hydrate(json);
+    return eprom;
+  }
+
+  public override toJSON(): any {
+    return super.toJSON();
+  }
 }

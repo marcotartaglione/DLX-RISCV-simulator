@@ -7,6 +7,7 @@ import {Memory} from '../memory/model/memory';
 import {StartLogicalNetwork} from '../memory/model/logicalNetworks/start.logical-network';
 import {InputPort} from '../memory/model/input-port';
 import {Ram} from '../memory/model/ram';
+import {FFDLogicalNetwork} from '../memory/model/logicalNetworks/ffd-logical-network';
 
 /**
  * Service responsible for managing the memory configuration, including loading and saving the memory state to localStorage, and providing
@@ -89,9 +90,10 @@ export class MemoryService {
    * The memory configuration is serialized to JSON format before being stored.
    */
   public storeInLocalStorage() {
-    window.localStorage.setItem('memory', JSON.stringify(this._memory.devices.map(dev => {
-      return {proto: dev.constructor.name, name: dev.name, min_address: dev.minAddress, max_address: dev.maxAddress};
-    })));
+    const json = this._memory.devices.map(dev => {
+      return dev.toJSON();
+    });
+    window.localStorage.setItem('memory', JSON.stringify(json));
   }
 
   /**

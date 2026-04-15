@@ -31,6 +31,17 @@ export class LedLogicalNetwork extends LogicalNetwork {
     return this._led;
   }
 
+  public static fromJSON(json: any) {
+    const ledLogicalNetwork = new LedLogicalNetwork(json.minAddress, json.maxAddress);
+    ledLogicalNetwork.hydrate(json);
+    return ledLogicalNetwork;
+  }
+
+  protected hydrate(json) {
+    super.hydrate(json);
+    this._led = json.led;
+  }
+
   public asyncSet() {
     this._ffd = true;
     this._led = this.ffd;
@@ -94,5 +105,11 @@ export class LedLogicalNetwork extends LogicalNetwork {
     if (CS_READ_LED != null) {
       super.store(CS_READ_LED.address, this._led ? 1 : 0);
     }
+  }
+
+  public toJSON(): any {
+    const json = super.toJSON();
+    json.led = this._led;
+    return json;
   }
 }

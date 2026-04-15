@@ -6,6 +6,7 @@ import {IVisualizable} from './IVisualizable';
  * Represents a hardware network with TRI-STATE buffers and Flip-Flops (FFD).
  */
 export class LogicalNetwork extends Device implements IVisualizable {
+  public _ffd = false;
 
   protected constructor(
     name: string,
@@ -22,17 +23,30 @@ export class LogicalNetwork extends Device implements IVisualizable {
   public get ffd(): boolean {
     return this._ffd;
   }
-  public _ffd = false;
 
   public static fromJSON(json: any) {
-    const logicalNetwork = super.fromJSON(json) as LogicalNetwork;
+    const logicalNetwork = new LogicalNetwork(
+      json.name,
+      json.minAddress,
+      json.maxAddress,
+      json.asyncSetSignal,
+      json.asyncResetSignal,
+      json.imagePath,
+      json.clockType
+    );
 
-    logicalNetwork.asyncSetSignal = json.async_set_signal;
-    logicalNetwork.asyncResetSignal = json.async_reset_signal;
-    logicalNetwork.imagePath = json.imagePath;
-    logicalNetwork.clockType = json.clk_type;
+    logicalNetwork.hydrate(json);
 
     return logicalNetwork;
+  }
+
+  protected hydrate(json) {
+    super.hydrate(json);
+    this.asyncSetSignal = json.asyncSetSignal;
+    this.asyncResetSignal = json.asyncResetSignal;
+    this.imagePath = json.imagePath;
+    this.clockType = json.clockType;
+    this._ffd = json.ffd;
   }
 
   protected mux = (zero: any, one: any, sel: number) => sel === 0 ? zero : one;
@@ -57,10 +71,11 @@ export class LogicalNetwork extends Device implements IVisualizable {
   public toJSON(): any {
     const json = super.toJSON();
 
-    json.async_set_signal = this.asyncSetSignal;
-    json.async_reset_signal = this.asyncResetSignal;
+    json.asyncSetSignal = this.asyncSetSignal;
+    json.asyncResetSignal = this.asyncResetSignal;
     json.imagePath = this.imagePath;
-    json.clk_type = this.clockType;
+    json.clkType = this.clockType;
+    json.ffd = this._ffd;
 
     return json;
   }
