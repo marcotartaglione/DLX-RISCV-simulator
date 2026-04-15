@@ -334,7 +334,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     try {
       const editorSettings = JSON.parse(window.localStorage.getItem('editor_settings'));
       if (editorSettings && editorSettings.start && editorSettings.interval) {
-        this.startTag = editorSettings.start;
+        this.startTag.set(editorSettings.start);
         this.intervalTime.set(editorSettings.interval);
       }
     } catch (error) {
