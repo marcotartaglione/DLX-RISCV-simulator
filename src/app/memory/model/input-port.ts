@@ -36,13 +36,16 @@ export class InputPort extends LogicalNetwork {
   }
 
   public static fromJSON(json: any) {
-    const inputPort = super.fromJSON(json) as InputPort;
-
-    inputPort._data = json.data;
-    inputPort._dataSize = json.dataSize;
-    inputPort._interrupt = json.interrupt;
-
+    const inputPort = new InputPort(json.minAddress, json.maxAddress);
+    inputPort.hydrate(json);
     return inputPort;
+  }
+
+  protected hydrate(json) {
+    super.hydrate(json);
+    this._data = json.data;
+    this._dataSize = json.dataSize;
+    this._interrupt = json.interrupt;
   }
 
   private generateData() {

@@ -15,4 +15,16 @@ export class ChipSelect {
     }
     return new ChipSelect(id, address);
   }
+
+  public toJSON() {
+    return {
+      proto: this.constructor.name,
+      id: this.id,
+      address: this.address,
+    };
+  }
+
+  public static fromJSON(json: any): ChipSelect {
+    return new ChipSelect(json.id, json.address);
+  }
 }

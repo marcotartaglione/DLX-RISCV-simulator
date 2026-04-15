@@ -1,8 +1,8 @@
-import {Injectable} from '@angular/core';
 import {LogicalNetwork} from './logical-network';
 import {ChipSelect} from './ChipSelect';
 
 export class Counter extends LogicalNetwork {
+  private _currentValue: number;
 
   constructor(
     minAddress: number,
@@ -32,20 +32,19 @@ export class Counter extends LogicalNetwork {
   // tri( in, en )
   // bd0 = tri( ffd( start, mux( start.q, bd0, cs_write ), reset, null, memwr* ), cs_read )";
 
-  private _currentValue: number;
-
   public get currentValue(): number {
     return this._currentValue;
   }
 
   public static fromJSON(json: any) {
-    const counter = super.fromJSON(json) as Counter;
-
-    counter.countingBasis = json.counting_basis;
-    counter.loadValue = json.load_value;
-    counter.upCounting = json.up_counting;
-
+    const counter = new Counter(json.minAddress, json.maxAddress);
+    counter.hydrate(json);
     return counter;
+  }
+
+  protected hydrate(json) {
+    super.hydrate(json);
+    this._currentValue = json.currentValue;
   }
 
   private updateCurrentValue() {
@@ -222,11 +221,10 @@ export class Counter extends LogicalNetwork {
 
   public toJSON(): any {
     const json = super.toJSON();
-
-    json.counting_basis = this.countingBasis;
-    json.load_value = this.loadValue;
-    json.up_counting = this.upCounting;
-
+    json.countingBasis = this.countingBasis;
+    json.loadValue = this.loadValue;
+    json.upCounting = this.upCounting;
+    json.currentValue = this._currentValue;
     return json;
   }
 }

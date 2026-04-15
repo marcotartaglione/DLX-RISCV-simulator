@@ -1,14 +1,13 @@
-import {IAddressableStorage} from './IAddressableStorage';
 import {ChipSelect} from './ChipSelect';
 
 /**
  * Represents a memory-mapped device with addressable storage and chip select management.
  */
-export class Device implements IAddressableStorage {
-  readonly chipSelects: ChipSelect[];
-  readonly memory: Uint8Array;
+export class Device {
+  private _chipSelects: ChipSelect[];
+  private _memory: Uint8Array;
 
-  constructor(
+  protected constructor(
     public name: string,
     private _minAddress: number,
     private _maxAddress: number,
@@ -18,9 +17,17 @@ export class Device implements IAddressableStorage {
       throw new Error('Invalid address for device: ' + name);
     }
 
-    this.chipSelects = [];
-    this.memory = new Uint8Array(size);
-    this.memory.forEach((_, i) => this.memory[i] = Math.floor(Math.random() * 256)); // Simulate uninitialized memory with random data
+    this._chipSelects = [];
+    this._memory = new Uint8Array(size);
+    this._memory.forEach((_, i) => this._memory[i] = Math.floor(Math.random() * 256)); // Simulate uninitialized memory with random data
+  }
+
+  public get chipSelects(): ChipSelect[] {
+    return this._chipSelects;
+  }
+
+  public get memory(): Uint8Array {
+    return this._memory;
   }
 
   public get minAddress(): number {
@@ -56,12 +63,15 @@ export class Device implements IAddressableStorage {
   }
 
   /**
-   * Creates a new Device instance from a JSON object.
+   * Hydrates a device object with data from a JSON object
    *
-   * @param json The JSON object containing the properties of the device. It must include the "proto" property with the value "Device".
+   * @param json The JSON object containing the properties of the device
    */
-  public static fromJSON(json: any): Device {
-    return new Device(json.name, json.min_address, json.max_address);
+  protected hydrate(json) {
+    this.name = json.name;
+    this._minAddress = json.minAddress;
+    this._maxAddress = json.maxAddress;
+    this._chipSelects = json.chipSelects.map((cs: any) => ChipSelect.fromJSON(cs));
   }
 
   /**
@@ -98,7 +108,7 @@ export class Device implements IAddressableStorage {
     if (existingChipSelect) {
       existingChipSelect.address = chipSelect.address;
     } else {
-      this.chipSelects.push(chipSelect);
+      this._chipSelects.push(chipSelect);
     }
 
     if (typeof value === 'boolean') {
@@ -120,9 +130,9 @@ export class Device implements IAddressableStorage {
    */
   public getChipSelect(value: string | number): ChipSelect | undefined {
     if (typeof value === 'number') {
-      return this.chipSelects.find(el => el.address === value);
+      return this._chipSelects.find(el => el.address === value);
     }
-    return this.chipSelects.find(el => el.id === value);
+    return this._chipSelects.find(el => el.id === value);
   }
 
   /**
@@ -145,7 +155,7 @@ export class Device implements IAddressableStorage {
       throw new Error('Memory out of bound at address: ' + address);
     }
 
-    return this.memory[address - (this._minAddress)];
+    return this._memory[address - (this._minAddress)];
   }
 
   /**
@@ -157,7 +167,7 @@ export class Device implements IAddressableStorage {
       throw new Error('Memory out of bound at address: ' + address);
     }
 
-    this.memory[address - (this._minAddress)] = byte;
+    this._memory[address - (this._minAddress)] = byte;
   }
 
   /**
@@ -167,8 +177,9 @@ export class Device implements IAddressableStorage {
     return {
       proto: this.constructor.name,
       name: this.name,
-      min_address: this.minAddress,
-      max_address: this.maxAddress
+      minAddress: this._minAddress,
+      maxAddress: this._maxAddress,
+      chipSelects: this._chipSelects.map(cs => cs.toJSON()),
     };
   }
 
@@ -181,7 +192,7 @@ export class Device implements IAddressableStorage {
    * @param lastMax The previous maximum address before the update. This is used to calculate how much to shift the chip select addresses.
    */
   private updateChipSelectMax(lastMax: number) {
-    this.chipSelects.forEach(el => {
+    this._chipSelects.forEach(el => {
       if (el.address > this.maxAddress) {
         el.address = this._minAddress - (lastMax - el.address);
       }
@@ -197,7 +208,7 @@ export class Device implements IAddressableStorage {
    * @param lastMin The previous minimum address before the update. This is used to calculate how much to shift the chip select addresses.
    */
   private updateChipSelectMin(lastMin: number) {
-    this.chipSelects.forEach(el => {
+    this._chipSelects.forEach(el => {
       if (el.address < this.minAddress) {
         el.address = this._minAddress + (el.address - lastMin);
       }

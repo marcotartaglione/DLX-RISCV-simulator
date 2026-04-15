@@ -6,44 +6,18 @@ import {FFDLogicalNetwork} from './logicalNetworks/ffd-logical-network';
 import {Counter} from './counter';
 import {InputPort} from './input-port';
 import {Ram} from './ram';
+import {DeviceFactory} from './DeviceFactoryImpl';
 
 export class Memory {
   devices: Device[] = [];
   inputPorts: Device[] = [];
 
   constructor(struct?: string) {
-    if (struct) {
-      JSON.parse(struct).forEach((el) => {
-        switch (el.proto) {
-          case Eprom.name:
-            this.add(Eprom.fromJSON(el));
-            break;
-          case StartLogicalNetwork.name:
-            this.add(StartLogicalNetwork.fromJSON(el));
-            break;
+    if (!struct)
+      return;
 
-          case LedLogicalNetwork.name:
-            this.add(LedLogicalNetwork.fromJSON(el));
-            break;
-
-          case FFDLogicalNetwork.name:
-            this.add(FFDLogicalNetwork.fromJSON(el));
-            break;
-
-          case Counter.name:
-            this.add(Counter.fromJSON(el));
-            break;
-
-          case InputPort.name:
-            this.add(InputPort.fromJSON(el));
-            break;
-
-          case Ram.name:
-            this.add(Ram.fromJSON(el));
-            break;
-        }
-      });
-    }
+    const rawDevices: Device[] = JSON.parse(struct);
+    rawDevices.forEach(d => this.add(DeviceFactory.create(d)))
   }
 
   public firstFreeAddr(startAddr): number {

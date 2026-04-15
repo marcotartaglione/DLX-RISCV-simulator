@@ -1,12 +1,12 @@
 import {LogicalNetwork} from '../logical-network';
 import {ChipSelect} from '../ChipSelect';
 
+// TODO: rimuovere e lasciare solo LogicalNetwork?
 export class FFDLogicalNetwork extends LogicalNetwork {
   // ffd( name, d, a_res, a_set, clk)
   // mux( zero, one, sel)
   // tri( in, en )
   // bd0 = tri( ffd( start, mux( start.q, bd0, cs_write ), reset, null, memwr* ), cs_read )";
-
 
   constructor(
     chipSelectRead: number,
@@ -21,6 +21,16 @@ export class FFDLogicalNetwork extends LogicalNetwork {
     this.setChipSelect(ChipSelect.of('cs_set_ff', this.minAddress + 0x00000001), 1);
     this.setChipSelect(ChipSelect.of('cs_reset', this.minAddress + 0x00000002), 0);
     this.setChipSelect(ChipSelect.of('cs_set', this.minAddress + 0x00000003), 0);
+  }
+
+  public static fromJSON(json: any) {
+    const ffdLogicalNetwork = new FFDLogicalNetwork(json.minAddress, json.maxAddress);
+    ffdLogicalNetwork.hydrate(json);
+    return ffdLogicalNetwork;
+  }
+
+  protected hydrate(json) {
+    super.hydrate(json);
   }
 
   public load(address: number): number {
@@ -50,5 +60,10 @@ export class FFDLogicalNetwork extends LogicalNetwork {
           break;
       }
     }
+  }
+
+  public toJSON(): any {
+    const json = super.toJSON();
+    return json;
   }
 }

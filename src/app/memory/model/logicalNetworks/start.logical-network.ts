@@ -31,6 +31,17 @@ export class StartLogicalNetwork extends LogicalNetwork {
     return this._startup;
   }
 
+  public static fromJSON(json: any) {
+    const startLogicalNetwork = new StartLogicalNetwork(json.minAddress, json.maxAddress);
+    startLogicalNetwork.hydrate(json);
+    return startLogicalNetwork;
+  }
+
+  protected hydrate(json) {
+    super.hydrate(json);
+    this._startup = json.startUp;
+  }
+
   public asyncSet() {
     this._ffd = true;
     this._startup = this.ffd;
@@ -93,5 +104,11 @@ export class StartLogicalNetwork extends LogicalNetwork {
   public clk() {
     this._startup = this.ffd;
     super.store(this.chipSelects.find(el => el.id === 'CS_READ_STARTUP').address, this.ffd ? 1 : 0);
+  }
+
+  public toJSON(): any {
+    const json = super.toJSON();
+    json.startUp = this._startup;
+    return json;
   }
 }
