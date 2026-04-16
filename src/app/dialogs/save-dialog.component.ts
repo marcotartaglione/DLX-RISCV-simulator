@@ -33,6 +33,6 @@ export class SaveDialogComponent {
   ]);
 
   protected onSave() {
-    this._codeService.save(this.fileName());
+    this._codeService.saveInLocalStorage(this.fileName());
   }
 }

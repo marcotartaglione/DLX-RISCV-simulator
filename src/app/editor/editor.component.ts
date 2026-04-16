@@ -13,7 +13,6 @@ import {
   OnDestroy,
   output,
   signal,
-  untracked,
   viewChild
 } from '@angular/core';
 import {FormsModule, NgForm} from '@angular/forms';
@@ -95,14 +94,17 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   private _hostElement = viewChild<ElementRef>('hostElement');
   private _form = viewChild<NgForm>('form');
   private _codeMirror = signal<EditorFromTextArea | null>(null);
+  protected readonly isContinuousRunDisabled = computed(() =>
+    this._codeMirror() ? (this.addressToLine(this.pc()) >= this._codeMirror().lineCount()) : false
+  );
   private _isRunning = signal(false);
-
+  protected isStopDisabled = computed(() =>
+    !this._isRunning()
+  );
   private _formStatusChangeSub: Subscription;
   private _timeout: any;
   private _exRunnedInstruction = -1;
   private _runnedInstruction = -1;
-  private _keepRunning = false;
-
 
   constructor() {
     this.initEditorSettings();
@@ -114,18 +116,21 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
 
       this.updateVisuals(this._exRunnedInstruction, this._runnedInstruction, this.pc());
     });
+
+    effect(() => {
+      const newContent = this._codeService.content();
+      const editor = this._codeMirror();
+
+      if (editor && editor.getValue() !== newContent) {
+        editor.setValue(newContent);
+      }
+    });
   }
+
+  private _keepRunning = false;
 
   protected isRunDisabled = computed(() =>
     this._codeMirror() ? (this.addressToLine(this.pc()) >= this._codeMirror().lineCount()) || this._keepRunning : false
-  );
-
-  protected isStopDisabled = computed(() =>
-    !this._isRunning()
-  );
-
-  protected readonly isContinuousRunDisabled = computed(() =>
-    this._codeMirror() ? (this.addressToLine(this.pc()) >= this._codeMirror().lineCount()) : false
   );
 
   public get keepRunning() {
@@ -158,10 +163,10 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     const textArea = this._hostElement().nativeElement.querySelector('textarea');
 
     this._codeMirror.set(CodeMirror.fromTextArea(textArea, this.options));
-    this._codeMirror().setValue(this._codeService.content || '');
+    this._codeMirror().setValue(this._codeService.content() || '');
 
     this._codeMirror().on('change', (event) => {
-      this._codeService.content = event.getValue();
+      this._codeService.content.set(event.getValue());
       this._form()?.form.markAsDirty();
 
       if (this._isRunning()) {
@@ -228,7 +233,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
         }
       });
 
-      this._codeService.interpreter.parseTags(this._codeService.content, this.startTag());
+      this._codeService.interpreter.parseTags(this._codeService.content(), this.startTag());
       this.pc.set(this._codeService.interpreter.getTag('start_tag'));
       this._isRunning.set(true);
 
@@ -246,7 +251,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       this._diagramService.resume();
     }
     try {
-      const newPc = this._codeService.interpreter.run(
+      const newPc = this._codeService.interpreter.execute(
         this._codeMirror().getLine(this.addressToLine(this.pc())),
         this.registers(),
         this._memoryService.memory
@@ -294,7 +299,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     if (download) {
       this._dialog.open(SaveDialogComponent);
     } else {
-      this._codeService.save();
+      this._codeService.saveInLocalStorage();
     }
 
     this.storeCodeInEprom();
@@ -303,7 +308,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
 
   protected clear() {
     this._memoryService.removeFromMemory();
-    this._codeService.clear();
+    this._codeService.removeFromLocalStorage();
     this._memoryService.init();
     this._codeService.load();
     this.storeCodeInEprom();
@@ -324,7 +329,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   }
 
   private storeCodeInEprom() {
-    this._codeService.interpreter.parseTags(this._codeService.content, this.startTag());
+    this._codeService.interpreter.parseTags(this._codeService.content(), this.startTag());
     for (let i = 0; i < this._codeService.linesCount; i++) {
       this._memoryService.getEprom().store(i, this._codeService.encode(i));
     }
