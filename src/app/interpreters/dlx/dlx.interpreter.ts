@@ -4,33 +4,40 @@ import {DiagramService} from 'src/app/services/diagram.service';
 import {DLXRegisters} from '../../registers/dlx.registers';
 import {Registers} from '../../registers/registers';
 import {Interpreter} from '../interpreter';
-import {NotExistingInstructionError, WrongArgumentsError} from '../interpreter-errors';
+import {NotExistingInstructionError, RegisterNotFoundError, WrongArgumentsError} from '../interpreter-errors';
 import {encoder, inputs_encoder} from './dlx.encoder';
-import {instructions, InstructionType, signExtend, specialRegisters, uintToInt} from './dlx.instructions';
+import {
+  DLXInstructionType,
+  DLXStructuredInstruction,
+  InstructionConfig,
+  instructions,
+  signExtend,
+  specialRegisters,
+  uintToInt
+} from './dlx.instructions';
+
+// TODO: la gestione dei diagrammi non deve far parte dell'interprete
 
 export class DLXInterpreter extends Interpreter {
-
-  private tmpReg: any;
-
   private readonly process_instruction: {
-    [key in InstructionType]:
+    [key in DLXInstructionType]:
     (line: string, instruction: string, args: number[], func: (registers: DLXRegisters, args?: number[]) => number, registers: DLXRegisters, memory?: Memory, unsigned?: boolean, tagged?: boolean) => void
   } = {
-    R: (line, instruction, [rd, rs1, rs2], func, registers) => {
+    Register: (line, instruction, [destination, register1, register2], func, registers) => {
       if (!(/\w+\s+R[123]?\d\s*,\s*R[123]?\d\s*,\s*R[123]?\d/i.test(line))) {
         throw new WrongArgumentsError(instruction, DLXDocumentation);
       }
-      registers.a = registers.registersValue[rs1];
-      registers.temp = registers.b = registers.registersValue[rs2];
-      try {
-        func(registers);
-      } catch (e) {
-        this.handleOverflow(e, registers);
+
+      registers.a = registers.registersValue[register1];
+      registers.temp = registers.b = registers.registersValue[register2];
+      func(registers);
+
+
+      if (destination) {
+        registers.registersValue[destination] = registers.c;
+        registers.setBold(destination);
       }
-      if (rd) {
-        registers.registersValue[rd] = registers.c;
-        registers.setBold(rd);
-      }
+
       if (DiagramService.instance.isAuto()) {
         DiagramService.instance.addressVisible = false;
         if (!DiagramService.instance.dlxDiagrams.getDiagram('clock').isRunning) {
@@ -38,7 +45,8 @@ export class DLXInterpreter extends Interpreter {
         }
       }
     },
-    RM: (_line, _instruction, args, func, registers) => {
+
+    RegisterMove: (_line, _instruction, args, func, registers) => {
       func(registers, args);
       if (DiagramService.instance.isAuto()) {
         DiagramService.instance.addressVisible = false;
@@ -47,18 +55,16 @@ export class DLXInterpreter extends Interpreter {
         }
       }
     },
-    I: (line, instruction, [rd, rs1, immediate], func, registers, _memory, unsigned = false) => {
+
+    Immediate: (line, instruction, [rd, rs1, immediate], func, registers, _memory, unsigned = false) => {
       if (!(/\w+\s+R[123]?\d\s*,\s*R[123]?\d\s*,\s*0x([0-9A-F]{4})/i.test(line))) {
         throw new WrongArgumentsError(instruction, DLXDocumentation);
       }
       registers.a = registers.registersValue[rs1];
       registers.b = registers.registersValue[rd];
-      registers.temp = unsigned ? immediate : uintToInt(immediate, 16, 32);
-      try {
-        func(registers);
-      } catch (e) {
-        this.handleOverflow(e, registers);
-      }
+      registers.temp = unsigned ? immediate : uintToInt(immediate, 16);
+      func(registers);
+
       if (rd) {
         registers.registersValue[rd] = registers.c;
         registers.setBold(rd);
@@ -70,7 +76,8 @@ export class DLXInterpreter extends Interpreter {
         }
       }
     },
-    IB: (line, instruction, [rs1, name], func, registers, _memory, unsigned = false, tagged) => {
+
+    ImmediateBranch: (line, instruction, [rs1, name], func, registers, _memory, unsigned = false, tagged) => {
       if (!(/\w+\s+R[123]?\d\s*,\s*\w+/i.test(line))) {
         throw new WrongArgumentsError(instruction, DLXDocumentation);
       }
@@ -93,7 +100,7 @@ export class DLXInterpreter extends Interpreter {
         // converto in decimale con segno
         // dentro la uintToInt è già effettuata la conversione del segno
 
-        name = uintToInt(name, 16, 32);
+        name = uintToInt(name, 16);
         registers.temp = registers.pc + name;
         func(registers);
       }
@@ -104,7 +111,8 @@ export class DLXInterpreter extends Interpreter {
         }
       }
     },
-    IJ: (line, instruction, [rs1], func, registers) => {
+
+    ImmediateJump: (line, instruction, [rs1], func, registers) => {
       if (!(/\w+\s+R[123]?\d/i.test(line))) {
         throw new WrongArgumentsError(instruction, DLXDocumentation);
       }
@@ -117,7 +125,8 @@ export class DLXInterpreter extends Interpreter {
         }
       }
     },
-    IL: (line, instruction, [rd, offset, rs1], func, registers, memory) => {
+
+    ImmediateLoad: (line, instruction, [rd, offset, rs1], func, registers, memory) => {
       if (!(/\w+\s+R[123]?\d\s*,\s*0x([0-9A-F]{4})\s*\(\s*R[123]?\d\s*\)\s*/i.test(line))) {
         throw new WrongArgumentsError(instruction, DLXDocumentation);
       }
@@ -137,7 +146,8 @@ export class DLXInterpreter extends Interpreter {
         DiagramService.instance.load();
       }
     },
-    IS: (line, instruction, [rd, offset, rs1], func, registers, memory) => {
+
+    ImmediateStore: (line, instruction, [rd, offset, rs1], func, registers, memory) => {
       if (!(/\w+\s+R[123]?\d\s*,\s*0x([0-9A-F]{4})\s*\(\s*R[123]?\d\s*\)\s*/i.test(line))) {
         throw new WrongArgumentsError(instruction, DLXDocumentation);
       }
@@ -155,7 +165,8 @@ export class DLXInterpreter extends Interpreter {
         DiagramService.instance.store();
       }
     },
-    J: (line, instruction, [name], func, registers, _memory, unsigned = false, tagged) => {
+
+    Jump: (line, instruction, [name], func, registers, _memory, unsigned = false, tagged) => {
       if (!(/\w+\s+\w+/i.test(line))) {
         throw new WrongArgumentsError(instruction, DLXDocumentation);
       }
@@ -166,7 +177,7 @@ export class DLXInterpreter extends Interpreter {
         if (unsigned) {
           registers.temp = registers.pc + 4 + name;
         } else {
-          name = uintToInt(name, 26, 32);
+          name = uintToInt(name, 26);
           registers.temp = registers.pc + name;
         }
         func(registers);
@@ -178,7 +189,8 @@ export class DLXInterpreter extends Interpreter {
         }
       }
     },
-    LHI: (line, instruction, [rd, immediate], func, registers) => {
+
+    LoadHighImmediate: (line, instruction, [rd, immediate], func, registers) => {
       if (!(/\w+\s+R[123]?\d\s*,\s*0x([0-9A-F]{4})/i.test(line))) {
         throw new WrongArgumentsError(instruction, DLXDocumentation);
       }
@@ -195,7 +207,8 @@ export class DLXInterpreter extends Interpreter {
         }
       }
     },
-    NOP: () => {
+
+    NoOperation: () => {
       if (DiagramService.instance.isAuto()) {
         DiagramService.instance.addressVisible = false;
         if (!DiagramService.instance.dlxDiagrams.getDiagram('clock').isRunning) {
@@ -203,7 +216,8 @@ export class DLXInterpreter extends Interpreter {
         }
       }
     },
-    RFE: (_line, instruction, args, func, registers) => {
+
+    ReturnFromException: (_line, instruction, args, func, registers) => {
       if (args.length) {
         throw new WrongArgumentsError(instruction, DLXDocumentation);
       }
@@ -222,126 +236,166 @@ export class DLXInterpreter extends Interpreter {
     }
   };
 
-  // In caso di overflow si notifica l'errore di overflow
-  // Nella versione precedente ci si comportava come nel codice commentato.
-  // Io l'ho tolto perchè facendo come nel codice commentato quando avveniva un overflow
-  // non si capiva e sembrava che il codie impazzisse e tornasse ogni volta dal punto di partenza
-  // Lascio comunque la vecchia versione nel caso volesse essere ripristinata.
+  /**
+   * Executes the given line of DLX assembly code
+   *
+   * @param line Instruction line
+   * @param registers DLX registers
+   * @param memory System memory
+   * @throws NotExistingInstructionError If the instruction mnemonic is not recognized
+   * @return Next Program Counter value after executing the instruction
+   */
+  public override execute(line: string, registers: Registers, memory: Memory): number {
+    let [instructionName, argsFixed, lineFixed, tagged] = this.processLine(line);
+    let instructionConfig: InstructionConfig = instructions[instructionName];
 
-  public run(line: string, registers: Registers, memory: Memory): number {
-    let [instruction, argsFixed, lineFixed, tagged] = this.processLine(line);
-    let inst = instructions[instruction];
-    if (inst) {
-      let [opcode, alucode] = encoder[instruction];
-      (registers as DLXRegisters).ir = parseInt(opcode + inputs_encoder[inst.type](argsFixed) + alucode, 2); //otteniamo l'istruzione scritta in 32 bit
-      (registers as DLXRegisters).setBold(0);
-      (registers as DLXRegisters).resetRegistersBoldness();
-      this.process_instruction[inst.type](lineFixed, instruction, argsFixed, inst.func, registers as DLXRegisters, memory, inst.unsigned, tagged);
+    if (!instructionConfig) {
+      throw new NotExistingInstructionError(instructionName);
+    }
+
+    let [opcode, alucode] = encoder[instructionName];
+    (registers as DLXRegisters).ir = parseInt(opcode + inputs_encoder[instructionConfig.type](argsFixed) + alucode, 2); //otteniamo l'istruzione scritta in 32 bit
+    (registers as DLXRegisters).setBold(0);
+    (registers as DLXRegisters).resetRegistersBoldness();
+    this.process_instruction[instructionConfig.type](lineFixed, instructionName, argsFixed, instructionConfig.func, registers as DLXRegisters, memory, instructionConfig.unsigned, tagged);
+
+    if (instructionConfig.type === 'Jump') {
+      return registers.pc;
     }
 
     return registers.pc + 4;
   }
 
+  /**
+   * Encodes the given instruction string into its corresponding 32-bit binary representation
+   *
+   * @param line Instruction string
+   * @return Instruction 32-bit representation or 0 if the instruction is invalid
+   */
   public encode(line: string): number {
     try {
-      let [instruction, argsFixed] = this.processLine(line);
-      let inst = instructions[instruction];
-      let [opcode, alucode] = encoder[instruction];
-      //NB: inverto ordine dei bit dell'opcode da -sig->+sig a +sig->-sig ; come vengono salvati i valori convertiti in binario
-      return parseInt(this.revString(opcode) + inputs_encoder[inst.type](argsFixed) + alucode, 2);
+      let [instructionName, argsFixed] = this.processLine(line);
+      let instruction = instructions[instructionName];
+      let [opCode, aluCode] = encoder[instructionName];
+
+      //NB: inverto ordine dei bit dell'opCode da -sig->+sig a +sig->-sig ; come vengono salvati i valori convertiti in binario
+      return parseInt(this.reverseString(opCode) + inputs_encoder[instruction.type](argsFixed) + aluCode, 2);
     } catch (error) {
       return 0;
     }
   }
 
-  public interrupt(registers: Registers): number {
+  /**
+   * Handles interrupt requests for the DLX interpreter.
+   *
+   * @param registers - The DLX registers object to be modified
+   * @returns The program counter value before the interrupt jump
+   */
+  public override interrupt(registers: DLXRegisters): number {
+    if (!this.interruptEnabled) {
+      return registers.pc;
+    }
+
     const beforeJump = registers.pc;
 
-    if (this.interruptEnabled) {
-      (registers as DLXRegisters).iar = registers.pc;
-      (registers as DLXRegisters).setIarBold();
-      registers.pc = 0;
-      this.interruptEnabled = false;
-      (registers as DLXRegisters).ien = 1;
-      (registers as DLXRegisters).setIenBold();
-      DiagramService.instance.dlxDiagrams.ienUp();
-      // this.tmpReg = (registers as DLXRegisters).r;
-      // (registers as DLXRegisters).r = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    registers.iar = registers.pc;
+    registers.setIarBold();
+    registers.pc = 0;
+    registers.ien = 1;
+    registers.setIenBold();
 
-    }
+    this.interruptEnabled = false;
+
+    DiagramService.instance.dlxDiagrams.ienUp();
 
     return beforeJump;
   }
 
-  /*
-  Funzione di utilità utilizzata per invertire l'ordine dei bit nell'opcode.
-  */
-  public revString(str: string) {
+  /**
+   * Reverse the given string
+   *
+   * @param str String to revert
+   */
+  public reverseString(str: string) {
     return str.split('').reverse().join('');
   }
 
-  private handleOverflow(e: Error, registers: DLXRegisters) {
-    /*if (['overflow', 'fault'].includes(e.message)) {
-        this.interruptEnabled = false;
-        (registers as DLXRegisters).iar = registers.pc;
-        registers.pc = 0;
-    } else {*/
-    throw e;
-    //}
-  }
+  /**
+   * Parses a raw assembly line into a structured instruction format.
+   *
+   * @param line - The raw string from the source code to be processed.
+   * @throws {NotExistingInstructionError} If the instruction mnemonic is not recognized.
+   * @throws {WrongArgumentsError} If the operands provided do not match the expected format.
+   * @throws {RegisterNotFoundError} If a register operand is invalid or out of range.
+   * @throws {Error} If an immediate value exceeds its bit-width.
+   * @private
+   */
+  private processLine(line: string): DLXStructuredInstruction {
+    const commentIndex = line.indexOf(';');
+    const cleanLine = commentIndex !== -1 ? line.substring(0, commentIndex) : line;
 
-  private processLine(line: string): [string, number[], string, boolean] {
-    let tokens: string[];
-    let lineFixed: string;
+    const lineWithoutLabel = cleanLine.replace(/^(\w+:)?\s+/, '');
 
-    // La variabile tagged indica se nel caso delle istruzioni di branch e jump se si utilizza
-    // un tag. Nel caso di utilizzo di tag bisognerà fare un "salto" assoluto mentre nel caso di
-    // immediato sarà caricato nel pc il valore pc + 4 + immediato
-
-    let tagged: boolean = false;
-    if (!line || line.match(/^;/)) {
-      tokens = ['NOP'];
-    } else {
-      lineFixed = line.split(';')[0].replace(/^(\w+:)?\s+/, '');
-      tokens = lineFixed.split(/\W+/);
+    if (!lineWithoutLabel) {
+      return ['NOP', [], '', false];
     }
 
-    let [instruction, ...args] = tokens;
-    let argsFixed: number[] = [];
+    const tokens = lineWithoutLabel.split(/[\s, ()]+/).filter(token => token.length > 0);
+    const [instructionName, ...rawArgs] = tokens;
+    const instruction = instructionName.toUpperCase();
 
-    if (instructions[instruction]) {
-      argsFixed = args.map<number>(arg => {
-        if (arg.match(/^R[123]?\d/i)) {
-          return parseInt(arg.substr(1));
-        } else if (specialRegisters.includes(arg.toUpperCase())) {
-          return specialRegisters.indexOf(arg.toUpperCase()) + 1;
-        } else if (arg.match(/^0x([0-9A-F]{4})/i)) {
-          if (['J'].includes(instructions[instruction].type) && arg.length == 9) // nel caso di jump in cui ho immediato a 26 bit
-          {
-            return parseInt(arg.substring(2, 9), 16);
-          }// prendo 7 byte
-          else if (['J'].includes(instructions[instruction].type) && arg.length != 9) {
-            throw new Error(instruction + ' has 26 bit immediate');
-          } else if (arg.length == 6) {
-            return parseInt(arg.substr(2, 4), 16);
-          }// prendo 4 byte
-          else {
-            throw new Error(instruction + ' has 16 bit immediate');
-          }
-        } else if (this.tags[arg] >= 0) {
-          tagged = true;  // si utilizza un tag
-          return this.tags[arg];
-        } else if (arg) {
-          if (['IB', 'J'].includes(instructions[instruction].type)) {
-            throw new Error('the tag doesn\'t exist');
-          } else {
-            throw new WrongArgumentsError(instruction, DLXDocumentation);
-          }
-        }
-      });
-    } else if (instruction) {
+    const config: InstructionConfig = instructions[instruction];
+    if (!config) {
       throw new NotExistingInstructionError(instruction);
     }
-    return [instruction, argsFixed, lineFixed, tagged];
+
+    let reliesOnSymbolicTag: boolean = false;
+
+    const argsFixed = rawArgs.map(arg => {
+      if (/^R\d{1,2}$/i.test(arg)) {
+        const register = parseInt(arg.substring(1), 10);
+        if (register < 0 || register > 31) {
+          throw new RegisterNotFoundError(arg);
+        }
+
+        return register;
+      }
+
+      const specialIndex = specialRegisters.indexOf(arg.toUpperCase());
+      if (specialIndex !== -1) {
+        return specialIndex + 1;
+      }
+
+      if (arg.toLowerCase().startsWith('0x')) {
+        const hex = parseInt(arg.substring(2), 16);
+        if (isNaN(hex)) {
+          throw new Error('Invalid hexadecimal number: ' + arg);
+        }
+
+        if (config.type === 'Jump') {
+          if (hex > 0x3FFFFFF) {
+            throw new Error(instruction + ' has 26 bit immediate');
+          }
+        } else if (hex > 0xFFFF) {
+          throw new Error(instruction + ' has 16 bit immediate');
+        }
+
+        return hex;
+      }
+
+      if (this.tags[arg] !== undefined) {
+        reliesOnSymbolicTag = true;
+        return this.tags[arg];
+      }
+
+      const fallbackCheck: DLXInstructionType[] = ['ImmediateBranch', 'Jump'];
+      if (fallbackCheck.includes(config.type)) {
+        throw new Error(`Tag ${arg} not found for jump/branch`);
+      }
+
+      throw new WrongArgumentsError(instruction, DLXDocumentation);
+    });
+
+    return [instruction, argsFixed, lineWithoutLabel, reliesOnSymbolicTag];
   }
 }
