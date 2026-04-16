@@ -304,7 +304,7 @@ export class RV32Interpreter extends Interpreter {
     }
   }
 
-  run(line: string, registers: Registers, memory: Memory): number {
+  execute(line: string, registers: Registers, memory: Memory): number {
     let tokens: string[];
     let lineFixed: string;
 
@@ -372,7 +372,7 @@ export class RV32Interpreter extends Interpreter {
 
   encode(line: string): number {
     try {
-      this.run(line, this.tmpRegisters, this.myMem);
+      this.execute(line, this.tmpRegisters, this.myMem);
       this.tmpRegisters.instruction = this.tmpRegisters.opcode + this.tmpRegisters.rd + this.tmpRegisters.rs1 + this.tmpRegisters.rs2 + this.tmpRegisters.func3 + this.tmpRegisters.func7 + this.tmpRegisters.jumpOffset + +this.tmpRegisters.immediate;
       // console.log(this.tmpRegisters.instruction);
       return this.tmpRegisters.instruction;
