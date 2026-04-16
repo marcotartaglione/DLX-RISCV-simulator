@@ -78,17 +78,18 @@ export class Device {
    * Calculates the size of the device's memory
    */
   public size(unit: 'B' | 'KB' | 'MB' | 'GB'): number {
-    const size = this._maxAddress - this._minAddress + 1;
+    // Every memory element is 4 bytes
+    const size = (this._maxAddress - this._minAddress + 1) * 4;
 
     switch (unit) {
       case 'B':
-        return size / 4;
+        return size;
       case 'KB':
-        return size / 4 / 1024;
+        return size / 1024;
       case 'MB':
-        return size / 4 / 1024 / 1024;
+        return size / 1024 / 1024;
       case 'GB':
-        return size / 4 / 1024 / 1024 / 1024;
+        return size / 1024 / 1024 / 1024;
       default:
         throw new Error('Invalid unit for size: ' + unit);
     }
