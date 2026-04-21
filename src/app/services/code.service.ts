@@ -7,6 +7,11 @@ import {HttpClient} from '@angular/common/http';
 })
 export class CodeService {
 
+  public static STARTING_SCRIPT = {
+    dlx: ['fibonacci', 'array_sum'],
+    rv32i: {}
+  }
+
   public content = signal('');
   public interpreter: Interpreter;
   public editorMode: string;
@@ -16,15 +21,19 @@ export class CodeService {
     return this.content().split('\n').length;
   }
 
-  public load() {
-    this.content.set(window.localStorage.getItem(`code-${this.editorMode}`) || '');
+  public load(script?: string, forceDefault = false) {
+    const localCode = window.localStorage.getItem(`code-${this.editorMode}`);
 
-    if (this.content()) {
+    if (!forceDefault && localCode) {
+      this.content.set(localCode);
       return;
     }
 
     if (this.editorMode === 'dlx') {
-      this._httpClient.get("/assets/scripts/fibonacci.dlx", {responseType: 'text'}).subscribe(val => this.content.set(val));
+      const url = `/assets/scripts/${script}.${this.editorMode}`
+      this._httpClient.get(url, {responseType: 'text'}).subscribe({
+        next: (val) => this.content.set(val),
+      });
     }
   }
 

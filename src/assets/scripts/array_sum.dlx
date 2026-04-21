@@ -1,0 +1,33 @@
+init:       LHI R30, 0x4000				; set R30 = 0x40000000h
+			SW R29, 0x0000(R30)			; save R29 in 0x40000000h (RAM)
+			SW R28, 0x0004(R30)			; save R28 in 0x40000004h (RAM)
+			LHI R29, 0XC000				; set R29 = 0xC0000000h (STARTUP address)
+			LBU R28, 0x0000(R29)		; read STARTUP signal into R28
+			BEQZ R28, handler			; if STARTUP == 0 then jump to (interrupt) handler
+			SB R0, 0x0004(R29)			; set STARTUP = 0
+			J main						; jump to main:
+handler:	LHI R29, 0x3000				; set R29 = 0x30000000h (INPUT_PORT address)
+			LBU R28, 0x0004(R29)		; read interrupt INPUT_PORT signal into R28
+			BNEZ R28, input_port		; if INT_I != 0 then jump to (interrupt) input_port
+			LHI R29, 0x9000				; set R29 = 0x90000000h (LED address)
+			SB R0, 0x0004(R29)			; switch LED signal
+			LW R28, 0x0004(R30)			; restore R28 value from memory (RAM)
+			LW R29, 0x0000(R30)			; restore R29 value from memory (RAM)
+			RFE
+
+										; Array Sum
+main:		LHI R1, 0x1000				; set R0 = 0x10000000 (array start)
+			XOR R2, R2, R2				; set R1 = 0
+			XOR R3, R3, R3				; set R2 = 0
+      		XOR R5, R5, R5				; set R4 = 0
+      		ADDI R2, R2, 0x000A			; set R1 = 10 (array size)
+      		ADDI R5, R5, 0x0004			; (word = 0x0004; halfword = 0x0002; byte = 0x0001)
+loop:		LW R4, 0x0000(R1)			; load array value into R3
+			ADD R3, R3, R4				; add R3 to R2
+			SUBI R2, R2, 0x0001			; decrease R1 by 1
+			BEQZ R2, main				; jump to main if R1 == 0
+           	ADD R1, R1, R5				; next word/halfword/byte address
+			J loop
+
+input_port:	LBU R20, 0x0000(R29)		; read data from input_port (CS_INPUT_PORT address)
+			RFE
