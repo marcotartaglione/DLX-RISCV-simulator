@@ -9,7 +9,7 @@ export class CodeService {
 
   public static STARTING_SCRIPT = {
     dlx: ['fibonacci', 'array_sum'],
-    rv32i: {}
+    rv32i: []
   }
 
   public content = signal('');
