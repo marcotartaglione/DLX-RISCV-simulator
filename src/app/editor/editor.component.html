@@ -72,6 +72,17 @@
       <input matInput type="text" name="start" [(ngModel)]="startTag">
     </mat-form-field>
 
+    <mat-form-field class="input-label select">
+      <mat-label>Start script</mat-label>
+      <mat-select name="scriptSelector"
+                  [ngModel]="selectedScript()"
+                  (selectionChange)="selectedScriptChange($event.value)">
+        @for (script of CodeService.STARTING_SCRIPT[editorMode()]; track script) {
+          <mat-option [value]="script">{{ script.replace('_', ' ') }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
     <div style="clear:both"></div>
   </div>
 </form>

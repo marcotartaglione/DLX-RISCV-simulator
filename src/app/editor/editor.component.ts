@@ -34,6 +34,7 @@ import {MatButton} from '@angular/material/button';
 import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
 import {MatFormField, MatInput} from '@angular/material/input';
 import {MatLabel} from '@angular/material/form-field';
+import {MatOption, MatSelect} from '@angular/material/select';
 
 @Component({
   selector: 'app-editor',
@@ -71,7 +72,9 @@ import {MatLabel} from '@angular/material/form-field';
     MatMenuItem,
     MatInput,
     MatFormField,
-    MatLabel
+    MatLabel,
+    MatSelect,
+    MatOption
   ]
 })
 export class EditorComponent implements AfterViewInit, OnDestroy {
@@ -84,6 +87,8 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   protected startTag = signal('init');
   protected isInterruptDisabled = signal(true);
   protected intervalTime = signal(1000);
+  protected selectedScript = signal('');
+  protected editorMode = computed(() => this._codeService.editorMode);
 
   private _codeService = inject(CodeService);
   private _memoryService = inject(MemoryService);
@@ -123,6 +128,20 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
 
       if (editor && editor.getValue() !== newContent) {
         editor.setValue(newContent);
+      }
+    });
+
+    effect(() => {
+      const mode = this.editorMode();
+      const script = this.selectedScript();
+
+      if (!script && CodeService.STARTING_SCRIPT[mode]?.length > 0) {
+        this.selectedScript.set(CodeService.STARTING_SCRIPT[mode][0]);
+        return;
+      }
+
+      if (script) {
+        this._codeService.load(script);
       }
     });
   }
@@ -205,6 +224,11 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     if (this._timeout) {
       clearInterval(this._timeout);
     }
+  }
+
+  protected selectedScriptChange(value: string) {
+    this.selectedScript.set(value);
+    this._codeService.load(value, true)
   }
 
   protected run() {
@@ -377,4 +401,6 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       this._codeMirror().addLineClass(this.addressToLine(nextAddr), 'wrap', 'next');
     }
   }
+
+  protected readonly CodeService = CodeService;
 }
