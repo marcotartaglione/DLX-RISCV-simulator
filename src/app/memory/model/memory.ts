@@ -57,7 +57,7 @@ export class Memory {
     }
   }
 
-  public load(address: number, instrType?: string): number {
+  public load(address: number): number {
     const device = this.devices.find((dev) => dev.hasAddress(address));
     if (device) {
       let res = device.load(address);

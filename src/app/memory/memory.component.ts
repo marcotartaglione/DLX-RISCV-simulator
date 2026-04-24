@@ -1,5 +1,5 @@
 import {animate, style, transition, trigger} from '@angular/animations';
-import {Component, inject, input, signal, Type} from '@angular/core';
+import {Component, effect, inject, input, signal, Type, untracked} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {MessageDialogComponent} from '../dialogs/message-dialog.component';
 import {MemoryService} from '../services/memory.service';
@@ -30,6 +30,7 @@ import {MatInput} from '@angular/material/input';
 import {MatSelect} from '@angular/material/select';
 import {ChipSelect} from './model/ChipSelect';
 import {NgOptimizedImage} from '@angular/common';
+import {FormatBytePipe} from '../pipes/formatByte.pipe';
 
 @Component({
   selector: 'app-memory',
@@ -74,6 +75,17 @@ export class MemoryComponent {
   protected readonly inputAddr = signal<string>('');
   protected readonly selectedChipSelect = signal<ChipSelect>(null);
   protected readonly selectedDevice = signal<Device>(null);
+
+  constructor() {
+    effect(() => {
+      const device = this.selectedDevice();
+
+      if (!device)
+        return;
+
+      untracked(() => this.inputAddr.set(this.formatPipe.transform(device.minAddress, 'hex')));
+    });
+  }
 
   public get canSelectedMoveLeft(): boolean {
     const devices = this.memoryService.devices;
@@ -204,126 +216,22 @@ export class MemoryComponent {
     this.memoryService.storeInLocalStorage();
   }
 
-  readMemoryDetail(addr) {
+  protected memoryInspect(address: string) {
+    let startAddress = this.formatPipe.transform(address, 'hex');
 
-    let finalAddr;
-
-    // controllo che in input siano inseriti degli indirizzi in formato esadecimale che inizino per 0x altrimenti
-    // si aprirà una finestra d'errore
-
-    if ((!addr.startsWith('0x') && !addr.startsWith('0X')) || addr.length !== 10 || isNaN(addr)) {
-      this._dialog.open(ErrorDialogComponent, {
-        data: {message: 'Format Error : only hexadecimal value starting with 0x'}
-      });
-      return;
-    }
-
-    let iv = parseInt(addr, 16);
-    if (iv || iv === 0) {
-      // tslint:disable-next-line:no-bitwise
-      finalAddr = iv >>> 2;
-    }
-
-    // Cerco nella memoria quale Device è allocato all'indirizzo scelto dall'utente. Se a quell'indirizzo non è
-    // mappato alcun device si aprirà una finestra d'errore
-
-    const d = this.memoryService.devices.find(el => el.minAddress <= finalAddr && el.maxAddress >= finalAddr);
+    const d = this.memoryService.devices.find(el => el.hasAddress(startAddress));
     if (d == null) {
       this._dialog.open(ErrorDialogComponent, {
-        data: {message: 'No memory allocated in this range'}
+        data: {message: 'No memory available in this address'}
       });
       return;
     }
 
-    // per visualizzare sempre il codice a partire da multipli di 4, così da non avere disallineamento tra
-    // indirizzo e codifica
-
-    if (iv % 4 !== 0) {
-      iv = (Math.floor(iv / 4)) * 4;
-    }
-    let instr = d.load(finalAddr);
-
-    // se la memoria a quell'indirizzo non è ancora stata inizializzata , allora la load restituirà un valore undefined
-    // in tal caso visualizzerò un valore casuale scelto con la riga di codice seguente
-
-    if (instr === undefined) {
-      instr = Math.floor(Math.random() * 4294967296);
-    }
-    // if(isUndefined(instr)) instr= Math.floor(Math.random()*256); //Gabri 2^8 max
-    // tslint:disable-next-line:no-bitwise
-    const bin = (instr >>> 0).toString(2).padStart(32, '0');
-    const arrData = [];
-
-    // Spezzo il valore a 32 bit in gruppi da un byte e inserisco ciascun byte nell'array
-    // con il relativo indirizzo associato
-
-    for (let i = 0; i < 32; i += 8) {
-      arrData.push(
-        {
-          iv,
-          // tslint:disable-next-line:no-bitwise
-          instruction: (instr >>> 0).toString(16).padStart(8, '0').toUpperCase(),
-          value: bin.slice(24 - i, 32 - i), // riempio l'array dalla fine per visualizzare in formato Little Endian
-          address: iv + (i / 8),
-          // tslint:disable-next-line:no-bitwise
-          hexAddress: new FormatPipe().transform((iv + i / 8) << 2, 'hex')
-        });
-    }
-
-    // Rovescio l'array per visualizzare a partire dall'indirizzo più
-    // significativo a quello meno significativo
-
-    arrData.reverse();
-    this._dialog.open(InstructionDialogComponent, {
-      data: {values: arrData, service: this.memoryService},
-    });
-  }
-
-  // METODO INVOCATO CLICCANDO SU SHOW DETAIL CHE PERMETTE LA VISUALIZZAZIONE BYTE PER BYTE DEI VALORI IN MEMORIA
-
-  readMemoryAddressValues(addr) {
-    let finalAddr;
-    if ((!addr.startsWith('0x') && !addr.startsWith('0X')) || addr.length !== 10 || isNaN(addr)) {
-      this._dialog.open(ErrorDialogComponent, {
-        data: {message: 'Format Error : only hexadecimal value starting with 0x'}
-      });
-      return;
-    }
-    const iv = parseInt(addr, 16);
-    if (iv || iv === 0) {
-      // tslint:disable-next-line:no-bitwise
-      finalAddr = iv >>> 2; // è un numero a 32 bit sotto
-    }
-    const d = this.memoryService.devices.find(el => el.minAddress <= finalAddr && el.maxAddress >= finalAddr);
-    if (d == null) {
-      this._dialog.open(ErrorDialogComponent, {
-        data: {message: 'No memory allocated in this range'}
-      });
-      return;
-    }
-    const arrData = [];
-    for (let i = 0; i < 8; i++) {
-      let v = d.load(finalAddr + (i));
-      if (v === undefined) {
-        v = Math.floor(Math.random() * 4294967296);
-      }
-      // nel caso la cella di memoria non contenga alcun valore visualizzo un valore casuale
-      // (4294...=2^32 cioè il valore massimo rappresentabile con 32 bit) per simulare il fatto
-      // che le celle di memoria contengono valori casuali all'inizializzazione
-      arrData.push(
-        {
-          value: v,
-          address: finalAddr + (i),
-          hexAddress: new FormatPipe().transform(finalAddr + (i), 'hex')
-        });
-    }
-    // Rovescio l'array per visualizzare a partire dall'indirizzo più
-    // significativo a quello meno significativo
-    arrData.reverse();
+    // memory alignment
+    startAddress -= startAddress % 4;
     this._dialog.open(MemoryAddressDialogComponent, {
-      data: {values: arrData, service: this.memoryService},
+      data: {startAddress: startAddress, numWords: 4},
     });
-
   }
 
   protected isLogicalNetwork(dev: Device): dev is LogicalNetwork {
@@ -386,7 +294,7 @@ export class MemoryComponent {
   }
 
   protected isEprom(device: Device): device is Eprom {
-    return device instanceof LedLogicalNetwork;
+    return device instanceof Eprom;
   }
 
   protected isStartLogicalNetwork(device: Device): device is StartLogicalNetwork {

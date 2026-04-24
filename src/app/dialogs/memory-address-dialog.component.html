@@ -1,21 +1,41 @@
-<h1 mat-dialog-title style="width:900px">Memory values</h1>
-<mat-dialog-content width="600px">
-  <mat-grid-list cols="4" rowHeight="150px">
-    @for (el of data.values; track el) {
-      <mat-grid-tile>
-        <mat-card><h4>0x{{ el.hexAddress }}</h4>
-          <!-- TODO: controllare event.target.value         -->
-          <input (input)="onInputChange($event.target.value,el)" matInput maxlength="10"
-                 minlength="0" value="{{el.value | format:formatType}}"/>
+<h1 class="dialog-header" mat-dialog-title>Memory values</h1>
+
+<mat-dialog-content class="dialog-content">
+  <mat-grid-list [gutterSize]="'10px'" [cols]="4 / dataSizeBytes()" rowHeight="100px">
+    @for (el of viewData(); track el.address) {
+      <mat-grid-tile class="memory-card-container">
+        <mat-card class="memory-card">
+          <mat-card-header>
+            <mat-card-title class="card-title">{{ el.address | format: 'hex' }}</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-form-field class="full-width" subscriptSizing="dynamic">
+              <input (ngModelChange)="onInputChange($event, el)"
+                     [ngModel]="el.value | format: formatType() : (dataSizeBytes() * 8)"
+                     matInput/>
+            </mat-form-field>
+          </mat-card-content>
         </mat-card>
       </mat-grid-tile>
     }
   </mat-grid-list>
 </mat-dialog-content>
-<mat-button-toggle-group [(ngModel)]="formatType" id="fType" name="fType">
-  <mat-button-toggle style="width: 50%;margin:10px" value="hex">Hexadecimal</mat-button-toggle>
-  <mat-button-toggle style="width: 50%;margin:10px" value="dec">Decimal</mat-button-toggle>
-</mat-button-toggle-group>
-<mat-dialog-actions align="end">
-  <button (click)="onSubmit()" mat-button mat-dialog-close>Ok</button>
+
+<mat-dialog-actions align="end" class="dialog-footer">
+  <mat-button-toggle-group [(ngModel)]="formatType" name="fType">
+    <mat-button-toggle value="hex">Hex</mat-button-toggle>
+    <mat-button-toggle value="dec">Dec</mat-button-toggle>
+    <mat-button-toggle value="bin">Bin</mat-button-toggle>
+  </mat-button-toggle-group>
+
+  <mat-button-toggle-group [(ngModel)]="dataFormat" name="dSize">
+    <mat-button-toggle value="b">Byte</mat-button-toggle>
+    <mat-button-toggle value="hw">Halfword</mat-button-toggle>
+    <mat-button-toggle value="w">Word</mat-button-toggle>
+  </mat-button-toggle-group>
+
+  <div class="actions">
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button (click)="onSubmit()" mat-button color="primary">Done</button>
+  </div>
 </mat-dialog-actions>

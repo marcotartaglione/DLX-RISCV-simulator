@@ -65,18 +65,18 @@
   </button>
 
   @if (selectedDevice()) {
-    <div @showHideTrigger class="container">
-      <div class="group">
-        <button (click)="moveSelectedLeft()"
-                [disabled]="!canSelectedMoveLeft"
-                class="standard_margin_hor"
-                id="move-left"
-                mat-raised-button>
-          <i class="fas fa-caret-left"></i>
-        </button>
+    <div @showHideTrigger class="actions-container">
+      <button (click)="moveSelectedLeft()"
+              [disabled]="!canSelectedMoveLeft"
+              class="standard_margin_hor"
+              id="move-left"
+              mat-raised-button>
+        <i class="fas fa-caret-left"></i>
+      </button>
 
-        <mat-form-field appearance="fill" id="min">
-          <mat-label>Min</mat-label>
+      <div class="group">
+        <mat-form-field id="min" subscriptSizing="dynamic">
+          <mat-label>Address start</mat-label>
           <input (change)="onChange($event, 'min')"
                  (ngModelChange)="selectedDevice().minAddress = formatPipe.transform($event, 'dec')"
                  [disabled]="selectedDevice()!.name === 'EPROM'"
@@ -86,18 +86,18 @@
                  minlength="10"/>
         </mat-form-field>
 
-        <mat-form-field appearance="fill" class="standard_margin_hor" id="name">
-          <mat-label>Name</mat-label>
+        <mat-form-field appearance="fill" class="standard_margin_hor" id="name" subscriptSizing="dynamic">
+          <mat-label>Device name</mat-label>
           <input (change)="onChange($event, 'name')"
                  [(ngModel)]="selectedDevice().name"
                  [disabled]="selectedDevice().name === 'EPROM'"
-                 matInput/>
+                 matInput />
         </mat-form-field>
       </div>
 
-      @if (selectedDevice().chipSelects.length > 0) {
-        <div class="group">
-          <mat-form-field appearance="fill">
+      <div class="group">
+        @if (selectedDevice().chipSelects.length > 0) {
+          <mat-form-field appearance="fill" subscriptSizing="dynamic">
             <mat-label>Chip-Select</mat-label>
             <mat-select (selectionChange)="selectedChipSelect.set($event.value)" [value]="selectedChipSelect()">
               @for (el of selectedDevice().chipSelects; track el.id) {
@@ -109,9 +109,7 @@
           </mat-form-field>
 
           @if (selectedChipSelect() && selectedChipSelect().id.length > 0) {
-            <mat-form-field appearance="fill"
-                            class="standard_margin_hor"
-                            id="csAddr">
+            <mat-form-field appearance="fill" class="standard_margin_hor" id="csAddr" subscriptSizing="dynamic">
               <mat-label>address</mat-label>
               <input (change)="onChangeCS($any($event.target).value, selectedChipSelect().id)"
                      [value]="selectedChipSelect().address | format: 'hex'"
@@ -120,12 +118,10 @@
                      minlength="10"/>
             </mat-form-field>
           }
-        </div>
-      }
+        }
 
-      @if (isMemory(selectedDevice())) {
-        <div class="group">
-          <mat-form-field appearance="fill">
+        @if (isMemory(selectedDevice())) {
+          <mat-form-field appearance="fill" subscriptSizing="dynamic">
             <mat-label>Address Value</mat-label>
             <input (ngModelChange)="inputAddr.set($event)"
                    [ngModel]="inputAddr()"
@@ -136,23 +132,19 @@
                    maxlength="10" minlength="10"/>
           </mat-form-field>
 
-          <button [matMenuTriggerFor]="menuSearch"
-                  class="standard_margin_hor"
-                  mat-raised-button
-                  style="height:50px; position: relative; top: -10px;">
+          <button [matMenuTriggerFor]="menuSearch" class="detail standard_margin_hor" mat-raised-button>
             <i class="fas fa-search"></i>
           </button>
 
           <mat-menu #menuSearch="matMenu">
-            <button (click)="readMemoryAddressValues(inputAddr())" mat-menu-item>Show</button>
-            <button (click)="readMemoryDetail(inputAddr())" mat-menu-item>Show Detail</button>
+            <button (click)="memoryInspect(inputAddr())" mat-menu-item>Inspect</button>
           </mat-menu>
-        </div>
-      }
+        }
+      </div>
 
       <div class="group">
-        <mat-form-field appearance="fill" id="max">
-          <mat-label>Max</mat-label>
+        <mat-form-field appearance="fill" id="max" subscriptSizing="dynamic">
+          <mat-label>Address end</mat-label>
           <input (change)="onChange($event, 'max')"
                  (ngModelChange)="selectedDevice().maxAddress = formatPipe.transform($event, 'dec')"
                  [ngModel]="selectedDevice().maxAddress | format: 'hex'"
@@ -160,14 +152,14 @@
                  maxlength="10"
                  minlength="10"/>
         </mat-form-field>
-
-        <button (click)="moveSelectedRight()"
-                [disabled]="!canSelectedMoveRight"
-                id="move-right"
-                mat-raised-button>
-          <i class="fas fa-caret-right"></i>
-        </button>
       </div>
+
+      <button (click)="moveSelectedRight()"
+              [disabled]="!canSelectedMoveRight"
+              id="move-right"
+              mat-raised-button>
+        <i class="fas fa-caret-right"></i>
+      </button>
     </div>
 
     <button (click)="onDelete(selectedDevice())"
