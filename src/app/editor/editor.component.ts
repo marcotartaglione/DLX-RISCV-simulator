@@ -228,7 +228,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
 
   protected selectedScriptChange(value: string) {
     this.selectedScript.set(value);
-    this._codeService.load(value, true)
+    this._codeService.load(value)
   }
 
   protected run() {

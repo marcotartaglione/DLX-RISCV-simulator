@@ -6,10 +6,11 @@ import {HttpClient} from '@angular/common/http';
   providedIn: 'root'
 })
 export class CodeService {
+  public static SAVED_SCRIPT = 'storage';
 
   public static STARTING_SCRIPT = {
-    dlx: ['fibonacci', 'array_sum'],
-    rv32i: []
+    dlx: [CodeService.SAVED_SCRIPT, 'fibonacci', 'array_sum'],
+    rv32i: [CodeService.SAVED_SCRIPT]
   }
 
   public content = signal('');
@@ -21,10 +22,14 @@ export class CodeService {
     return this.content().split('\n').length;
   }
 
-  public load(script?: string, forceDefault = false) {
-    const localCode = window.localStorage.getItem(`code-${this.editorMode}`);
+  public load(script?: string) {
+    let localCode = window.localStorage.getItem(`code-${this.editorMode}`);
 
-    if (!forceDefault && localCode) {
+    if (script === CodeService.SAVED_SCRIPT || script === undefined) {
+      if (!localCode) {
+        localCode = '; No program saved in storage.';
+      }
+
       this.content.set(localCode);
       return;
     }
