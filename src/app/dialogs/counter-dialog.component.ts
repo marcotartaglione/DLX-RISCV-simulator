@@ -1,6 +1,6 @@
 import {Component, inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent} from '@angular/material/dialog';
-import {Counter} from '../memory/model/counter';
+import {Counter} from '../memory/model/logicalNetworks/counter';
 import {ErrorDialogComponent} from './error-dialog.component';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';

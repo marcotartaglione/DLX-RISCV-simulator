@@ -3,8 +3,8 @@ import {Eprom} from './eprom';
 import {StartLogicalNetwork} from './logicalNetworks/start.logical-network';
 import {LedLogicalNetwork} from './logicalNetworks/led.logical-network';
 import {FFDLogicalNetwork} from './logicalNetworks/ffd-logical-network';
-import {Counter} from './counter';
-import {InputPort} from './input-port';
+import {Counter} from './logicalNetworks/counter';
+import {InputPort} from './logicalNetworks/input-port';
 import {Ram} from './ram';
 import {DeviceFactory} from './DeviceFactoryImpl';
 
@@ -58,28 +58,26 @@ export class Memory {
   }
 
   public load(address: number): number {
+    const alignedAddress = (address & ~3) >>> 0;
     const device = this.devices.find((dev) => dev.hasAddress(address));
-    if (device) {
-      let res = device.load(address);
-      if (res === undefined) {
-        // Se non è stato ancora inizializzata quella cella di memoria la inizializzo con un valore
-        // casuale e salvo quel valore in quella cella di memoria
-        res = Math.floor(Math.random() * 4294967296);
-        device.store(address, res);
-      }
-      return res;
-    } else {
+
+    if (!device) {
       throw new Error('Device not found');
     }
+
+    return device.load(alignedAddress);
   }
 
   public store(address: number, word: number): number {
-    const device = this.devices.find((dev) => dev.hasAddress(address));
+    const alignedAddress = (address & ~3) >>> 0;
+    const device = this.findDevice(alignedAddress);
+
     if (device) {
-      device.store(address, word);
+      device.store(alignedAddress, word);
     } else {
       throw new Error('Device not found');
     }
+
     return word;
   }
 
@@ -98,5 +96,13 @@ export class Memory {
 
     result += String.fromCharCode(65 + num);
     return result;
+  }
+
+  private findDevice(address: number) {
+    return this.devices.find(dev => dev.hasAddress(address));
+  }
+
+  private checkOverlap(dev1: Device, dev2: Device): boolean {
+    return dev1.minAddress <= dev2.maxAddress && dev1.maxAddress >= dev2.minAddress;
   }
 }

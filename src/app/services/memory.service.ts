@@ -2,10 +2,10 @@ import {Injectable, Injector} from '@angular/core';
 import {Device} from '../memory/model/device';
 import {Eprom} from '../memory/model/eprom';
 import {LedLogicalNetwork} from '../memory/model/logicalNetworks/led.logical-network';
-import {Counter} from '../memory/model/counter';
+import {Counter} from '../memory/model/logicalNetworks/counter';
 import {Memory} from '../memory/model/memory';
 import {StartLogicalNetwork} from '../memory/model/logicalNetworks/start.logical-network';
-import {InputPort} from '../memory/model/input-port';
+import {InputPort} from '../memory/model/logicalNetworks/input-port';
 import {Ram} from '../memory/model/ram';
 import {FFDLogicalNetwork} from '../memory/model/logicalNetworks/ffd-logical-network';
 
@@ -34,13 +34,13 @@ export class MemoryService {
       this._memory = new Memory(storedMemory);
     } else {
       this._memory = new Memory();
-      this._memory.add(new Eprom(0x00000000, 0x07FFFFFF));
-      this._memory.add(new Ram(0x10000000, 0x1FFFFFFF));
-      this._memory.add(new StartLogicalNetwork(0x30000000, 0x30000003));
-      this._memory.add(new LedLogicalNetwork(0x24000000, 0x24000003));
-      this._memory.add(new Counter(0x29000000, 0x29000005));
-      this._memory.add(new Ram(0x38000000, 0x3FFFFFFF));
-      this._memory.add(new InputPort(0x0C000000, 0x0C000003));
+      this._memory.add(new Eprom(0x00000000, 0x1FFFFFFF));
+      this._memory.add(new InputPort(0x30000000, 0x3000000C));
+      this._memory.add(new Ram(0x40000000, 0x7FFFFFFF));
+      this._memory.add(new LedLogicalNetwork(0x90000000, 0x9000000C));
+      this._memory.add(new Counter(0xA4000000, 0xA4000014));
+      this._memory.add(new StartLogicalNetwork(0xC0000000, 0xC000000C));
+      this._memory.add(new Ram(0xE0000000, 0xFFFFFFFF));
     }
   }
 

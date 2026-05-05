@@ -1,13 +1,7 @@
 import {LogicalNetwork} from '../logical-network';
 import {ChipSelect} from '../ChipSelect';
 
-// TODO: rimuovere e lasciare solo LogicalNetwork?
 export class FFDLogicalNetwork extends LogicalNetwork {
-  // ffd( name, d, a_res, a_set, clk)
-  // mux( zero, one, sel)
-  // tri( in, en )
-  // bd0 = tri( ffd( start, mux( start.q, bd0, cs_write ), reset, null, memwr* ), cs_read )";
-
   constructor(
     chipSelectRead: number,
     chipSelectWrite: number,
@@ -34,31 +28,33 @@ export class FFDLogicalNetwork extends LogicalNetwork {
   }
 
   public load(address: number): number {
-    let res = 0;
     const cs = this.chipSelects.find(el => el.address === address);
+
     if (cs == null) {
-      res = super.load(address);
-    } else {
-      switch (cs.id) {
-        case 'cs_read_ff':
-          res = this.ffd ? 1 : 0;
-      }
+      return super.load(address);
     }
 
-    return res;
+    switch (cs.id) {
+      case 'cs_read_ff':
+        return this.positionValue(this.ffd ? 1 : 0, address);
+      default:
+        return 0;
+    }
   }
 
   public store(address: number, word: number): void {
     const cs = this.chipSelects.find(el => el.address === address);
+
     if (cs == null) {
       return super.store(address, word);
-    } else {
-      switch (cs.id) {
-        case 'cs_set_ff':
-          // tslint:disable-next-line:no-bitwise
-          this._ffd = (word & 0x1) === 0x1;
-          break;
-      }
+    }
+
+    const commandByte = this.extractByte(word, address);
+
+    switch (cs.id) {
+      case 'cs_set_ff':
+        this._ffd = (commandByte !== 0);
+        break;
     }
   }
 

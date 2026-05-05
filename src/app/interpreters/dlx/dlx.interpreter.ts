@@ -18,221 +18,188 @@ import {
 
 // TODO: la gestione dei diagrammi non deve far parte dell'interprete
 
+interface DLXInstructionContext {
+  line: string,
+  instruction: string,
+  args: number[],
+  registers: DLXRegisters,
+  memory?: Memory,
+  unsigned?: boolean,
+  tagged?: boolean,
+}
+
+type ALUOperation = (registers: DLXRegisters, args?: number[]) => number;
+type InstructionHandler = (ctx: DLXInstructionContext, op: ALUOperation) => void;
+
 export class DLXInterpreter extends Interpreter {
-  private readonly process_instruction: {
-    [key in DLXInstructionType]:
-    (line: string, instruction: string, args: number[], func: (registers: DLXRegisters, args?: number[]) => number, registers: DLXRegisters, memory?: Memory, unsigned?: boolean, tagged?: boolean) => void
-  } = {
-    Register: (line, instruction, [destination, register1, register2], func, registers) => {
-      if (!(/\w+\s+R[123]?\d\s*,\s*R[123]?\d\s*,\s*R[123]?\d/i.test(line))) {
-        throw new WrongArgumentsError(instruction, DLXDocumentation);
+  private readonly _processInstruction: Record<DLXInstructionType, InstructionHandler> = {
+
+    Register: (ctx, func) => {
+      const [destination, register1, register2] = ctx.args;
+      if (!(/\w+\s+R[123]?\d\s*,\s*R[123]?\d\s*,\s*R[123]?\d/i.test(ctx.line))) {
+        throw new WrongArgumentsError(ctx.instruction, DLXDocumentation);
       }
 
-      registers.a = registers.registersValue[register1];
-      registers.temp = registers.b = registers.registersValue[register2];
-      func(registers);
-
+      ctx.registers.a = ctx.registers.registersValue[register1];
+      ctx.registers.temp = ctx.registers.b = ctx.registers.registersValue[register2];
+      func(ctx.registers);
 
       if (destination) {
-        registers.registersValue[destination] = registers.c;
-        registers.setBold(destination);
+        ctx.registers.registersValue[destination] = ctx.registers.c;
+        ctx.registers.setBold(destination);
       }
 
-      if (DiagramService.instance.isAuto()) {
-        DiagramService.instance.addressVisible = false;
-        if (!DiagramService.instance.dlxDiagrams.getDiagram('clock').isRunning) {
-          DiagramService.instance.idle();
-        }
-      }
+      this.updateDiagramAuto();
     },
 
-    RegisterMove: (_line, _instruction, args, func, registers) => {
-      func(registers, args);
-      if (DiagramService.instance.isAuto()) {
-        DiagramService.instance.addressVisible = false;
-        if (!DiagramService.instance.dlxDiagrams.getDiagram('clock').isRunning) {
-          DiagramService.instance.idle();
-        }
-      }
+    RegisterMove: (ctx, func) => {
+      func(ctx.registers, ctx.args);
+      this.updateDiagramAuto();
     },
 
-    Immediate: (line, instruction, [rd, rs1, immediate], func, registers, _memory, unsigned = false) => {
-      if (!(/\w+\s+R[123]?\d\s*,\s*R[123]?\d\s*,\s*0x([0-9A-F]{4})/i.test(line))) {
-        throw new WrongArgumentsError(instruction, DLXDocumentation);
+    Immediate: (ctx, func) => {
+      const [rd, rs1, immediate] = ctx.args;
+      if (!(/\w+\s+R[123]?\d\s*,\s*R[123]?\d\s*,\s*0x([0-9A-F]{4})/i.test(ctx.line))) {
+        throw new WrongArgumentsError(ctx.instruction, DLXDocumentation);
       }
-      registers.a = registers.registersValue[rs1];
-      registers.b = registers.registersValue[rd];
-      registers.temp = unsigned ? immediate : uintToInt(immediate, 16);
-      func(registers);
+      ctx.registers.a = ctx.registers.registersValue[rs1];
+      ctx.registers.b = ctx.registers.registersValue[rd];
+      ctx.registers.temp = ctx.unsigned ? immediate : uintToInt(immediate, 16);
+      func(ctx.registers);
 
       if (rd) {
-        registers.registersValue[rd] = registers.c;
-        registers.setBold(rd);
+        ctx.registers.registersValue[rd] = ctx.registers.c;
+        ctx.registers.setBold(rd);
       }
-      if (DiagramService.instance.isAuto()) {
-        DiagramService.instance.addressVisible = false;
-        if (!DiagramService.instance.dlxDiagrams.getDiagram('clock').isRunning) {
-          DiagramService.instance.idle();
-        }
-      }
+      this.updateDiagramAuto();
     },
 
-    ImmediateBranch: (line, instruction, [rs1, name], func, registers, _memory, unsigned = false, tagged) => {
-      if (!(/\w+\s+R[123]?\d\s*,\s*\w+/i.test(line))) {
-        throw new WrongArgumentsError(instruction, DLXDocumentation);
+    ImmediateBranch: (ctx, func) => {
+      let [rs1, name] = ctx.args;
+      if (!(/\w+\s+R[123]?\d\s*,\s*\w+/i.test(ctx.line))) {
+        throw new WrongArgumentsError(ctx.instruction, DLXDocumentation);
       }
 
-      // Se nella branch si fa riferimento a un tag saltiamo direttamente a quello. Nel registro
-      // temp ci carico l'indirizzo del tag. Il valore di temp sarà poi caricare nel pc.
-
-      if (tagged === true) {
-        registers.a = registers.registersValue[rs1];
-        registers.temp = name;
-        func(registers);
-      } else
-
-        // Se invece al posto del tag c'è un immediato a 16 bit , nel pc dovrò caricare il valore
-        // pc + 4 + immediato 16 bit esteso con segno
-
-      {
-        registers.a = registers.registersValue[rs1];
-
-        // converto in decimale con segno
-        // dentro la uintToInt è già effettuata la conversione del segno
-
+      if (ctx.tagged === true) {
+        ctx.registers.a = ctx.registers.registersValue[rs1];
+        ctx.registers.temp = name;
+        func(ctx.registers);
+      } else {
+        ctx.registers.a = ctx.registers.registersValue[rs1];
         name = uintToInt(name, 16);
-        registers.temp = registers.pc + name;
-        func(registers);
+        ctx.registers.temp = ctx.registers.pc + name;
+        func(ctx.registers);
       }
-      if (DiagramService.instance.isAuto()) {
-        DiagramService.instance.addressVisible = false;
-        if (!DiagramService.instance.dlxDiagrams.getDiagram('clock').isRunning) {
-          DiagramService.instance.idle();
-        }
-      }
+
+      this.updateDiagramAuto();
     },
 
-    ImmediateJump: (line, instruction, [rs1], func, registers) => {
-      if (!(/\w+\s+R[123]?\d/i.test(line))) {
-        throw new WrongArgumentsError(instruction, DLXDocumentation);
+    ImmediateJump: (ctx, func) => {
+      const [rs1] = ctx.args;
+      if (!(/\w+\s+R[123]?\d/i.test(ctx.line))) {
+        throw new WrongArgumentsError(ctx.instruction, DLXDocumentation);
       }
-      registers.a = registers.registersValue[rs1];
-      func(registers);
-      if (DiagramService.instance.isAuto()) {
-        DiagramService.instance.addressVisible = false;
-        if (!DiagramService.instance.dlxDiagrams.getDiagram('clock').isRunning) {
-          DiagramService.instance.idle();
-        }
-      }
+      ctx.registers.a = ctx.registers.registersValue[rs1];
+      func(ctx.registers);
+      this.updateDiagramAuto();
     },
 
-    ImmediateLoad: (line, instruction, [rd, offset, rs1], func, registers, memory) => {
-      if (!(/\w+\s+R[123]?\d\s*,\s*0x([0-9A-F]{4})\s*\(\s*R[123]?\d\s*\)\s*/i.test(line))) {
-        throw new WrongArgumentsError(instruction, DLXDocumentation);
+    ImmediateLoad: (ctx, func) => {
+      const [rd, offset, rs1] = ctx.args;
+      if (!(/\w+\s+R[123]?\d\s*,\s*0x([0-9A-F]{4})\s*\(\s*R[123]?\d\s*\)\s*/i.test(ctx.line))) {
+        throw new WrongArgumentsError(ctx.instruction, DLXDocumentation);
       }
-      registers.a = registers.registersValue[rs1];
-      registers.b = registers.registersValue[rd];
-      registers.mar = signExtend(offset) + registers.a;
-      let rest = (registers.mar >>> 0) % 4;   //permette di capire da quale byte partiamo per l'accesso in memoria  es: FFFF0003 -> 3 byte (quello meno significativo)
-      let addr = Math.floor((registers.mar >>> 0) / 4) >>> 0;
-      registers.mdr = memory.load(addr, 'IL');
-      registers.temp = rest;
-      func(registers);
+      ctx.registers.a = ctx.registers.registersValue[rs1];
+      ctx.registers.b = ctx.registers.registersValue[rd];
+
+      ctx.registers.mar = signExtend(offset) + ctx.registers.a;
+
+      let rest = (ctx.registers.mar >>> 0) % 4;
+      let addr = (ctx.registers.mar >>> 0);
+
+      ctx.registers.mdr = ctx.memory!.load(addr - rest);
+      ctx.registers.temp = rest;
+
+      func(ctx.registers);
+
       if (rd) {
-        registers.registersValue[rd] = registers.c;
-        registers.setBold(rd);
+        ctx.registers.registersValue[rd] = ctx.registers.c;
+        ctx.registers.setBold(rd);
       }
+
       if (DiagramService.instance.isAuto()) {
         DiagramService.instance.load();
       }
     },
 
-    ImmediateStore: (line, instruction, [rd, offset, rs1], func, registers, memory) => {
-      if (!(/\w+\s+R[123]?\d\s*,\s*0x([0-9A-F]{4})\s*\(\s*R[123]?\d\s*\)\s*/i.test(line))) {
-        throw new WrongArgumentsError(instruction, DLXDocumentation);
+    ImmediateStore: (ctx, func) => {
+      const [rd, offset, rs1] = ctx.args;
+      if (!(/\w+\s+R[123]?\d\s*,\s*0x([0-9A-F]{4})\s*\(\s*R[123]?\d\s*\)\s*/i.test(ctx.line))) {
+        throw new WrongArgumentsError(ctx.instruction, DLXDocumentation);
       }
-      registers.a = registers.registersValue[rs1];
-      registers.mdr = registers.b = registers.registersValue[rd];
-      registers.mar = signExtend(offset) + registers.a;
-      registers.setMarBold();
-      registers.setMdrBold();
-      let rest = (registers.mar >>> 0) % 4;   //permette di capire a da quale byte partiamo per l'accesso in memoria  es: FFFF0003 -> 3 byte (quello meno significativo)
-      registers.temp = rest;
-      let addr = Math.floor((registers.mar >>> 0) / 4) >>> 0;
-      memory.store(addr, func(registers, [memory.load(addr, 'IS')]));
-      //se l'esecuzione è impostata su auto, l'animazione viene gestita dall'interprete
+      ctx.registers.a = ctx.registers.registersValue[rs1];
+      ctx.registers.mdr = ctx.registers.b = ctx.registers.registersValue[rd];
+      ctx.registers.mar = signExtend(offset) + ctx.registers.a;
+      ctx.registers.setMarBold();
+      ctx.registers.setMdrBold();
+      let rest = (ctx.registers.mar >>> 0) % 4;
+      ctx.registers.temp = rest;
+      let addr = (ctx.registers.mar >>> 0);
+      ctx.memory!.store(addr, func(ctx.registers, [ctx.memory!.load(addr)]));
+
       if (DiagramService.instance.isAuto()) {
         DiagramService.instance.store();
       }
     },
 
-    Jump: (line, instruction, [name], func, registers, _memory, unsigned = false, tagged) => {
-      if (!(/\w+\s+\w+/i.test(line))) {
-        throw new WrongArgumentsError(instruction, DLXDocumentation);
+    Jump: (ctx, func) => {
+      let [name] = ctx.args;
+      if (!(/\w+\s+\w+/i.test(ctx.line))) {
+        throw new WrongArgumentsError(ctx.instruction, DLXDocumentation);
       }
-      if (tagged === true) {
-        registers.temp = name;
-        func(registers);
+      if (ctx.tagged === true) {
+        ctx.registers.temp = name;
+        func(ctx.registers);
       } else {
-        if (unsigned) {
-          registers.temp = registers.pc + 4 + name;
+        if (ctx.unsigned) {
+          ctx.registers.temp = ctx.registers.pc + 4 + name;
         } else {
           name = uintToInt(name, 26);
-          registers.temp = registers.pc + name;
+          ctx.registers.temp = ctx.registers.pc + name;
         }
-        func(registers);
+        func(ctx.registers);
       }
-      if (DiagramService.instance.isAuto()) {
-        DiagramService.instance.addressVisible = false;
-        if (!DiagramService.instance.dlxDiagrams.getDiagram('clock').isRunning) {
-          DiagramService.instance.idle();
-        }
-      }
+      this.updateDiagramAuto();
     },
 
-    LoadHighImmediate: (line, instruction, [rd, immediate], func, registers) => {
-      if (!(/\w+\s+R[123]?\d\s*,\s*0x([0-9A-F]{4})/i.test(line))) {
-        throw new WrongArgumentsError(instruction, DLXDocumentation);
+    LoadHighImmediate: (ctx, func) => {
+      const [rd, immediate] = ctx.args;
+      if (!(/\w+\s+R[123]?\d\s*,\s*0x([0-9A-F]{4})/i.test(ctx.line))) {
+        throw new WrongArgumentsError(ctx.instruction, DLXDocumentation);
       }
-      registers.temp = immediate;
-      func(registers);
+      ctx.registers.temp = immediate;
+      func(ctx.registers);
       if (rd) {
-        registers.registersValue[rd] = registers.c;
-        registers.setBold(rd);
+        ctx.registers.registersValue[rd] = ctx.registers.c;
+        ctx.registers.setBold(rd);
       }
-      if (DiagramService.instance.isAuto()) {
-        DiagramService.instance.addressVisible = false;
-        if (!DiagramService.instance.dlxDiagrams.getDiagram('clock').isRunning) {
-          DiagramService.instance.idle();
-        }
-      }
+      this.updateDiagramAuto();
     },
 
-    NoOperation: () => {
-      if (DiagramService.instance.isAuto()) {
-        DiagramService.instance.addressVisible = false;
-        if (!DiagramService.instance.dlxDiagrams.getDiagram('clock').isRunning) {
-          DiagramService.instance.idle();
-        }
-      }
+    NoOperation: (_ctx) => {
+      this.updateDiagramAuto();
     },
 
-    ReturnFromException: (_line, instruction, args, func, registers) => {
-      if (args.length) {
-        throw new WrongArgumentsError(instruction, DLXDocumentation);
+    ReturnFromException: (ctx, func) => {
+      if (ctx.args.length) {
+        throw new WrongArgumentsError(ctx.instruction, DLXDocumentation);
       }
-      func(registers);
+      func(ctx.registers);
       this.interruptEnabled = true;
-      (registers as DLXRegisters).ien = 0;
-      (registers as DLXRegisters).resetIenBold();
+      ctx.registers.ien = 0;
+      ctx.registers.resetIenBold();
       DiagramService.instance.dlxDiagrams.ienDown();
-      if (DiagramService.instance.isAuto()) {
-        DiagramService.instance.addressVisible = false;
-        if (!DiagramService.instance.dlxDiagrams.getDiagram('clock').isRunning) {
-          DiagramService.instance.idle();
-        }
-      }
-      // registers.r = this.tmpReg;
+      this.updateDiagramAuto();
     }
   };
 
@@ -257,11 +224,18 @@ export class DLXInterpreter extends Interpreter {
     (registers as DLXRegisters).ir = parseInt(opcode + inputs_encoder[instructionConfig.type](argsFixed) + alucode, 2); //otteniamo l'istruzione scritta in 32 bit
     (registers as DLXRegisters).setBold(0);
     (registers as DLXRegisters).resetRegistersBoldness();
-    this.process_instruction[instructionConfig.type](lineFixed, instructionName, argsFixed, instructionConfig.func, registers as DLXRegisters, memory, instructionConfig.unsigned, tagged);
 
-    if (instructionConfig.type === 'Jump') {
-      return registers.pc;
-    }
+    const ctx: DLXInstructionContext = {
+      line: lineFixed,
+      instruction: instructionName,
+      args: argsFixed,
+      registers: registers as DLXRegisters,
+      memory: memory,
+      unsigned: instructionConfig.unsigned,
+      tagged: tagged
+    };
+
+    this._processInstruction[instructionConfig.type](ctx, instructionConfig.func);
 
     return registers.pc + 4;
   }
@@ -318,6 +292,15 @@ export class DLXInterpreter extends Interpreter {
    */
   public reverseString(str: string) {
     return str.split('').reverse().join('');
+  }
+
+  private updateDiagramAuto() {
+    if (DiagramService.instance.isAuto()) {
+      DiagramService.instance.addressVisible = false;
+      if (!DiagramService.instance.dlxDiagrams.getDiagram('clock').isRunning) {
+        DiagramService.instance.idle();
+      }
+    }
   }
 
   /**

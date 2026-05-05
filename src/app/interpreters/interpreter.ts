@@ -51,11 +51,11 @@ export abstract class Interpreter {
         let tag = /^(\w+):/.exec(line);
 
         if (tag) {
-          this.tags[tag[1]] = index * 4;
+          this.tags[tag[1]] = (index - 1) * 4;
         }
       });
 
-    this.tags['start_tag'] = this.tags[startTag];
+    this.tags['start_tag'] = this.tags[startTag] + 4;
   }
 
   /**

@@ -33,7 +33,7 @@ export class MemoryAddressDialogComponent {
   protected memoryValues: { address: number; value: number }[] = [];
 
   protected formatPipe = new FormatPipe();
-  protected dataFormat = signal<'b' | 'hw' | 'w'>('b');
+  protected dataFormat = signal<'b' | 'hw' | 'w'>('w');
   protected formatType = signal<'hex' | 'dec' | 'bin'>('hex');
 
   constructor() {
@@ -42,14 +42,24 @@ export class MemoryAddressDialogComponent {
 
   private loadMemory() {
     const start = this._config.startAddress;
-    const count = this._config.numWords ?? 16;
+    const numWords = this._config.numWords ?? 16;
+    this.memoryValues = [];
 
-    for (let i = 0; i < count * 4; i++) {
-      const addr = start + i;
-      this.memoryValues.push({
-        address: addr,
-        value: this._memoryService.memory.load(addr) ?? 0
-      });
+    for (let i = 0; i < numWords; i++) {
+      const wordAddr = start + (i * 4);
+      const word = this._memoryService.memory.load(wordAddr) ?? 0;
+
+      for (let j = 0; j < 4; j++) {
+        const byteAddr = wordAddr + j;
+
+        const shift = (3 - j) * 8;
+        const byteVal = (word >> shift) & 0xFF;
+
+        this.memoryValues.push({
+          address: byteAddr,
+          value: byteVal
+        });
+      }
     }
   }
 
@@ -76,7 +86,7 @@ export class MemoryAddressDialogComponent {
 
     for (let i = 0; i < size; i++) {
       const shift = (size - 1 - i) * 8;
-      const byteVal = (numericVal >> shift) & 0xFF;
+      const byteVal = (numericVal >>> shift) & 0xFF;
       const index = this.memoryValues.findIndex(x => x.address === el.address + i);
       if (index !== -1) {
         this.memoryValues[index].value = byteVal;
@@ -85,9 +95,20 @@ export class MemoryAddressDialogComponent {
   };
 
   protected onSubmit = () => {
-    this.memoryValues.forEach(el => {
-      this._memoryService.memory.store(el.address, el.value);
-    });
+    for (let i = 0; i < this.memoryValues.length; i += 4) {
+
+      const b0 = this.memoryValues[i].value;
+      const b1 = this.memoryValues[i + 1].value;
+      const b2 = this.memoryValues[i + 2].value;
+      const b3 = this.memoryValues[i + 3].value;
+
+      const word = ((b0 << 24) | (b1 << 16) | (b2 << 8) | b3) >>> 0;
+
+      const wordAddr = this.memoryValues[i].address;
+
+      this._memoryService.memory.store(wordAddr, word);
+    }
+
     this._dialogRef.close();
   };
 }
