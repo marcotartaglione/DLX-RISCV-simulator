@@ -5,29 +5,28 @@ import {ChipSelect} from './ChipSelect';
  */
 export class Device {
   private _chipSelects: ChipSelect[];
-  private _memory: Uint8Array;
+  private _memory: Uint32Array;
 
   protected constructor(
     public name: string,
     private _minAddress: number,
     private _maxAddress: number,
   ) {
-    const size = _maxAddress - _minAddress + 1;
+    let size = (_maxAddress - _minAddress + 1);
     if (size < 0) {
       throw new Error('Invalid address for device: ' + name);
     }
 
+    // Round up so ranges not divisible by 4 bytes still allocate the last word.
+    size = Math.ceil(size / 4);
+
     this._chipSelects = [];
-    this._memory = new Uint8Array(size);
-    this._memory.forEach((_, i) => this._memory[i] = Math.floor(Math.random() * 256)); // Simulate uninitialized memory with random data
+    this._memory = new Uint32Array(size);
+    this._memory.forEach((_, i) => this._memory[i] = Math.floor(Math.random() * 0x100000000)); // Simulate uninitialized memory with random data
   }
 
   public get chipSelects(): ChipSelect[] {
     return this._chipSelects;
-  }
-
-  public get memory(): Uint8Array {
-    return this._memory;
   }
 
   public get minAddress(): number {
@@ -78,8 +77,7 @@ export class Device {
    * Calculates the size of the device's memory
    */
   public size(unit: 'B' | 'KB' | 'MB' | 'GB'): number {
-    // Every memory element is 4 bytes
-    const size = (this._maxAddress - this._minAddress + 1) * 4;
+    const size = this._maxAddress - this._minAddress + 1;
 
     switch (unit) {
       case 'B':
@@ -146,7 +144,7 @@ export class Device {
   }
 
   /**
-   * Reads a byte from the device's memory at the specified address. If the address is out of bounds
+   * Reads a word from the device's memory at the specified address. If the address is out of bounds
    * (less than the minimum address or greater than the maximum address), it throws a MemoryOutOfBoundsError.
    *
    * @param address The memory address to read from. It must be within the range defined by the device's minimum and maximum addresses.
@@ -156,19 +154,21 @@ export class Device {
       throw new Error('Memory out of bound at address: ' + address);
     }
 
-    return this._memory[address - (this._minAddress)];
+    const index = Math.ceil((address - this._minAddress) / 4);
+    return this._memory[index];
   }
 
   /**
-   * Writes a byte to the device's memory at the specified address. If the address is out of bounds (less than the
+   * Writes a word to the device's memory at the specified address. If the address is out of bounds (less than the
    * minimum address or greater than the maximum address), it throws a MemoryOutOfBoundsError
    */
-  public store(address: number, byte: number): void {
+  public store(address: number, word: number): void {
     if (address < this.minAddress || address > this._maxAddress) {
       throw new Error('Memory out of bound at address: ' + address);
     }
 
-    this._memory[address - (this._minAddress)] = byte;
+    const index = Math.ceil((address - this._minAddress) / 4);
+    this._memory[index] = word;
   }
 
   /**

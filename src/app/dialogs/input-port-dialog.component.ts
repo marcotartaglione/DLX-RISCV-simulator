@@ -1,7 +1,7 @@
 import {Component, inject, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent} from '@angular/material/dialog';
 import {ErrorDialogComponent} from './error-dialog.component';
-import {InputPort, InputPortSizesArray} from '../memory/model/input-port';
+import {InputPort, InputPortSizesArray} from '../memory/model/logicalNetworks/input-port';
 import {NgOptimizedImage} from '@angular/common';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';

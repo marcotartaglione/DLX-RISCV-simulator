@@ -7,8 +7,6 @@ export class LedLogicalNetwork extends LogicalNetwork {
   // tri( in, en )
   // bd0 = tri( ffd( start, mux( start.q, bd0, cs_write ), reset, null, memwr* ), cs_read )";
 
-  private _led = false;
-
   constructor(
     minAddress: number,
     maxAddress: number,
@@ -27,6 +25,8 @@ export class LedLogicalNetwork extends LogicalNetwork {
     this.setChipSelect(ChipSelect.of('CS_A_SET_LED', this.minAddress + 0x00000003), 0);
   }
 
+  private _led = false;
+
   public get led(): boolean {
     return this._led;
   }
@@ -35,11 +35,6 @@ export class LedLogicalNetwork extends LogicalNetwork {
     const ledLogicalNetwork = new LedLogicalNetwork(json.minAddress, json.maxAddress);
     ledLogicalNetwork.hydrate(json);
     return ledLogicalNetwork;
-  }
-
-  protected hydrate(json) {
-    super.hydrate(json);
-    this._led = json.led;
   }
 
   public asyncSet() {
@@ -54,22 +49,20 @@ export class LedLogicalNetwork extends LogicalNetwork {
     this.setChipSelect(ChipSelect.of('CS_READ_LED', this.minAddress), this._led);
   }
 
-  public load(address: number, instrType?: string): number {
+  public load(address: number): number {
     const cs = this.chipSelects.find(el => el.address === address);
+
     if (this.clockType === 'MEMRD*') {
       this.clk();
     }
 
-    // se l'istruzione è del tipo IS ritorno il valore salvato in quella cella di memoria perchè significa
-    // che questa specifica store proviene da una load effettuata quando si esegue una store (dlx.interpreter.ts - line 103)
-    // quindi gli interessa solamente il valore salvato in memoria e non vuole impartire nessun comnando al led.
-    if (cs == null || instrType === 'IS') {
+    if (cs == null) {
       return super.load(address);
-    } else {
-      switch (cs.id) {
-        case 'CS_READ_LED':
-          return this._led ? 1 : 0;
-      }
+    }
+
+    switch (cs.id) {
+      case 'CS_READ_LED':
+        return this.positionValue(this._led ? 1 : 0, address);
     }
   }
 
@@ -77,25 +70,29 @@ export class LedLogicalNetwork extends LogicalNetwork {
     const cs = this.chipSelects.find(el => el.address === address);
     if (cs == null) {
       return super.store(address, word);
-    } else {
-      switch (cs.id) {
-        case 'CS_SWITCH_LED':
+    }
+    const commandByte = this.extractByte(word, address);
+    const isActive = commandByte !== 0;
+
+    switch (cs.id) {
+      case 'CS_SWITCH_LED':
+        if (isActive) {
           this._ffd = this.mux(this.ffd, !this.ffd, 1);
           if ('MEMWR*' === this.clockType) {
             this.clk();
           }
-          break;
-        case 'CS_A_SET_LED':
-          if (this.asyncSetSignal === 'CS_A_SET_LED') {
-            this.asyncSet();
-          }
-          break;
-        case 'CS_A_RES_LED':
-          if (this.asyncSetSignal === 'CS_A_RES_LED') {
-            this.asyncReset();
-          }
-          break;
-      }
+        }
+        break;
+      case 'CS_A_SET_LED':
+        if (this.asyncSetSignal === 'CS_A_SET_LED' && isActive) {
+          this.asyncSet();
+        }
+        break;
+      case 'CS_A_RES_LED':
+        if (this.asyncSetSignal === 'CS_A_RES_LED' && isActive) {
+          this.asyncReset();
+        }
+        break;
     }
   }
 
@@ -105,11 +102,16 @@ export class LedLogicalNetwork extends LogicalNetwork {
     if (CS_READ_LED != null) {
       super.store(CS_READ_LED.address, this._led ? 1 : 0);
     }
-  }
+  };
 
   public toJSON(): any {
     const json = super.toJSON();
     json.led = this._led;
     return json;
+  }
+
+  protected hydrate(json) {
+    super.hydrate(json);
+    this._led = json.led;
   }
 }

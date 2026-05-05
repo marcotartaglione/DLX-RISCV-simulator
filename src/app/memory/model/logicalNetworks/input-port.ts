@@ -1,5 +1,5 @@
-import {LogicalNetwork} from './logical-network';
-import {ChipSelect} from './ChipSelect';
+import {LogicalNetwork} from '../logical-network';
+import {ChipSelect} from '../ChipSelect';
 
 export const InputPortSizesArray = [8, 16, 32] as const;
 type InputPortSize = typeof InputPortSizesArray[number];
@@ -41,18 +41,6 @@ export class InputPort extends LogicalNetwork {
     return inputPort;
   }
 
-  protected hydrate(json) {
-    super.hydrate(json);
-    this._data = json.data;
-    this._dataSize = json.dataSize;
-    this._interrupt = json.interrupt;
-  }
-
-  private generateData() {
-    const max = Math.pow(2, this._dataSize);
-    this._data = Math.floor(Math.random() * max);
-  }
-
   public interrupt() {
     this._interrupt = true;
   }
@@ -60,15 +48,20 @@ export class InputPort extends LogicalNetwork {
   public load(address: number): number {
     const chipSelect = this.chipSelects.find((el) => el.address === address);
 
+    if (!chipSelect) {
+      return super.load(address);
+    }
+
     switch (chipSelect.id) {
       case 'CS_READ_INT_INPUT_PORT':
-        return this._interrupt ? 1 : 0;
+        return this.positionValue(this._interrupt ? 1 : 0, address);
+
       case 'CS_INPUT_PORT':
         if (this.clockType === 'MEMRD*') {
           this._interrupt = false;
           this.generateData();
           this.setChipSelect(ChipSelect.of('CS_INPUT_PORT', this.minAddress), this._data);
-          return this._data;
+          return this.positionValue(this._data, address);
         }
     }
 
@@ -83,5 +76,28 @@ export class InputPort extends LogicalNetwork {
     json.interrupt = this._interrupt;
 
     return json;
+  }
+
+  protected positionValue(value: number, address: number): number {
+    const offset = address % 4;
+    const shift = (3 - offset) * 8;
+
+    if (this._dataSize === 32) {
+      return value >>> 0;
+    }
+
+    return (value << shift) >>> 0;
+  }
+
+  protected hydrate(json) {
+    super.hydrate(json);
+    this._data = json.data;
+    this._dataSize = json.dataSize;
+    this._interrupt = json.interrupt;
+  }
+
+  private generateData() {
+    const max = Math.pow(2, this._dataSize);
+    this._data = Math.floor(Math.random() * max);
   }
 }

@@ -7,8 +7,6 @@ export class StartLogicalNetwork extends LogicalNetwork {
   // tri( in, en )
   // bd0 = tri( ffd( start, mux( start.q, bd0, cs_write ), reset, null, memwr* ), cs_read )";
 
-  private _startup = false;
-
   constructor(
     chipSelectRead: number,
     chipSelectWrite: number,
@@ -27,6 +25,8 @@ export class StartLogicalNetwork extends LogicalNetwork {
     this.setChipSelect(ChipSelect.of('CS_A_SET_STARTUP', this.minAddress + 0x00000003), 0);
   }
 
+  private _startup = false;
+
   public get startup(): boolean {
     return this._startup;
   }
@@ -35,11 +35,6 @@ export class StartLogicalNetwork extends LogicalNetwork {
     const startLogicalNetwork = new StartLogicalNetwork(json.minAddress, json.maxAddress);
     startLogicalNetwork.hydrate(json);
     return startLogicalNetwork;
-  }
-
-  protected hydrate(json) {
-    super.hydrate(json);
-    this._startup = json.startUp;
   }
 
   public asyncSet() {
@@ -54,21 +49,20 @@ export class StartLogicalNetwork extends LogicalNetwork {
     this.setChipSelect(ChipSelect.of('CS_READ_STARTUP', this.minAddress), this._startup);
   }
 
-  public load(address: number, instrType?: string): number {
+  public load(address: number): number {
     const cs = this.chipSelects.find(el => el.address === address);
     if (this.clockType === 'MEMRD*') {
       this.clk();
     }
 
-    // Metto il controllo instrType==IS per gli stessi motivi per cui lo metto in  led e counter.
-    // Vedere commenti nei rispettivi componenti.
-    if (cs == null || instrType === 'IS') {
+    if (cs == null) {
       return super.load(address);
-    } else {
-      switch (cs.id) {
-        case 'CS_READ_STARTUP':
-          return this.ffd ? 1 : 0;
-      }
+    }
+
+    switch (cs.id) {
+      case 'CS_READ_STARTUP':
+        // Big endian
+        return this.ffd ? 0x01000000 : 0;
     }
 
     return 0;
@@ -78,26 +72,29 @@ export class StartLogicalNetwork extends LogicalNetwork {
     const cs = this.chipSelects.find(el => el.address === address);
     if (cs == null) {
       return super.store(address, word);
-    } else {
-      switch (cs.id) {
-        case 'CS_WRITE_STARTUP':
-          // tslint:disable-next-line:no-bitwise
-          this._ffd = (word & 0x1) === 0x1;
-          if (this.clockType === 'MEMWR*') {
-            this.clk();
-          }
-          break;
-        case 'CS_A_SET_STARTUP':
-          if (this.asyncSetSignal === 'CS_A_SET_STARTUP') {
-            this.asyncSet();
-          }
-          break;
-        case 'CS_A_RES_STARTUP':
-          if (this.asyncSetSignal === 'CS_A_RES_STARTUP') {
-            this.asyncReset();
-          }
-          break;
-      }
+    }
+
+    const offset = cs.address % 4;
+    const shift = (3 - offset) * 8;
+    const commandByte = (word >>> shift) & 0xFF;
+
+    switch (cs.id) {
+      case 'CS_WRITE_STARTUP':
+        this._ffd = (commandByte !== 0);
+        if (this.clockType === 'MEMWR*') {
+          this.clk();
+        }
+        break;
+      case 'CS_A_SET_STARTUP':
+        if (this.asyncSetSignal === 'CS_A_SET_STARTUP') {
+          this.asyncSet();
+        }
+        break;
+      case 'CS_A_RES_STARTUP':
+        if (this.asyncSetSignal === 'CS_A_RES_STARTUP') {
+          this.asyncReset();
+        }
+        break;
     }
   }
 
@@ -110,5 +107,10 @@ export class StartLogicalNetwork extends LogicalNetwork {
     const json = super.toJSON();
     json.startUp = this._startup;
     return json;
+  }
+
+  protected hydrate(json) {
+    super.hydrate(json);
+    this._startup = json.startUp;
   }
 }

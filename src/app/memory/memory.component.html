@@ -22,7 +22,7 @@
         <img (click)="selectedDevice() === device ? selectedDevice.set(null) : selectedDevice.set(device)"
              [class.selected]="selectedDevice() === device"
              [matTooltip]="device.name + (isLogicalNetwork(device) ? ' ' + (device.ffd ? '1' : '0') : '')"
-             [style.left]="((device.minAddress / 1073741824) * 100 - 3.5).toFixed(2) + '%'"
+             [style.left]="((device.minAddress / 4294967295) * 100 - 3.5).toFixed(2) + '%'"
              alt="device icon"
              class="icon_absolute"
              matTooltipClass="device-size"
@@ -32,7 +32,7 @@
 
         @if (isLogicalNetwork(device)) {
           <div [matTooltip]="device.name + ' ' + (device.ffd ? '1' : '0')"
-               [style.left]="((device.minAddress / 1073741824) * 100).toFixed(2)+'%'"
+               [style.left]="((device.minAddress / 4294967295) * 100).toFixed(2)+'%'"
                class="ln"
                matTooltipClass="device-size"
                matTooltipPosition="above">
@@ -42,8 +42,8 @@
         <div (click)="selectedDevice() === device ? selectedDevice.set(null) : selectedDevice.set(device)"
              [class.selected]="selectedDevice() == device"
              [matTooltip]="device.size('MB') + 'MB'"
-             [style.left]="((device.minAddress/1073741824) * 100).toFixed(2)+'%'"
-             [style.right]="(100 - (device.maxAddress/1073741824) * 100).toFixed(2)+'%'" class="dev"
+             [style.left]="((device.minAddress/4294967295) * 100).toFixed(2)+'%'"
+             [style.right]="(100 - (device.maxAddress/4294967295) * 100).toFixed(2)+'%'" class="dev"
              matRipple
              matTooltipClass="device-size"
              matTooltipPosition="above">

@@ -54,22 +54,26 @@ const maskMap = {byte: 0xFF, halfword: 0xFFFF, word: 0xFFFFFFFF};
 
 /**
  * Extracts a specific data segment (byte, halfword, or word) from a 32-bit value
- * based on the provided offset and dimension.
+ * based on the provided offset and dimension. Data is considered Big Endian
  *
  * @param value The 32-bit source word to read from.
  * @param offset The memory offset used to determine the byte position within the word.
  * @param dim The size of the data to load ('byte', 'halfword', or 'word').
  */
 function load(value: number, offset: number, dim: DLXDataSizeName) {
-  const byteOffset = offset % 4;
-
-  if ((dim === 'word' && byteOffset !== 0) || (dim === 'halfword' && byteOffset % 2 !== 0)) {
+  const alignment = (dim === 'word') ? 4 : (dim === 'halfword') ? 2 : 1;
+  if (offset % alignment !== 0) {
     throw new Error('alignment fault');
   }
 
-  const shift = byteOffset * 8;
-  const mask = maskMap[dim]; // Note: Ensure your local variable uses 'dim' as the key
+  let shift = 0;
+  if (dim === 'byte') {
+    shift = (3 - (offset % 4)) * 8;
+  } else if (dim === 'halfword') {
+    shift = (2 - (offset % 4)) * 8;
+  }
 
+  const mask = maskMap[dim];
   return ((value >> shift) & mask) >>> 0;
 }
 
@@ -141,7 +145,11 @@ export type DLXInstruction =
   'RFE' |
   'TRAP';
 
-export type InstructionConfig = { type: DLXInstructionType, func: (registers: DLXRegisters, args?: number[]) => number, unsigned?: boolean };
+export type InstructionConfig = {
+  type: DLXInstructionType,
+  func: (registers: DLXRegisters, args?: number[]) => number,
+  unsigned?: boolean
+};
 
 /**
  * Represents the structured data of a parsed DLX assembly instruction.
@@ -166,7 +174,7 @@ export const instructions: {
   },
   ADDU: {
     type: 'Register',
-    func: (registers) => registers.c = registers.a + registers.temp
+    func: (registers) => instructions['ADDUI'].func(registers)
   },
   ADDUI: {
     type: 'Immediate',
@@ -175,7 +183,7 @@ export const instructions: {
   },
   AND: {
     type: 'Register',
-    func: (registers) => registers.c = registers.a & registers.temp
+    func: (registers) => instructions['ANDI'].func(registers)
   },
   ANDI: {
     type: 'Immediate',
@@ -197,13 +205,13 @@ export const instructions: {
   JAL: {
     type: 'Jump',
     func: (registers) => {
-      registers.registersValue[31] = registers.c = registers.pc + 4;
+      registers.registersValue[31] = registers.c = registers.pc;
       return registers.pc = registers.temp;
     }
   },
   JALR: {
     type: 'ImmediateJump', func: (registers) => {
-      registers.registersValue[31] = registers.c = registers.pc + 4;
+      registers.registersValue[31] = registers.c = registers.pc;
       return registers.pc = registers.a;
     }
   },
@@ -253,7 +261,8 @@ export const instructions: {
   },
   ORI: {
     type: 'Immediate',
-    func: (registers) => registers.c = registers.a | registers.temp, unsigned: true
+    func: (registers) => registers.c = registers.a | registers.temp,
+    unsigned: true
   },
   RFE: {
     type: 'ReturnFromException',
@@ -265,7 +274,7 @@ export const instructions: {
   },
   SEQ: {
     type: 'Register',
-    func: (registers) => registers.c = registers.a == registers.temp ? 1 : 0
+    func: (registers) => instructions['SEQI'].func(registers)
   },
   SEQI: {
     type: 'Immediate',
@@ -273,7 +282,7 @@ export const instructions: {
   },
   SGE: {
     type: 'Register',
-    func: (registers) => registers.c = registers.a >= registers.temp ? 1 : 0
+    func: (registers) => instructions['SGEI'].func(registers)
   },
   SGEI: {
     type: 'Immediate',
@@ -281,7 +290,7 @@ export const instructions: {
   },
   SGT: {
     type: 'Register',
-    func: (registers) => registers.c = registers.a > registers.temp ? 1 : 0
+    func: (registers) => instructions['SGT'].func(registers)
   },
   SGTI: {
     type: 'Immediate',
@@ -293,7 +302,7 @@ export const instructions: {
   },
   SLE: {
     type: 'Register',
-    func: (registers) => registers.c = registers.a <= registers.temp ? 1 : 0
+    func: (registers) => instructions['SLEI'].func(registers)
   },
   SLEI: {
     type: 'Immediate',
@@ -301,7 +310,7 @@ export const instructions: {
   },
   SLL: {
     type: 'Register',
-    func: (registers) => registers.c = registers.a << (registers.temp & 0x1F)
+    func: (registers) => instructions['SLLI'].func(registers)
   },
   SLLI: {
     type: 'Immediate',
@@ -309,7 +318,7 @@ export const instructions: {
   },
   SLT: {
     type: 'Register',
-    func: (registers) => registers.c = registers.a < registers.temp ? 1 : 0
+    func: (registers) => instructions['SLT'].func(registers)
   },
   SLTI: {
     type: 'Immediate',
@@ -317,7 +326,7 @@ export const instructions: {
   },
   SNE: {
     type: 'Register',
-    func: (registers) => registers.c = registers.a != registers.temp ? 1 : 0
+    func: (registers) => instructions['SNEI'].func(registers)
   },
   SNEI: {
     type: 'Immediate',
@@ -325,7 +334,7 @@ export const instructions: {
   },
   SRA: {
     type: 'Register',
-    func: (registers) => registers.c = registers.a >> (registers.temp & 0x1F)
+    func: (registers) => instructions['SRAI'].func(registers)
   },
   SRAI: {
     type: 'Immediate',
@@ -333,7 +342,7 @@ export const instructions: {
   },
   SRL: {
     type: 'Register',
-    func: (registers) => registers.c = registers.a >>> (registers.temp & 0x1F)
+    func: (registers) => instructions['SRLI'].func(registers)
   },
   SRLI: {
     type: 'Immediate',
@@ -341,7 +350,7 @@ export const instructions: {
   },
   SUB: {
     type: 'Register',
-    func: (registers) => overflowCheck(instructions['SUBUI'].func(registers), true)
+    func: (registers) => instructions['SUBI'].func(registers)
   },
   SUBI: {
     type: 'Immediate',
@@ -353,7 +362,8 @@ export const instructions: {
   },
   SUBUI: {
     type: 'Immediate',
-    func: (registers) => registers.c = registers.a - registers.temp, unsigned: true
+    func: (registers) => registers.c = registers.a - registers.temp,
+    unsigned: true
   },
   SW: {
     type: 'ImmediateStore',
@@ -367,7 +377,7 @@ export const instructions: {
   },
   XOR: {
     type: 'Register',
-    func: (registers) => registers.c = registers.a ^ registers.temp
+    func: (registers) => instructions['XORI'].func(registers)
   },
   XORI: {
     type: 'Immediate',

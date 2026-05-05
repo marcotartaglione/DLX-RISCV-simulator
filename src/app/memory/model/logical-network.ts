@@ -6,8 +6,6 @@ import {IVisualizable} from './IVisualizable';
  * Represents a hardware network with TRI-STATE buffers and Flip-Flops (FFD).
  */
 export class LogicalNetwork extends Device implements IVisualizable {
-  public _ffd = false;
-
   protected constructor(
     name: string,
     minAddress: number,
@@ -19,6 +17,8 @@ export class LogicalNetwork extends Device implements IVisualizable {
   ) {
     super(name, minAddress, maxAddress);
   }
+
+  public _ffd = false;
 
   public get ffd(): boolean {
     return this._ffd;
@@ -39,18 +39,6 @@ export class LogicalNetwork extends Device implements IVisualizable {
 
     return logicalNetwork;
   }
-
-  protected hydrate(json) {
-    super.hydrate(json);
-    this.asyncSetSignal = json.asyncSetSignal;
-    this.asyncResetSignal = json.asyncResetSignal;
-    this.imagePath = json.imagePath;
-    this.clockType = json.clockType;
-    this._ffd = json.ffd;
-  }
-
-  protected mux = (zero: any, one: any, sel: number) => sel === 0 ? zero : one;
-  protected tri = (input: any, en: any) => input && en;
 
   public asyncSet() {
     this._ffd = true;
@@ -78,5 +66,30 @@ export class LogicalNetwork extends Device implements IVisualizable {
     json.ffd = this._ffd;
 
     return json;
+  }
+
+  protected hydrate(json) {
+    super.hydrate(json);
+    this.asyncSetSignal = json.asyncSetSignal;
+    this.asyncResetSignal = json.asyncResetSignal;
+    this.imagePath = json.imagePath;
+    this.clockType = json.clockType;
+    this._ffd = json.ffd;
+  }
+
+  protected mux = (zero: any, one: any, sel: number) => sel === 0 ? zero : one;
+
+  protected tri = (input: any, en: any) => input && en;
+
+  protected extractByte(word: number, address: number): number {
+    const offset = address % 4;
+    const shift = (3 - offset) * 8;
+    return (word >>> shift) & 0xFF;
+  }
+
+  protected positionValue(value: number, address: number): number {
+    const offset = address % 4;
+    const shift = (3 - offset) * 8;
+    return (value << shift) >>> 0;
   }
 }
