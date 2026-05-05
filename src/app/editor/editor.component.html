@@ -42,12 +42,14 @@
     </div>
 
     <button mat-raised-button class="mr"
+            [matTooltip]="'F8'"
             (click)="executeNextInstruction()"
             [disabled]="isRunDisabled()">
       <span class="btn">Step <i class="fas fa-step-forward fa-lg green"></i></span>
     </button>
 
     <button mat-raised-button class="mr"
+            [matTooltip]="'F9'"
             (click)="keepRunning ? pause() : run()"
             [disabled]="isContinuousRunDisabled()">
       @if (!keepRunning) {
@@ -63,7 +65,10 @@
       <input matInput type="number" name="interval" [(ngModel)]="intervalTime" min="1">
     </mat-form-field>
 
-    <button mat-raised-button class="mr" (click)="stop()" [disabled]="isStopDisabled()">
+    <button mat-raised-button class="mr"
+            [matTooltip]="'F10'"
+            (click)="stop()"
+            [disabled]="isStopDisabled()" >
       <span class="btn">Stop <i class="fas fa-square red"></i></span>
     </button>
 
