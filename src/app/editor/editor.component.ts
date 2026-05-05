@@ -35,6 +35,7 @@ import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
 import {MatFormField, MatInput} from '@angular/material/input';
 import {MatLabel} from '@angular/material/form-field';
 import {MatOption, MatSelect} from '@angular/material/select';
+import {MatTooltip} from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-editor',
@@ -74,7 +75,8 @@ import {MatOption, MatSelect} from '@angular/material/select';
     MatFormField,
     MatLabel,
     MatSelect,
-    MatOption
+    MatOption,
+    MatTooltip
   ]
 })
 export class EditorComponent implements AfterViewInit, OnDestroy {
@@ -209,6 +211,28 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   unloadNotification($event: any) {
     if (this._form()?.dirty) {
       $event.returnValue = true;
+    }
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  handleKeyDown(event: KeyboardEvent) {
+    switch (event.key) {
+      case 'F8':
+        event.preventDefault();
+        if (!this.isRunDisabled()) {
+          this.executeNextInstruction();
+        }
+        break;
+      case 'F9':
+        event.preventDefault();
+        if (!this.isContinuousRunDisabled()) {
+          this.keepRunning ? this.pause() : this.run();
+        }
+        break;
+      case 'F10':
+        event.preventDefault();
+        stop();
+        break;
     }
   }
 
