@@ -29,6 +29,7 @@ form
   margin-top: .5rem
 
   mat-card
+    padding: .5rem
     background-color: map-get(mat.$m2-red-palette, 900)
 
 .btn
@@ -107,3 +108,45 @@ input[type=number]
 .diagrams
   align-items: center
   margin-left: 5em
+
+::ng-deep .CodeMirror-hints
+  background-color: #1e1e1e
+  border: 1px solid #454545
+  border-radius: 4px
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3)
+  padding: 4px 0
+  font-size: 13px
+  max-height: 200px
+
+  &::-webkit-scrollbar
+    width: 8px
+
+  &::-webkit-scrollbar-thumb
+    background: #454545
+    border-radius: 10px
+
+  &::-webkit-scrollbar-thumb:hover
+    background: #555555
+
+::ng-deep .CodeMirror-hint
+  color: #d4d4d4
+  padding: 4px 12px
+  cursor: pointer
+  white-space: pre
+
+::ng-deep .CodeMirror-hint-active
+  background-color: #094771
+  color: #ffffff
+
+::ng-deep .hint-instruction
+  &::before
+    content: 'λ'
+    margin-right: 8px
+    color: #569cd6
+
+::ng-deep .hint-register
+  color: #ce9178
+  &::before
+    content: 'R'
+    margin-right: 8px
+    font-weight: bold

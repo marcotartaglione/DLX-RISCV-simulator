@@ -26,7 +26,7 @@ import {Registers} from '../registers/registers.js';
 import {CodeService} from '../services/code.service.js';
 import {DiagramService} from '../services/diagram.service';
 import {MemoryService} from '../services/memory.service.js';
-import './modes/dlx.js';
+import './modes/dlx';
 import './modes/rv32i.js';
 import {LogicalNetwork} from '../memory/model/logical-network';
 import {MatCard} from '@angular/material/card';
@@ -36,6 +36,9 @@ import {MatFormField, MatInput} from '@angular/material/input';
 import {MatLabel} from '@angular/material/form-field';
 import {MatOption, MatSelect} from '@angular/material/select';
 import {MatTooltip} from '@angular/material/tooltip';
+import 'codemirror/addon/hint/show-hint';
+import 'codemirror/addon/hint/show-hint.css';
+import {DLX_INSTRUCTIONS} from '../interpreters/dlx/dlx.instructions';
 
 @Component({
   selector: 'app-editor',
@@ -90,14 +93,13 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   protected isInterruptDisabled = signal(true);
   protected intervalTime = signal(1000);
   protected selectedScript = signal('');
-  protected editorMode = computed(() => this._codeService.editorMode);
-
+  protected readonly CodeService = CodeService;
   private _codeService = inject(CodeService);
+  protected editorMode = computed(() => this._codeService.editorMode);
   private _memoryService = inject(MemoryService);
   private _diagramService = inject(DiagramService);
   private _appRef = inject(ApplicationRef);
   private _dialog = inject(MatDialog);
-
   private _hostElement = viewChild<ElementRef>('hostElement');
   private _form = viewChild<NgForm>('form');
   private _codeMirror = signal<EditorFromTextArea | null>(null);
@@ -172,10 +174,14 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       styleActiveLine: true,
       viewportMargin: Infinity,
       extraKeys: {
+        'Ctrl-Space': 'autocomplete',
         'Ctrl-S': () => {
           this.save();
           this._appRef.tick();
         }
+      },
+      hintOptions: {
+        hint: (CodeMirror as any).hint[this._codeService.editorMode]
       }
     };
   }
@@ -186,8 +192,38 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     this._codeMirror.set(CodeMirror.fromTextArea(textArea, this.options));
     this._codeMirror().setValue(this._codeService.content() || '');
 
-    this._codeMirror().on('change', (event) => {
-      this._codeService.content.set(event.getValue());
+    this._codeMirror().on('inputRead', (cm, change) => {
+      const cursor = cm.getCursor();
+      const posBeforeTrigger = {line: cursor.line, ch: Math.max(0, cursor.ch - 2)};
+
+      const token = cm.getTokenAt(cursor);
+      const wordRange = cm.findWordAt(posBeforeTrigger);
+      const word = cm.getRange(wordRange.anchor, wordRange.head);
+      const upperWord = word.toUpperCase();
+
+      if (!change.origin || change.origin !== '+delete') {
+        if (token.type !== 'comment' && /^[a-zA-Z0-9]$/.test(change.text[0])) {
+          (cm as any).showHint({completeSingle: false});
+        }
+      }
+
+      const isInstruction = (DLX_INSTRUCTIONS as readonly string[]).includes(upperWord);
+      const isRegister = /^(R([12]?\d|3[01])|IAR)$/i.test(word);
+
+      if (isInstruction || isRegister) {
+        if (word !== upperWord) {
+          cm.replaceRange(
+            upperWord,
+            wordRange.anchor,
+            wordRange.head,
+            '*ignore'
+          );
+        }
+      }
+    });
+
+    this._codeMirror().on('change', (instance, _change) => {
+      this._codeService.content.set(instance.getValue());
       this._form()?.form.markAsDirty();
 
       if (this._isRunning()) {
@@ -231,7 +267,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
         break;
       case 'F10':
         event.preventDefault();
-        stop();
+        this.stop();
         break;
     }
   }
@@ -252,7 +288,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
 
   protected selectedScriptChange(value: string) {
     this.selectedScript.set(value);
-    this._codeService.load(value)
+    this._codeService.load(value);
   }
 
   protected run() {
@@ -282,6 +318,12 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       });
 
       this._codeService.interpreter.parseTags(this._codeService.content(), this.startTag());
+
+      if (isNaN(this._codeService.interpreter.getTag('start_tag'))) {
+        this.errorMessage.set('Start tag not found');
+        return;
+      }
+
       this.pc.set(this._codeService.interpreter.getTag('start_tag'));
       this._isRunning.set(true);
 
@@ -307,9 +349,15 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
 
       this.pc.set(newPc);
     } catch (error) {
+      const lineWithError = this.addressToLine(this.pc());
       this.stop();
-      this._codeMirror().addLineClass(this._runnedInstruction, 'wrap', 'error');
-      this.errorMessage.set(error.message);
+
+      // Necessary due to visuals update after stop, which removes error highlights
+      setTimeout(() => {
+        this._codeMirror().addLineClass(lineWithError, 'wrap', 'error');
+        this.errorMessage.set(error.message);
+        this._appRef.tick();
+      }, 0);
     }
 
     this._memoryService.devices.forEach(el => {
@@ -425,6 +473,4 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       this._codeMirror().addLineClass(this.addressToLine(nextAddr), 'wrap', 'next');
     }
   }
-
-  protected readonly CodeService = CodeService;
 }
