@@ -1,6 +1,8 @@
 import CodeMirror from "codemirror";
+import {DLX_INSTRUCTIONS} from '../../interpreters/dlx/dlx.instructions';
+import {DLXRegisters} from '../../registers/dlx.registers';
 
-CodeMirror.defineMode('dlx', function () {
+(CodeMirror as any).defineMode('dlx', function () {
   const instructions_R = 'ADDU|ADD|AND|MOVI2S|MOVS2I|NOP|OR|SEQ|SGE|SGT|SLE|SLL|SLT|SNE|SRA|SRL|SUBU|SUB|XOR';
   const instructions_I = 'ADDI|ADDUI|ANDI|LBU|LB|LHI|LHU|LH|LW|ORI|SB|SEQI|SGEI|SGTI|SH|SLEI|SLLI|SLTI|SNEI|SRAI|SRLI|SUBI|SUBUI|SW|XORI';
   const instructions_IJ = 'BEQZ|BNEZ|JALR|JR';
@@ -10,9 +12,9 @@ CodeMirror.defineMode('dlx', function () {
     startState: function () {
       return {first: true, j_instruction: false, indent: 0};
     },
-    token: function (stream, state) {
-      let style;
-      let matched;
+    token: function (stream: any, state: any) {
+      let style: string;
+      let matched: any;
 
       if (stream.sol()) {
         state.first = true;
@@ -51,8 +53,35 @@ CodeMirror.defineMode('dlx', function () {
 
       return style;
     },
-    indent: function (state) {
+    indent: function (state: any) {
       return state.indent;
     }
+  };
+});
+
+(CodeMirror as any).registerHelper('hint', 'dlx', (editor: any) => {
+  const cursor = editor.getCursor();
+  const token = editor.getTokenAt(cursor);
+  const currentWord = token.string.toUpperCase();
+
+  const registers = Array.from({length: DLXRegisters.registersCount}, (_, i) => `R${i}`).concat(['IAR']);
+  const instructions = [...DLX_INSTRUCTIONS];
+
+  const suggestions = [...instructions, ...registers];
+  const filtered = suggestions.filter(item => item.startsWith(currentWord));
+
+  const list = filtered.map(item => {
+    const isReg = registers.includes(item);
+    return {
+      text: item,
+      displayText: item,
+      className: isReg ? 'hint-register' : 'hint-instruction'
+    };
+  });
+
+  return {
+    list,
+    from: CodeMirror.Pos(cursor.line, token.start),
+    to: CodeMirror.Pos(cursor.line, token.end),
   };
 });

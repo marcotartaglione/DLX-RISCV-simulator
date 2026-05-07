@@ -15,7 +15,7 @@ export class CodeService {
 
   public content = signal('');
   public interpreter: Interpreter;
-  public editorMode: string;
+  public editorMode: 'dlx' | 'rv32i';
   private _httpClient = inject(HttpClient);
 
   public get linesCount(): number {

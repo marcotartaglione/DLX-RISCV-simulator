@@ -114,36 +114,19 @@ export type DLXInstructionType =
   'RegisterMove' |
   'ReturnFromException';
 
-export type DLXInstruction =
-  'ADD' | 'ADDI' | 'ADDU' | 'ADDUI' |
-  'SUB' | 'SUBI' | 'SUBU' | 'SUBUI' |
+export const DLX_INSTRUCTIONS = [
+  'ADD', 'ADDI', 'ADDU', 'ADDUI',
+  'SUB', 'SUBI', 'SUBU', 'SUBUI',
+  'AND', 'ANDI', 'OR', 'ORI', 'XOR', 'XORI', 'LHI',
+  'SLL', 'SLLI', 'SRA', 'SRAI', 'SRL', 'SRLI',
+  'SEQ', 'SEQI', 'SGE', 'SGEI', 'SGT', 'SGTI',
+  'SLE', 'SLEI', 'SLT', 'SLTI', 'SNE', 'SNEI',
+  'LB', 'LBU', 'LH', 'LHU', 'LW', 'SB', 'SH', 'SW',
+  'BEQZ', 'BNEZ', 'J', 'JAL', 'JALR', 'JR',
+  'MOVI2S', 'MOVS2I', 'NOP', 'RFE', 'TRAP'
+] as const;
 
-  'AND' | 'ANDI' |
-  'OR' | 'ORI' |
-  'XOR' | 'XORI' |
-  'LHI' |
-
-  'SLL' | 'SLLI' |
-  'SRA' | 'SRAI' |
-  'SRL' | 'SRLI' |
-
-  'SEQ' | 'SEQI' |
-  'SGE' | 'SGEI' |
-  'SGT' | 'SGTI' |
-  'SLE' | 'SLEI' |
-  'SLT' | 'SLTI' |
-  'SNE' | 'SNEI' |
-
-  'LB' | 'LBU' | 'LH' | 'LHU' | 'LW' |
-  'SB' | 'SH' | 'SW' |
-
-  'BEQZ' | 'BNEZ' |
-  'J' | 'JAL' | 'JALR' | 'JR' |
-
-  'MOVI2S' | 'MOVS2I' |
-  'NOP' |
-  'RFE' |
-  'TRAP';
+export type DLXInstruction = typeof DLX_INSTRUCTIONS[number];
 
 export type InstructionConfig = {
   type: DLXInstructionType,

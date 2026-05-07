@@ -1,5 +1,5 @@
 export abstract class Registers {
-  public readonly registersCount;
+  public static readonly registersCount: number;
   public pc: number;
 
   protected constructor() {

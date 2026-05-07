@@ -1,10 +1,10 @@
 import {Registers} from './registers';
 
 export class DLXRegisters extends Registers {
-  public readonly registersCount = 32;
+  public static readonly registersCount = 32;
 
-  public registersValue = Array<number>(this.registersCount);
-  public registersBoldness = Array<string>(this.registersCount);
+  public registersValue = Array<number>(DLXRegisters.registersCount);
+  public registersBoldness = Array<string>(DLXRegisters.registersCount);
 
   private _previousRegister: number = 0;
 
@@ -27,7 +27,7 @@ export class DLXRegisters extends Registers {
     super();
 
     this.registersValue[0] = 0;
-    for (let i = 0; i < this.registersCount; i++) {
+    for (let i = 0; i < DLXRegisters.registersCount; i++) {
       if (i === 0) {
         this.registersValue[i] = 0;
       } else {
@@ -39,8 +39,8 @@ export class DLXRegisters extends Registers {
   }
 
   public setBold(registerIndex: number) {
-    if (registerIndex < 0 || registerIndex >= this.registersCount) {
-      throw new Error(`Invalid register index: ${registerIndex}. It must be between 0 and ${this.registersCount - 1}.`);
+    if (registerIndex < 0 || registerIndex >= DLXRegisters.registersCount) {
+      throw new Error(`Invalid register index: ${registerIndex}. It must be between 0 and ${DLXRegisters.registersCount - 1}.`);
     }
 
     this.registersBoldness[this._previousRegister] = 'normal';
@@ -49,7 +49,7 @@ export class DLXRegisters extends Registers {
   }
 
   public resetRegistersBoldness() {
-    for (let i = 0; i < this.registersCount; i++) {
+    for (let i = 0; i < DLXRegisters.registersCount; i++) {
       this.registersBoldness[i] = 'normal';
     }
 
