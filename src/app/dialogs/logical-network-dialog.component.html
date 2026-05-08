@@ -2,56 +2,47 @@
   <img src="{{data.network.imagePath}}" style="background-color:white" width="850px"/>
   <br/>
   <div>
-    <!--  TODO: controllare se questi if sono necessari  -->
-    @if (data.network.clockType) {
-      <div style="display:inline-block; margin:10px;">
-        <mat-form-field appearance="fill">
-          <mat-label>Clock Type</mat-label>
-          <mat-select [(value)]="data.network.clockType">
-            <mat-option value="MEMWR*">MEMWR*</mat-option>
-            <mat-option value="MEMRD*">MEMRD*</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-    }
-    @if (data.network.asyncSetSignal) {
-      <div style="display:inline-block; margin:10px;">
-        <mat-form-field appearance="fill">
-          <mat-label>A_SET</mat-label>
-          <mat-select [(value)]="data.network.asyncSetSignal">
-            <mat-option value="RESET">RESET</mat-option>
+    <div style="display:inline-block; margin:10px;">
+      <mat-form-field appearance="fill">
+        <mat-label>Clock Type</mat-label>
+        <mat-select [(value)]="data.network.clockType">
+          <mat-option value="MEMWR*">MEMWR*</mat-option>
+          <mat-option value="MEMRD*">MEMRD*</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div style="display:inline-block; margin:10px;">
+      <mat-form-field appearance="fill">
+        <mat-label>A_SET</mat-label>
+        <mat-select [(value)]="data.network.asyncSetSignal">
+          <mat-option value="RESET">RESET</mat-option>
 
-            @if (isLedLogicalNetwork(data.network)) {
-              <mat-option value="CS_A_SET_LED">CS_A_SET_LED</mat-option>
-            }
-            @else if (isStartLogicalNetwork(data.network)) {
-              <mat-option value="CS_A_SET_STARTUP">CS_A_SET_STARTUP</mat-option>
-            }
+          @if (isLedLogicalNetwork(data.network)) {
+            <mat-option value="CS_A_SET_LED">CS_A_SET_LED</mat-option>
+          } @else if (isStartLogicalNetwork(data.network)) {
+            <mat-option value="CS_A_SET_STARTUP">CS_A_SET_STARTUP</mat-option>
+          }
 
-            <mat-option value="0">0</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-    }
-    @if (data.network.asyncResetSignal) {
-      <div style="display:inline-block; margin:10px;">
-        <mat-form-field appearance="fill">
-          <mat-label>A_RES</mat-label>
-          <mat-select [(value)]="data.network.asyncResetSignal">
-            <mat-option value="RESET">RESET</mat-option>
+          <mat-option value="0">0</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div style="display:inline-block; margin:10px;">
+      <mat-form-field appearance="fill">
+        <mat-label>A_RES</mat-label>
+        <mat-select [(value)]="data.network.asyncResetSignal">
+          <mat-option value="RESET">RESET</mat-option>
 
-            @if (isLedLogicalNetwork(data.network)) {
-              <mat-option value="CS_A_SET_LED">CS_A_SET_LED</mat-option>
-            }
-            @else if (isStartLogicalNetwork(data.network)) {
-              <mat-option value="CS_A_SET_STARTUP">CS_A_SET_STARTUP</mat-option>
-            }
+          @if (isLedLogicalNetwork(data.network)) {
+            <mat-option value="CS_A_SET_LED">CS_A_SET_LED</mat-option>
+          } @else if (isStartLogicalNetwork(data.network)) {
+            <mat-option value="CS_A_SET_STARTUP">CS_A_SET_STARTUP</mat-option>
+          }
 
-            <mat-option value="0">0</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-    }
+          <mat-option value="0">0</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
   </div>
 
   <br/>
@@ -72,8 +63,7 @@
       <b>LED</b><br/>
       @if (data.network.led) {
         <span>ON</span>
-      }
-      @else {
+      } @else {
         <span>OFF</span>
       }
     </div>
@@ -84,8 +74,7 @@
       <b>STARTUP</b><br/>
       @if (data.network.startup) {
         <span>ON</span>
-      }
-      @else {
+      } @else {
         <span>OFF</span>
       }
     </div>
