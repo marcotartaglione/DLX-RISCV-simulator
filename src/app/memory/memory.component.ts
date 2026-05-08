@@ -1,25 +1,17 @@
 import {animate, style, transition, trigger} from '@angular/animations';
-import {Component, effect, inject, input, signal, Type, untracked} from '@angular/core';
+import {Component, effect, inject, signal, Type, untracked} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {MessageDialogComponent} from '../dialogs/message-dialog.component';
 import {MemoryService} from '../services/memory.service';
 import {Device} from './model/device';
 import {LogicalNetwork} from './model/logical-network';
-import {LogicalNetworkDialogComponent} from '../dialogs/logical-network-dialog.component';
 import {MemoryAddressDialogComponent} from '../dialogs/memory-address-dialog.component';
-import {LedLogicalNetwork} from './model/logicalNetworks/led.logical-network';
-import {FFDLogicalNetwork} from './model/logicalNetworks/ffd-logical-network';
 import {ImageDialogComponent} from '../dialogs/image-dialog.component';
 import {ErrorDialogComponent} from '../dialogs/error-dialog.component';
-import {InstructionDialogComponent} from '../dialogs/instruction-dialog.component';
-import {Counter} from './model/logicalNetworks/counter';
-import {CounterDialogComponent} from '../dialogs/counter-dialog.component';
-import {InputPort} from './model/logicalNetworks/input-port';
-import {InputPortDialogComponent} from '../dialogs/input-port-dialog.component';
 import {FormatPipe} from '../pipes/format.pipe';
 import {Ram} from './model/ram';
 import {Eprom} from './model/eprom';
-import {StartLogicalNetwork} from './model/logicalNetworks/start.logical-network';
+import {DeviceDialogRegistry} from '../decorators/device-dialog.decorator';
 import {MatButton} from '@angular/material/button';
 import {MatTooltip} from '@angular/material/tooltip';
 import {MatOption, MatRipple} from '@angular/material/core';
@@ -29,8 +21,11 @@ import {FormsModule} from '@angular/forms';
 import {MatInput} from '@angular/material/input';
 import {MatSelect} from '@angular/material/select';
 import {ChipSelect} from './model/ChipSelect';
-import {NgOptimizedImage} from '@angular/common';
-import {FormatBytePipe} from '../pipes/formatByte.pipe';
+import {LedLogicalNetwork} from './model/logicalNetworks/led-logical-network';
+import {StartLogicalNetwork} from './model/logicalNetworks/start-logical-network';
+import {Counter} from './model/logicalNetworks/counter';
+import {InputPort} from './model/logicalNetworks/input-port';
+import {FFDLogicalNetwork} from './model/logicalNetworks/ffd-logical-network';
 
 @Component({
   selector: 'app-memory',
@@ -62,7 +57,6 @@ import {FormatBytePipe} from '../pipes/formatByte.pipe';
     MatMenu,
     MatMenuItem,
     MatLabel,
-    NgOptimizedImage
   ]
 })
 
@@ -75,6 +69,8 @@ export class MemoryComponent {
   protected readonly inputAddr = signal<string>('');
   protected readonly selectedChipSelect = signal<ChipSelect>(null);
   protected readonly selectedDevice = signal<Device>(null);
+
+  protected readonly MAX_32_BIT_ADDRESS = 0xFFFFFFFF;
 
   constructor() {
     effect(() => {
@@ -102,18 +98,10 @@ export class MemoryComponent {
   }
 
   protected openDialogImage(n: Device) {
-    // TODO: costruire decoratore per i componenti che registri le relative finestre di dialogo,
-    //  così da evitare questo tipo di if-else e rendere più scalabile l'aggiunta di nuovi device
-    if (this.selectedDevice() instanceof Counter) {
-      this._dialog.open(CounterDialogComponent, {
-        data: {network: n as Counter}
-      });
-    } else if (this.selectedDevice() instanceof InputPort) {
-      this._dialog.open(InputPortDialogComponent, {
-        data: {network: n as InputPort}
-      });
-    } else {
-      this._dialog.open(LogicalNetworkDialogComponent, {
+    const dialogComponent = DeviceDialogRegistry.getDialogComponent(n);
+
+    if (dialogComponent) {
+      this._dialog.open(dialogComponent, {
         data: {network: n}
       });
     }
