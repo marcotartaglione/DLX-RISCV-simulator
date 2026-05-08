@@ -16,13 +16,12 @@
 
 <div class="main-container">
   <div class="memory">
-    <!--  // TODO: togliere tutti i magic numbers  -->
     @for (device of memoryService.devices; track device) {
       @if (deviceImage(device) !== '') {
         <img (click)="selectedDevice() === device ? selectedDevice.set(null) : selectedDevice.set(device)"
              [class.selected]="selectedDevice() === device"
              [matTooltip]="device.name + (isLogicalNetwork(device) ? ' ' + (device.ffd ? '1' : '0') : '')"
-             [style.left]="((device.minAddress / 4294967295) * 100 - 3.5).toFixed(2) + '%'"
+             [style.left]="((device.minAddress / MAX_32_BIT_ADDRESS) * 100 - 3.5).toFixed(2) + '%'"
              alt="device icon"
              class="icon_absolute"
              matTooltipClass="device-size"
@@ -32,7 +31,7 @@
 
         @if (isLogicalNetwork(device)) {
           <div [matTooltip]="device.name + ' ' + (device.ffd ? '1' : '0')"
-               [style.left]="((device.minAddress / 4294967295) * 100).toFixed(2)+'%'"
+               [style.left]="((device.minAddress / MAX_32_BIT_ADDRESS) * 100).toFixed(2) + '%'"
                class="ln"
                matTooltipClass="device-size"
                matTooltipPosition="above">
@@ -40,10 +39,10 @@
         }
       } @else {
         <div (click)="selectedDevice() === device ? selectedDevice.set(null) : selectedDevice.set(device)"
-             [class.selected]="selectedDevice() == device"
+             [class.selected]="selectedDevice() === device"
              [matTooltip]="device.size('MB') + 'MB'"
-             [style.left]="((device.minAddress/4294967295) * 100).toFixed(2)+'%'"
-             [style.right]="(100 - (device.maxAddress/4294967295) * 100).toFixed(2)+'%'" class="dev"
+             [style.left]="((device.minAddress / MAX_32_BIT_ADDRESS) * 100).toFixed(2) + '%'"
+             [style.right]="(100 - (device.maxAddress / MAX_32_BIT_ADDRESS) * 100).toFixed(2) + '%'" class="dev"
              matRipple
              matTooltipClass="device-size"
              matTooltipPosition="above">
@@ -91,7 +90,7 @@
           <input (change)="onChange($event, 'name')"
                  [(ngModel)]="selectedDevice().name"
                  [disabled]="selectedDevice().name === 'EPROM'"
-                 matInput />
+                 matInput/>
         </mat-form-field>
       </div>
 
