@@ -1,6 +1,9 @@
 import {LogicalNetwork} from '../logical-network';
 import {ChipSelect} from '../ChipSelect';
+import {DeviceDialog} from '../../../decorators/device-dialog.decorator';
+import {CounterDialogComponent} from '../../../dialogs/counter-dialog.component';
 
+@DeviceDialog(() => CounterDialogComponent)
 export class Counter extends LogicalNetwork {
   constructor(
     minAddress: number,

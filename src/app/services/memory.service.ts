@@ -1,10 +1,10 @@
 import {Injectable, Injector} from '@angular/core';
 import {Device} from '../memory/model/device';
 import {Eprom} from '../memory/model/eprom';
-import {LedLogicalNetwork} from '../memory/model/logicalNetworks/led.logical-network';
+import {LedLogicalNetwork} from '../memory/model/logicalNetworks/led-logical-network';
 import {Counter} from '../memory/model/logicalNetworks/counter';
 import {Memory} from '../memory/model/memory';
-import {StartLogicalNetwork} from '../memory/model/logicalNetworks/start.logical-network';
+import {StartLogicalNetwork} from '../memory/model/logicalNetworks/start-logical-network';
 import {InputPort} from '../memory/model/logicalNetworks/input-port';
 import {Ram} from '../memory/model/ram';
 import {FFDLogicalNetwork} from '../memory/model/logicalNetworks/ffd-logical-network';

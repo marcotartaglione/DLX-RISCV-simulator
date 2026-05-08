@@ -1,6 +1,4 @@
 export class ChipSelect {
-  // TODO: implementare la possibilità di associare una funzione al chip select invece che un valore?
-
   constructor(
     public id: string,
     public address: number

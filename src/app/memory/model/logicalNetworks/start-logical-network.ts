@@ -1,12 +1,10 @@
 import {LogicalNetwork} from '../logical-network';
 import {ChipSelect} from '../ChipSelect';
+import {DeviceDialog} from '../../../decorators/device-dialog.decorator';
+import {LogicalNetworkDialogComponent} from '../../../dialogs/logical-network-dialog.component';
 
+@DeviceDialog(() => LogicalNetworkDialogComponent)
 export class StartLogicalNetwork extends LogicalNetwork {
-  // ffd( name, d, a_res, a_set, clk)
-  // mux( zero, one, sel)
-  // tri( in, en )
-  // bd0 = tri( ffd( start, mux( start.q, bd0, cs_write ), reset, null, memwr* ), cs_read )";
-
   constructor(
     chipSelectRead: number,
     chipSelectWrite: number,

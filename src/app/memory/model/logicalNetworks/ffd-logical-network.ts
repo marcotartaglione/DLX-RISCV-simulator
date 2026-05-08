@@ -1,6 +1,9 @@
 import {LogicalNetwork} from '../logical-network';
 import {ChipSelect} from '../ChipSelect';
+import {DeviceDialog} from '../../../decorators/device-dialog.decorator';
+import {LogicalNetworkDialogComponent} from '../../../dialogs/logical-network-dialog.component';
 
+@DeviceDialog(() => LogicalNetworkDialogComponent)
 export class FFDLogicalNetwork extends LogicalNetwork {
   constructor(
     chipSelectRead: number,

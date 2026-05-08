@@ -1,9 +1,12 @@
 import {LogicalNetwork} from '../logical-network';
 import {ChipSelect} from '../ChipSelect';
+import {DeviceDialog} from '../../../decorators/device-dialog.decorator';
+import {InputPortDialogComponent} from '../../../dialogs/input-port-dialog.component';
 
 export const InputPortSizesArray = [8, 16, 32] as const;
 type InputPortSize = typeof InputPortSizesArray[number];
 
+@DeviceDialog(() => InputPortDialogComponent)
 export class InputPort extends LogicalNetwork {
   constructor(
     minAddress: number,
