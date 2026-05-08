@@ -1,8 +1,8 @@
 import {Component, inject, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent} from '@angular/material/dialog';
 import {LogicalNetwork} from '../memory/model/logical-network';
-import {LedLogicalNetwork} from '../memory/model/logicalNetworks/led.logical-network';
-import {StartLogicalNetwork} from '../memory/model/logicalNetworks/start.logical-network';
+import {LedLogicalNetwork} from '../memory/model/logicalNetworks/led-logical-network';
+import {StartLogicalNetwork} from '../memory/model/logicalNetworks/start-logical-network';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatSelect} from '@angular/material/select';
 import {MatOption} from '@angular/material/core';
