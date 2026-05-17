@@ -23,7 +23,6 @@ bootstrapApplication(AppComponent, {
         paramsInheritanceStrategy: 'always',
         onSameUrlNavigation: 'reload',
       }),
-      withHashLocation()
     ),
     importProvidersFrom(MatNativeDateModule)
   ]
