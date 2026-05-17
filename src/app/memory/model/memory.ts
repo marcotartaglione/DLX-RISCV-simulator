@@ -1,12 +1,7 @@
 import {Device} from './device';
-import {Eprom} from './eprom';
-import {StartLogicalNetwork} from './logicalNetworks/start-logical-network';
-import {LedLogicalNetwork} from './logicalNetworks/led-logical-network';
-import {FFDLogicalNetwork} from './logicalNetworks/ffd-logical-network';
-import {Counter} from './logicalNetworks/counter';
 import {InputPort} from './logicalNetworks/input-port';
-import {Ram} from './ram';
 import {DeviceFactory} from './DeviceFactoryImpl';
+import {LogicalNetwork} from './logical-network';
 
 export class Memory {
   devices: Device[] = [];
@@ -65,6 +60,10 @@ export class Memory {
       throw new Error('Device not found');
     }
 
+    if (device instanceof LogicalNetwork) {
+      return device.load(address);
+    }
+
     return device.load(alignedAddress);
   }
 
@@ -72,10 +71,14 @@ export class Memory {
     const alignedAddress = (address & ~3) >>> 0;
     const device = this.findDevice(alignedAddress);
 
-    if (device) {
-      device.store(alignedAddress, word);
-    } else {
+    if (!device) {
       throw new Error('Device not found');
+    }
+
+    if (device instanceof LogicalNetwork) {
+      device.store(address, word);
+    } else {
+      device.store(alignedAddress, word);
     }
 
     return word;

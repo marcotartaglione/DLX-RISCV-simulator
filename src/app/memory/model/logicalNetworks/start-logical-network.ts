@@ -2,6 +2,7 @@ import {LogicalNetwork} from '../logical-network';
 import {ChipSelect} from '../ChipSelect';
 import {DeviceDialog} from '../../../decorators/device-dialog.decorator';
 import {LogicalNetworkDialogComponent} from '../../../dialogs/logical-network-dialog.component';
+import {Device} from '../device';
 
 @DeviceDialog(() => LogicalNetworkDialogComponent)
 export class StartLogicalNetwork extends LogicalNetwork {
@@ -11,6 +12,7 @@ export class StartLogicalNetwork extends LogicalNetwork {
     asyncSetSignal = 'RESET',
     asyncResetSignal = '0',
     clockType: 'MEMWR*' | 'MEMRD*' = 'MEMWR*',
+    private _startup = false
   ) {
     super('Start', chipSelectRead, chipSelectWrite, asyncSetSignal, asyncResetSignal,
       ('assets/img/startup/' +
@@ -23,8 +25,6 @@ export class StartLogicalNetwork extends LogicalNetwork {
     this.setChipSelect(ChipSelect.of('CS_A_SET_STARTUP', this.minAddress + 0x00000003), 0);
   }
 
-  private _startup = false;
-
   public get startup(): boolean {
     return this._startup;
   }
@@ -33,6 +33,15 @@ export class StartLogicalNetwork extends LogicalNetwork {
     const startLogicalNetwork = new StartLogicalNetwork(json.minAddress, json.maxAddress);
     startLogicalNetwork.hydrate(json);
     return startLogicalNetwork;
+  }
+
+  public updateFrom(other: Device) {
+    if (!(other instanceof StartLogicalNetwork)) {
+      throw new Error('Can only update from another StartLogicalNetwork');
+    }
+
+    super.updateFrom(other);
+    this._startup = other._startup;
   }
 
   public asyncSet() {

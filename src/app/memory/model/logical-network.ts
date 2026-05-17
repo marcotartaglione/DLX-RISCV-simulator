@@ -6,7 +6,7 @@ import {IVisualizable} from './IVisualizable';
  * Represents a hardware network with TRI-STATE buffers and Flip-Flops (FFD).
  */
 export class LogicalNetwork extends Device implements IVisualizable {
-  protected constructor(
+  public constructor(
     name: string,
     minAddress: number,
     maxAddress: number,
@@ -38,6 +38,18 @@ export class LogicalNetwork extends Device implements IVisualizable {
     logicalNetwork.hydrate(json);
 
     return logicalNetwork;
+  }
+
+  public updateFrom(other: Device) {
+    if (!(other instanceof LogicalNetwork)) {
+      throw new Error('Can only update from another LogicalNetwork');
+    }
+
+    super.updateFrom(other);
+    this.asyncSetSignal = other.asyncSetSignal;
+    this.asyncResetSignal = other.asyncResetSignal;
+    this.imagePath = other.imagePath;
+    this.clockType = other.clockType;
   }
 
   public asyncSet() {

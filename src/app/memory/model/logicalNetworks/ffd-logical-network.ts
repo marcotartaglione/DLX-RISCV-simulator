@@ -2,6 +2,8 @@ import {LogicalNetwork} from '../logical-network';
 import {ChipSelect} from '../ChipSelect';
 import {DeviceDialog} from '../../../decorators/device-dialog.decorator';
 import {LogicalNetworkDialogComponent} from '../../../dialogs/logical-network-dialog.component';
+import {Device} from '../device';
+import {StartLogicalNetwork} from './start-logical-network';
 
 @DeviceDialog(() => LogicalNetworkDialogComponent)
 export class FFDLogicalNetwork extends LogicalNetwork {
@@ -24,6 +26,14 @@ export class FFDLogicalNetwork extends LogicalNetwork {
     const ffdLogicalNetwork = new FFDLogicalNetwork(json.minAddress, json.maxAddress);
     ffdLogicalNetwork.hydrate(json);
     return ffdLogicalNetwork;
+  }
+
+  public updateFrom(other: Device) {
+    if (!(other instanceof FFDLogicalNetwork)) {
+      throw new Error('Cannot update FFDLogicalNetwork from a different type of device');
+    }
+
+    super.updateFrom(other);
   }
 
   protected hydrate(json) {
