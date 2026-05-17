@@ -2,6 +2,7 @@ import {LogicalNetwork} from '../logical-network';
 import {ChipSelect} from '../ChipSelect';
 import {DeviceDialog} from '../../../decorators/device-dialog.decorator';
 import {InputPortDialogComponent} from '../../../dialogs/input-port-dialog.component';
+import {Device} from '../device';
 
 export const InputPortSizesArray = [8, 16, 32] as const;
 type InputPortSize = typeof InputPortSizesArray[number];
@@ -29,6 +30,10 @@ export class InputPort extends LogicalNetwork {
     return this._data;
   }
 
+  public set data(value: number) {
+    this._data = value;
+  }
+
   public get dataSize(): InputPortSize {
     return this._dataSize;
   }
@@ -42,6 +47,17 @@ export class InputPort extends LogicalNetwork {
     const inputPort = new InputPort(json.minAddress, json.maxAddress);
     inputPort.hydrate(json);
     return inputPort;
+  }
+
+  public updateFrom(other: Device) {
+    if (!(other instanceof InputPort)) {
+      throw new Error('Cannot update InputPort from a different type of device');
+    }
+
+    super.updateFrom(other);
+    this._data = other._data;
+    this._dataSize = other._dataSize;
+    this._interrupt = other._interrupt;
   }
 
   public interrupt() {

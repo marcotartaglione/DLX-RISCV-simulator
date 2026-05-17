@@ -86,14 +86,20 @@ function load(value: number, offset: number, dim: DLXDataSizeName) {
  * @param offset The memory offset determining where the value starts within the destination.
  * @param dim The size of the data to store ('byte', 'halfword', or 'word').
  */
-function store(value: number, destination: number, offset: number, dim: DLXDataSizeName): number {
+function storeValue(value: number, destination: number, offset: number, dim: DLXDataSizeName): number {
   const byteOffset = offset % 4;
 
   if ((dim === 'word' && byteOffset !== 0) || (dim === 'halfword' && byteOffset % 2 !== 0)) {
     throw new Error('alignment fault');
   }
 
-  const shift = byteOffset * 8;
+  let shift = 0;
+  if (dim === 'byte') {
+    shift = (3 - byteOffset) * 8;
+  }
+  else if (dim === 'halfword') {
+    shift = (2 - byteOffset) * 8;
+  }
   const mask = maskMap[dim];
 
   const clearMask = ~(mask << shift);
@@ -253,7 +259,7 @@ export const instructions: {
   },
   SB: {
     type: 'ImmediateStore',
-    func: (registers, [stored]) => store(registers.mdr, stored, registers.temp, 'byte')
+    func: (registers, [stored]) => storeValue(registers.mdr, stored, registers.temp, 'byte')
   },
   SEQ: {
     type: 'Register',
@@ -281,7 +287,7 @@ export const instructions: {
   },
   SH: {
     type: 'ImmediateStore',
-    func: (registers, [stored]) => store(registers.mdr, stored, registers.temp, 'halfword')
+    func: (registers, [stored]) => storeValue(registers.mdr, stored, registers.temp, 'halfword')
   },
   SLE: {
     type: 'Register',
@@ -350,7 +356,7 @@ export const instructions: {
   },
   SW: {
     type: 'ImmediateStore',
-    func: (registers, [stored]) => store(registers.mdr, stored, registers.temp, 'word')
+    func: (registers, [stored]) => storeValue(registers.mdr, stored, registers.temp, 'word')
   },
   TRAP: {
     type: 'Jump', func: (registers) => {

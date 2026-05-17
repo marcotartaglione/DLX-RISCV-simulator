@@ -11,6 +11,14 @@ export class Ram extends Device {
     return ram;
   }
 
+  public updateFrom(other: Device) {
+    if (!(other instanceof Ram)) {
+      throw new Error('Cannot update Ram from a different type of device');
+    }
+
+    super.updateFrom(other);
+  }
+
   public override toJSON(): any {
     return super.toJSON();
   }

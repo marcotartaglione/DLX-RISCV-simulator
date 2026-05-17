@@ -2,6 +2,7 @@ import {LogicalNetwork} from '../logical-network';
 import {ChipSelect} from '../ChipSelect';
 import {DeviceDialog} from '../../../decorators/device-dialog.decorator';
 import {LogicalNetworkDialogComponent} from '../../../dialogs/logical-network-dialog.component';
+import {Device} from '../device';
 
 @DeviceDialog(() => LogicalNetworkDialogComponent)
 export class LedLogicalNetwork extends LogicalNetwork {
@@ -11,6 +12,7 @@ export class LedLogicalNetwork extends LogicalNetwork {
     asyncSetSignal = 'RESET',
     asyncResetSignal = '0',
     clockType: 'MEMWR*' | 'MEMRD*' = 'MEMWR*',
+    private _led = false
   ) {
     super('LED', minAddress, maxAddress, asyncSetSignal, asyncResetSignal,
       ('assets/img/led/' +
@@ -23,8 +25,6 @@ export class LedLogicalNetwork extends LogicalNetwork {
     this.setChipSelect(ChipSelect.of('CS_A_SET_LED', this.minAddress + 0x00000003), 0);
   }
 
-  private _led = false;
-
   public get led(): boolean {
     return this._led;
   }
@@ -33,6 +33,15 @@ export class LedLogicalNetwork extends LogicalNetwork {
     const ledLogicalNetwork = new LedLogicalNetwork(json.minAddress, json.maxAddress);
     ledLogicalNetwork.hydrate(json);
     return ledLogicalNetwork;
+  }
+
+  public updateFrom(other: Device) {
+    if (!(other instanceof LedLogicalNetwork)) {
+      throw new Error('Cannot update LedLogicalNetwork from a different type of device');
+    }
+
+    super.updateFrom(other);
+    this._led = other._led;
   }
 
   public asyncSet() {
