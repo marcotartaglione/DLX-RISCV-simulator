@@ -21,7 +21,6 @@ import CodeMirror, {EditorFromTextArea} from 'codemirror';
 import 'codemirror/addon/selection/active-line';
 import {Subscription} from 'rxjs';
 import {SaveDialogComponent} from '../dialogs/save-dialog.component';
-import {StartLogicalNetwork} from '../memory/model/logicalNetworks/start-logical-network';
 import {Registers} from '../registers/registers.js';
 import {CodeService} from '../services/code.service.js';
 import {DiagramService} from '../services/diagram.service';

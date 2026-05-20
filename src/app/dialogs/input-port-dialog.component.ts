@@ -3,7 +3,7 @@ import {MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent} fro
 import {InputPort, InputPortSizesArray} from '../memory/model/logicalNetworks/input-port';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
-import {FormGroup, FormsModule} from '@angular/forms';
+import {FormsModule} from '@angular/forms';
 import {FormatPipe} from '../pipes/format.pipe';
 import {MatButton} from '@angular/material/button';
 import {MatOption} from '@angular/material/core';
