@@ -1,96 +1,99 @@
 <div mat-dialog-content>
   <div>
     <div style="display:inline-block;">
-      <img height="260px" src="{{data.network.imagePath}}"
-           style="background-color:white ; display: block; margin:0 auto;" width="450px" alt=""/>
+      <img alt="" height="260px"
+           src="assets/img/counter/network/fcb_ffdr_{{this.cloneDevice.asyncResetSignal.toLowerCase()}}_ffds_{{this.cloneDevice.asyncSetSignal.toLowerCase()}}.png"
+           style="background-color:white ; display: block; margin:0 auto;"
+           width="450px"/>
     </div>
     <div style="display:inline-block;">
-      <img height="260px" src="{{data.network.imagePath}}"
-           style="background-color:white ; display: block; margin:0 auto;" width="450px" alt=""/>
+      <img alt="" height="260px"
+           src="{{cloneDevice.imagePath}}"
+           style="background-color:white ; display: block; margin:0 auto;"
+           width="450px"/>
     </div>
   </div>
-  <div>
+  <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 20px;">
     <mat-form-field appearance="outline">
       <mat-label>Current Value</mat-label>
-      <input [value]="data.network.currentValue + ''" matInput name="currentVal" readonly type="text">
+      <input (blur)="applyPadding()"
+             (ngModelChange)="onCurrentValueChange($event)"
+             [(ngModel)]="hexCurrentValueDisplay"
+             [maxLength]="cloneDevice.countingBasis / 4 + 2"
+             matInput
+             name="currentVal"
+             type="text">
     </mat-form-field>
-    <div style="display:inline-block; margin:10px;">
+
+    <div style="display:inline-block;">
       <mat-form-field appearance="outline">
-        <mat-label>N bit</mat-label>
-        <input (change)="onCountingBasisChange()" [(ngModel)]="this.data.network.countingBasis" matInput>
+        <mat-label>Counting basis</mat-label>
+        <input (change)="onCountingBasisChange()"
+               [(ngModel)]="this.countingBasis"
+               matInput
+               type="number">
       </mat-form-field>
     </div>
-    <div style="display:inline-block; margin:10px;">
+
+    <div style="display:inline-block;">
       <mat-form-field appearance="outline">
         <mat-label>Load Value</mat-label>
-        <input [(ngModel)]="this.data.network.loadValue" matInput>
+        <input (blur)="applyPadding()"
+               (ngModelChange)="onLoadValueChange($event)"
+               [(ngModel)]="hexLoadValueDisplay"
+               [maxLength]="cloneDevice.countingBasis / 4 + 2"
+               matInput
+               name="loadVal"
+               type="text">
       </mat-form-field>
     </div>
-    @if (data.network.clockType) {
-      <div style="display:inline-block; margin:10px;">
-        <mat-form-field appearance="fill">
-          <mat-label>Clock Type</mat-label>
-          <mat-select [(value)]="data.network.clockType">
-            <mat-option value="MEMWR*">MEMWR*</mat-option>
-            <mat-option value="MEMRD*">MEMRD*</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-    }
+
+    <div style="display:inline-block;">
+      <mat-form-field appearance="fill">
+        <mat-label>Clock Type</mat-label>
+        <mat-select [(value)]="cloneDevice.clockType">
+          <mat-option value="MEMWR*">MEMWR*</mat-option>
+          <mat-option value="MEMRD*">MEMRD*</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
   </div>
+  <div style="display: flex; gap: 10px;">
+    <mat-form-field appearance="outline">
+      <mat-label>A_RES FFD</mat-label>
+      <mat-select [(value)]="cloneDevice.asyncResetSignal">
+        <mat-option value="RESET">RESET</mat-option>
+        <mat-option value="0">0</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>A_SET FFD</mat-label>
+      <mat-select [(value)]="cloneDevice.asyncSetSignal">
+        <mat-option value="0">0</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Async Counter Reset</mat-label>
+      <mat-select [(value)]="cloneDevice.asyncCounterResetSignal">
+        <mat-option value="CS_A_RES_COUNTER">CS_A_RES_COUNTER</mat-option>
+        <mat-option value="RESET">RESET</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
   <div>
-    <div style="float: left;">
-      @if (data.network.asyncResetSignal) {
-        <div style="display:inline-block; margin:10px;">
-          <mat-form-field appearance="outline">
-            <mat-label>A_RES FFD</mat-label>
-            <mat-select [(value)]="data.network.asyncResetSignal">
-              @if (this.data.network.asyncSetSignal !== 'RESET') {
-                <mat-option value="RESET">RESET</mat-option>
-              }
-              <mat-option value="0">0</mat-option>
-            </mat-select>
-          </mat-form-field>
-          &nbsp;
-          <mat-form-field appearance="outline">
-            <mat-label>A_SET FFD</mat-label>
-            <mat-select [(value)]="data.network.asyncSetSignal">
-              @if (this.data.network.asyncResetSignal !== 'RESET') {
-                <mat-option value="RESET">RESET</mat-option>
-              }
-              <mat-option value="0">0</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-      }
-    </div>
-    <div style="float: right;">
-      @if (data.network.asyncResetSignal) {
-        <div style="display:inline-block; margin:10px;">
-          <mat-form-field appearance="outline">
-            <mat-label>A_RES</mat-label>
-            <mat-select [(value)]="data.network.asyncResetSignal">
-              <mat-option value="CS_A_RES_COUNTER">CS_A_RES_COUNTER</mat-option>
-              <mat-option value="RESET">RESET</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-      }
-    </div>
-  </div>
-  <br/> <br/><br/> <br/><br/> <br/>
-  @if (data.network.chipSelects.length > 0) {
-    <div>
-      <b>Chip-Select</b><br/>
-      @for (cs of data.network.chipSelects; track cs) {
-        <span>
+    <b>Chip-Select</b><br/>
+    @for (cs of cloneDevice.chipSelects; track cs) {
+      <span>
           {{ cs.id }} - {{ cs.address | format: 'hex' }}<br/>
         </span>
-      }
-    </div>
-  }
+    }
+  </div>
   <br/>
 </div>
 <div align="end" mat-dialog-actions>
-  <button (click)="onSubmit()" mat-button mat-dialog-close>Ok</button>
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button [mat-dialog-close]="cloneDevice" color="primary" mat-button>Confirm</button>
 </div>
