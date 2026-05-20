@@ -2,7 +2,7 @@ import {Memory} from '../memory/model/memory';
 import {Registers} from '../registers/registers';
 
 export abstract class Interpreter {
-  protected interruptEnabled: boolean = true;
+  protected _wasInStartup: boolean = true;
 
   /**
    * From tag name to line number
@@ -23,9 +23,10 @@ export abstract class Interpreter {
   abstract execute(line: string, registers: Registers, memory: Memory): number;
 
   /**
+   * Encodes a single assembly line into its machine-code representation.
    *
-   *
-   * @param line
+   * @param line The source line to encode.
+   * @return The encoded instruction value.
    */
   abstract encode(line: string): number;
 
@@ -37,6 +38,19 @@ export abstract class Interpreter {
    * @return The program counter value before the interrupt jump
    */
   abstract interrupt(registers: Registers): number;
+
+  /**
+   * Resets the interpreter to its initial state by disabling interrupts
+   * and clearing any architecture-specific state.
+   */
+  public reset(registers: Registers): void {
+    this.resetArchitectureState(registers);
+  }
+
+  /**
+   * Reset the architecture-specific state. This method is called by the reset()
+   */
+  protected abstract resetArchitectureState(registers: Registers): void;
 
   /**
    * Extracts the tags from the code and stores them.

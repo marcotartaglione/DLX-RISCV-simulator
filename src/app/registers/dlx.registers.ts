@@ -8,12 +8,15 @@ export class DLXRegisters extends Registers {
 
   private _previousRegister: number = 0;
 
-  public iar: number = 0;
-  public mar: number = 0;
-  public ir: number = 0;
+  public instructionAddressRegister: number = 0;
+  public instructionRegister: number = 0;
+
+  public memoryAddressRegister: number = 0;
+  public memoryDataRegister: number = 0;
+
+
   public temp: number = 0;
-  public mdr: number = 0;
-  public ien: number = 0;
+
   public a: number = 0;
   public b: number = 0;
   public c: number = 0;

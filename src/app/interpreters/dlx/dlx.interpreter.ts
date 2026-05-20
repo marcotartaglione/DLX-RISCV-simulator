@@ -15,6 +15,7 @@ import {
   specialRegisters,
   uintToInt
 } from './dlx.instructions';
+import {StartLogicalNetwork} from '../../memory/model/logicalNetworks/start-logical-network';
 
 // TODO: la gestione dei diagrammi non deve far parte dell'interprete
 
@@ -112,12 +113,12 @@ export class DLXInterpreter extends Interpreter {
       ctx.registers.a = ctx.registers.registersValue[rs1];
       ctx.registers.b = ctx.registers.registersValue[rd];
 
-      ctx.registers.mar = signExtend(offset) + ctx.registers.a;
+      ctx.registers.memoryAddressRegister = signExtend(offset) + ctx.registers.a;
 
-      let rest = (ctx.registers.mar >>> 0) % 4;
-      let addr = (ctx.registers.mar >>> 0);
+      let rest = (ctx.registers.memoryAddressRegister >>> 0) % 4;
+      let addr = (ctx.registers.memoryAddressRegister >>> 0);
 
-      ctx.registers.mdr = ctx.memory!.load(addr - rest);
+      ctx.registers.memoryDataRegister = ctx.memory!.load(addr);
       ctx.registers.temp = rest;
 
       func(ctx.registers);
@@ -138,13 +139,12 @@ export class DLXInterpreter extends Interpreter {
         throw new WrongArgumentsError(ctx.instruction, DLXDocumentation);
       }
       ctx.registers.a = ctx.registers.registersValue[rs1];
-      ctx.registers.mdr = ctx.registers.b = ctx.registers.registersValue[rd];
-      ctx.registers.mar = signExtend(offset) + ctx.registers.a;
+      ctx.registers.memoryDataRegister = ctx.registers.b = ctx.registers.registersValue[rd];
+      ctx.registers.memoryAddressRegister = signExtend(offset) + ctx.registers.a;
       ctx.registers.setMarBold();
       ctx.registers.setMdrBold();
-      let rest = (ctx.registers.mar >>> 0) % 4;
-      ctx.registers.temp = rest;
-      let addr = (ctx.registers.mar >>> 0);
+      ctx.registers.temp = (ctx.registers.memoryAddressRegister >>> 0) % 4;
+      let addr = (ctx.registers.memoryAddressRegister >>> 0);
       ctx.memory!.store(addr, func(ctx.registers, [ctx.memory!.load(addr)]));
 
       if (DiagramService.instance.isAuto()) {
@@ -195,13 +195,16 @@ export class DLXInterpreter extends Interpreter {
         throw new WrongArgumentsError(ctx.instruction, DLXDocumentation);
       }
       func(ctx.registers);
-      this.interruptEnabled = true;
-      ctx.registers.ien = 0;
+      ctx.registers.interruptEnabled = 1;
       ctx.registers.resetIenBold();
       DiagramService.instance.dlxDiagrams.ienDown();
       this.updateDiagramAuto();
     }
   };
+
+  protected resetArchitectureState(registers:Registers): void {
+
+  }
 
   /**
    * Executes the given line of DLX assembly code
@@ -221,7 +224,7 @@ export class DLXInterpreter extends Interpreter {
     }
 
     let [opcode, alucode] = encoder[instructionName];
-    (registers as DLXRegisters).ir = parseInt(opcode + inputs_encoder[instructionConfig.type](argsFixed) + alucode, 2); //otteniamo l'istruzione scritta in 32 bit
+    (registers as DLXRegisters).instructionRegister = parseInt(opcode + inputs_encoder[instructionConfig.type](argsFixed) + alucode, 2); //otteniamo l'istruzione scritta in 32 bit
     (registers as DLXRegisters).setBold(0);
     (registers as DLXRegisters).resetRegistersBoldness();
 
@@ -237,7 +240,25 @@ export class DLXInterpreter extends Interpreter {
 
     this._processInstruction[instructionConfig.type](ctx, instructionConfig.func);
 
-    return registers.pc + 4;
+    const startNetwork = memory.devices.find(el => el instanceof StartLogicalNetwork) as StartLogicalNetwork | undefined;
+    if (startNetwork) {
+      if (startNetwork.startup) {
+        registers.interruptEnabled = 0;
+      }
+      else if (this._wasInStartup && !startNetwork.startup) {
+        registers.interruptEnabled = 1;
+      }
+
+      this._wasInStartup = startNetwork.startup;
+    }
+
+    let increment = 4;
+
+    if (instructionConfig.type === 'ReturnFromException') {
+      increment = 0;
+    }
+
+    return registers.pc + increment;
   }
 
   /**
@@ -266,19 +287,17 @@ export class DLXInterpreter extends Interpreter {
    * @returns The program counter value before the interrupt jump
    */
   public override interrupt(registers: DLXRegisters): number {
-    if (!this.interruptEnabled) {
+    if (registers.interruptEnabled === 0) {
       return registers.pc;
     }
 
     const beforeJump = registers.pc;
 
-    registers.iar = registers.pc;
+    registers.instructionAddressRegister = registers.pc;
     registers.setIarBold();
     registers.pc = 0;
-    registers.ien = 1;
+    registers.interruptEnabled = 0;
     registers.setIenBold();
-
-    this.interruptEnabled = false;
 
     DiagramService.instance.dlxDiagrams.ienUp();
 

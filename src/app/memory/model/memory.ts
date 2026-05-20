@@ -88,7 +88,6 @@ export class Memory {
     this.inputPorts = this.inputPorts.filter(el => el !== dev);
   }
 
-  // setto i nomi in base a quante input port ho mappato
   public setNameExt(num: number): string {
     let result = 'INPUT_PORT_';
 

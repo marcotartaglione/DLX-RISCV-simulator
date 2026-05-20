@@ -34,26 +34,26 @@
       <span>IAR</span>
       <div [ngStyle]="{'font-weight': dlxRegisters().iarBoldness, 'background-color': (dlxRegisters().iarBoldness=='bold') ? '#5a5a5a' : ''}"
            class="register special">
-        {{ dlxRegisters().iar | format: fType }}
+        {{ dlxRegisters().instructionAddressRegister | format: fType }}
       </div>
       <span>IEN</span>
       <div [ngStyle]="{'font-weight': dlxRegisters().ienBoldness, 'background-color': (dlxRegisters().ienBoldness=='bold') ? '#5a5a5a' : ''}"
            class="register special">
-        {{ dlxRegisters().ien | format: 'dec' }}
+        {{ dlxRegisters().interruptEnabled | format: 'dec' }}
       </div>
       <span>MAR</span>
       <div [ngStyle]="{'font-weight': dlxRegisters().marBoldness, 'background-color': (dlxRegisters().marBoldness=='bold') ? '#5a5a5a' : ''}"
            class="register special">
-        {{ dlxRegisters().mar | format: fType }}
+        {{ dlxRegisters().memoryAddressRegister | format: fType }}
       </div>
       <span>IR</span>
       <div [ngStyle]="{'font-weight': 'bold', 'background-color': '#5a5a5a'}"
-           class="register special">{{ dlxRegisters().ir | format: fType }}
+           class="register special">{{ dlxRegisters().instructionRegister | format: fType }}
       </div>
       <span>MDR</span>
       <div [ngStyle]="{'font-weight': dlxRegisters().mdrBoldness, 'background-color': (dlxRegisters().mdrBoldness=='bold') ? '#5a5a5a' : ''}"
            class="register special">
-        {{ dlxRegisters().mdr | format: fType }}
+        {{ dlxRegisters().memoryDataRegister | format: fType }}
       </div>
       <br/>
       <mat-form-field appearance="fill">

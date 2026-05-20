@@ -1,6 +1,6 @@
 <div class="btn-container">
   @if (selectedDevice(); as device) {
-    @if (selectedDevice().chipSelects.length > 0) {
+    @if (isLogicalNetwork(device)) {
       <button (click)="openDialogImage(device)" class="mr" mat-raised-button>
         <span class="btn">View logic circuit <i class="fa fa-code-branch"></i></span>
       </button>

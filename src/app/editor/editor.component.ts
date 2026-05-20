@@ -90,7 +90,6 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
 
   protected errorMessage = signal('');
   protected startTag = signal('init');
-  protected isInterruptDisabled = signal(true);
   protected intervalTime = signal(1000);
   protected selectedScript = signal('');
   protected readonly CodeService = CodeService;
@@ -119,7 +118,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     this.initEditorSettings();
 
     effect(() => {
-      if (!this._codeMirror()) {
+      if (!this._codeMirror() || !this._isRunning()) {
         return;
       }
 
@@ -150,14 +149,19 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  private _keepRunning = false;
+  private _keepRunning = signal(false);
 
-  protected isRunDisabled = computed(() =>
-    this._codeMirror() ? (this.addressToLine(this.pc()) >= this._codeMirror().lineCount()) || this._keepRunning : false
-  );
+  protected isRunDisabled = computed(() => {
+    if (!this._codeMirror()) {
+      return false;
+    }
+
+    const isAtEnd = this.addressToLine(this.pc()) >= this._codeMirror().lineCount();
+    return isAtEnd || this._keepRunning();
+  });
 
   public get keepRunning() {
-    return this._keepRunning;
+    return this._keepRunning();
   }
 
   public get inputPorts() {
@@ -282,7 +286,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     }
 
     if (this._timeout) {
-      clearInterval(this._timeout);
+      clearTimeout(this._timeout);
     }
   }
 
@@ -292,9 +296,9 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   }
 
   protected run() {
-    this._keepRunning = true;
+    this._keepRunning.set(true);
 
-    if (this.pc() >= this._codeService.linesCount * 4) {
+    if (this._codeMirror() && this.addressToLine(this.pc()) >= this._codeMirror().lineCount()) {
       this.pc.set(0);
     }
 
@@ -303,7 +307,10 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     }
 
     this.executeNextInstruction();
-    this._timeout = setTimeout(() => this.run(), this.intervalTime());
+
+    if (this._isRunning() && this._keepRunning()) {
+      this._timeout = setTimeout(() => this.run(), this.intervalTime());
+    }
   }
 
   protected executeNextInstruction() {
@@ -340,6 +347,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       this._diagramService.setAnimationDuration(this.intervalTime());
       this._diagramService.resume();
     }
+
     try {
       const newPc = this._codeService.interpreter.execute(
         this._codeMirror().getLine(this.addressToLine(this.pc())),
@@ -352,19 +360,12 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       const lineWithError = this.addressToLine(this.pc());
       this.stop();
 
-      // Necessary due to visuals update after stop, which removes error highlights
       setTimeout(() => {
         this._codeMirror().addLineClass(lineWithError, 'wrap', 'error');
         this.errorMessage.set(error.message);
         this._appRef.tick();
       }, 0);
     }
-
-    this._memoryService.devices.forEach(el => {
-      if (el instanceof StartLogicalNetwork) {
-        this.isInterruptDisabled.set((el as StartLogicalNetwork).startup);
-      }
-    });
   }
 
   protected pause() {
@@ -372,7 +373,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       clearTimeout(this._timeout);
     }
 
-    this._keepRunning = false;
+    this._keepRunning.set(false);
 
     if (this._diagramService.isAuto()) {
       this._diagramService.pause();
@@ -386,9 +387,15 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
 
     this._exRunnedInstruction = -1;
     this._runnedInstruction = -1;
+    this._codeService.interpreter.reset(this.registers());
 
-    // Dummy update to trigger visuals update and remove runned/next highlights
-    this.pc.set(0);
+    if (this._codeMirror()) {
+      for (let i = 0; i < this._codeMirror().lineCount(); i++) {
+        this._codeMirror().removeLineClass(i, 'wrap', 'error');
+        this._codeMirror().removeLineClass(i, 'wrap', 'runned');
+        this._codeMirror().removeLineClass(i, 'wrap', 'next');
+      }
+    }
   }
 
   protected save(download: boolean = false) {
@@ -444,7 +451,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   }
 
   private persistSettings() {
-    const settings = {start: this.startTag(), _interval: this.intervalTime()};
+    const settings = {start: this.startTag(), interval: this.intervalTime()};
     window.localStorage.setItem('editor_settings', JSON.stringify(settings));
   }
 
@@ -464,13 +471,21 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
         this._codeMirror().removeLineClass(i, 'wrap', 'next');
       }
     } else {
-      this._codeMirror().removeLineClass(this.addressToLine(prevAddr), 'wrap', 'runned');
-      this._codeMirror().removeLineClass(this.addressToLine(prevAddr), 'wrap', 'next');
-      this._codeMirror().removeLineClass(this.addressToLine(currentAddr), 'wrap', 'runned');
-      this._codeMirror().removeLineClass(this.addressToLine(currentAddr), 'wrap', 'next');
+      if (prevAddr >= 0) {
+        this._codeMirror().removeLineClass(this.addressToLine(prevAddr), 'wrap', 'runned');
+        this._codeMirror().removeLineClass(this.addressToLine(prevAddr), 'wrap', 'next');
+      }
+      if (currentAddr >= 0) {
+        this._codeMirror().removeLineClass(this.addressToLine(currentAddr), 'wrap', 'runned');
+        this._codeMirror().removeLineClass(this.addressToLine(currentAddr), 'wrap', 'next');
+      }
 
       this._codeMirror().addLineClass(this.addressToLine(currentAddr), 'wrap', 'runned');
-      this._codeMirror().addLineClass(this.addressToLine(nextAddr), 'wrap', 'next');
+
+      const nextLine = this.addressToLine(nextAddr);
+      if (nextLine < this._codeMirror().lineCount()) {
+        this._codeMirror().addLineClass(nextLine, 'wrap', 'next');
+      }
     }
   }
 }

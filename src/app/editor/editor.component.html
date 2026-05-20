@@ -11,12 +11,12 @@
 
   <div class="btn-container">
     <div class="right">
-      <button mat-raised-button class="mr" [disabled]="isInterruptDisabled()" (click)="onInterrupt()">
+      <button mat-raised-button class="mr" [disabled]="!registers().interruptEnabled" (click)="onInterrupt()">
         <span class="btn">Int (Led) <i class="fas fa-bolt amber"></i></span>
       </button>
 
       @if (inputPorts.length > 0) {
-        <button mat-raised-button class="mr" [matMenuTriggerFor]="menuInputPort" [disabled]="isInterruptDisabled()">
+        <button mat-raised-button class="mr" [matMenuTriggerFor]="menuInputPort" [disabled]="!registers().interruptEnabled">
           <span class="btn">Int (Input Port) <i class="fas fa-bolt amber"></i></span>
         </button>
       }

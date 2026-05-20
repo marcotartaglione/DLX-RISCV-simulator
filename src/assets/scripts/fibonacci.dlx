@@ -4,7 +4,7 @@ init:       LHI R30, 0x4000				; set R30 = 0x40000000h
 			LHI R29, 0XC000				; set R29 = 0xC0000000h (STARTUP address)
 			LBU R28, 0x0000(R29)		; read STARTUP signal into R28
 			BEQZ R28, handler			; if STARTUP == 0 then jump to (interrupt) handler
-			SB R0, 0x0004(R29)			; set STARTUP = 0
+			SB R0, 0x0001(R29)			; set STARTUP = 0
 			J main						; jump to main:
 handler:	LHI R29, 0x3000				; set R29 = 0x30000000h (INPUT_PORT address)
 			LBU R28, 0x0004(R29)		; read interrupt INPUT_PORT signal into R28
