@@ -1,11 +1,11 @@
 <mat-dialog-content>
-  <img src="{{data.network.imagePath}}" style="background-color:white" width="850px"/>
+  <img src="{{cloneDevice.imagePath}}" style="background-color:white" width="850px"/>
   <br/>
   <div>
     <div style="display:inline-block; margin:10px;">
       <mat-form-field appearance="fill">
         <mat-label>Clock Type</mat-label>
-        <mat-select [(value)]="data.network.clockType">
+        <mat-select [(value)]="cloneDevice.clockType">
           <mat-option value="MEMWR*">MEMWR*</mat-option>
           <mat-option value="MEMRD*">MEMRD*</mat-option>
         </mat-select>
@@ -14,12 +14,12 @@
     <div style="display:inline-block; margin:10px;">
       <mat-form-field appearance="fill">
         <mat-label>A_SET</mat-label>
-        <mat-select [(value)]="data.network.asyncSetSignal">
+        <mat-select [(value)]="cloneDevice.asyncSetSignal">
           <mat-option value="RESET">RESET</mat-option>
 
-          @if (isLedLogicalNetwork(data.network)) {
+          @if (isLedLogicalNetwork(cloneDevice)) {
             <mat-option value="CS_A_SET_LED">CS_A_SET_LED</mat-option>
-          } @else if (isStartLogicalNetwork(data.network)) {
+          } @else if (isStartLogicalNetwork(cloneDevice)) {
             <mat-option value="CS_A_SET_STARTUP">CS_A_SET_STARTUP</mat-option>
           }
 
@@ -30,12 +30,12 @@
     <div style="display:inline-block; margin:10px;">
       <mat-form-field appearance="fill">
         <mat-label>A_RES</mat-label>
-        <mat-select [(value)]="data.network.asyncResetSignal">
+        <mat-select [(value)]="cloneDevice.asyncResetSignal">
           <mat-option value="RESET">RESET</mat-option>
 
-          @if (isLedLogicalNetwork(data.network)) {
+          @if (isLedLogicalNetwork(cloneDevice)) {
             <mat-option value="CS_A_SET_LED">CS_A_SET_LED</mat-option>
-          } @else if (isStartLogicalNetwork(data.network)) {
+          } @else if (isStartLogicalNetwork(cloneDevice)) {
             <mat-option value="CS_A_SET_STARTUP">CS_A_SET_STARTUP</mat-option>
           }
 
@@ -46,10 +46,10 @@
   </div>
 
   <br/>
-  @if (data.network.chipSelects.length > 0) {
+  @if (cloneDevice.chipSelects.length > 0) {
     <div>
       <b>Chip-Select</b><br/>
-      @for (cs of data.network.chipSelects; track cs) {
+      @for (cs of cloneDevice.chipSelects; track cs) {
         <span>
           {{ cs.id }} - {{ cs.address | format: 'hex' }}<br/>
         </span>
@@ -58,10 +58,10 @@
   }
   <br/>
 
-  @if (isLedLogicalNetwork(data.network)) {
+  @if (isLedLogicalNetwork(cloneDevice)) {
     <div>
       <b>LED</b><br/>
-      @if (data.network.led) {
+      @if (cloneDevice.led) {
         <span>ON</span>
       } @else {
         <span>OFF</span>
@@ -69,10 +69,10 @@
     </div>
   }
 
-  @if (isStartLogicalNetwork(data.network)) {
+  @if (isStartLogicalNetwork(cloneDevice)) {
     <div>
       <b>STARTUP</b><br/>
-      @if (data.network.startup) {
+      @if (cloneDevice.startup) {
         <span>ON</span>
       } @else {
         <span>OFF</span>
@@ -81,5 +81,6 @@
   }
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Ok</button>
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button [mat-dialog-close]="cloneDevice" color="primary">Confirm</button>
 </mat-dialog-actions>

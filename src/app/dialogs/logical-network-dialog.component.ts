@@ -29,7 +29,23 @@ export interface LogicalNetworkDialogData {
   ]
 })
 export class LogicalNetworkDialogComponent {
-  public data = inject<LogicalNetworkDialogData>(MAT_DIALOG_DATA);
+  private originalDevice = inject<LogicalNetworkDialogData>(MAT_DIALOG_DATA);
+  protected cloneDevice: LogicalNetwork;
+
+  constructor() {
+
+    if (this.isLedLogicalNetwork(this.originalDevice.network)) {
+      this.cloneDevice = new LedLogicalNetwork(0, 1);
+    }
+    else if (this.isStartLogicalNetwork(this.originalDevice.network)) {
+      this.cloneDevice = new StartLogicalNetwork(0, 1);
+    }
+    else {
+      this.cloneDevice = new LogicalNetwork( "", 0, 1);
+    }
+
+    this.cloneDevice.updateFrom(this.originalDevice.network);
+  }
 
   protected isLedLogicalNetwork(device: LogicalNetwork): device is LedLogicalNetwork {
     return device instanceof LedLogicalNetwork;

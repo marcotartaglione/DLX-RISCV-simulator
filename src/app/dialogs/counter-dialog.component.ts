@@ -1,7 +1,6 @@
-import {Component, inject} from '@angular/core';
+import {Component, effect, inject, OnInit, signal} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent} from '@angular/material/dialog';
 import {Counter} from '../memory/model/logicalNetworks/counter';
-import {ErrorDialogComponent} from './error-dialog.component';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
 import {FormsModule} from '@angular/forms';
@@ -17,6 +16,7 @@ export interface CounterDialogData {
 @Component({
   templateUrl: './counter-dialog.component.html',
   standalone: true,
+  providers: [FormatPipe],
   imports: [
     MatDialogContent,
     MatFormField,
@@ -31,28 +31,75 @@ export interface CounterDialogData {
     MatLabel
   ]
 })
-export class CounterDialogComponent {
-  protected data = inject<CounterDialogData>(MAT_DIALOG_DATA);
-  private _dialog = inject(MatDialog);
+export class CounterDialogComponent implements OnInit {
+  private data = inject<CounterDialogData>(MAT_DIALOG_DATA);
 
-  protected onCountingBasisChange() {
-    this.data.network.asyncReset();
+  private _formatPipe = inject(FormatPipe);
+
+  protected cloneDevice: Counter;
+  protected hexCurrentValueDisplay = signal('');
+  protected hexLoadValueDisplay = signal('');
+  protected countingBasis = signal(0);
+
+  constructor() {
+    this.cloneDevice = new Counter(0, 5);
+    this.cloneDevice.updateFrom(this.data.network);
+
+    effect(() => {
+      const basis = this.countingBasis();
+      this.applyPadding();
+    });
   }
 
-  protected onSubmit() {
-    if (this.data.network.countingBasis < 2 || this.data.network.countingBasis > 32) {
-      this._dialog.open(ErrorDialogComponent, {
-        data: {message: 'Counting Basis: must be between 2 and 32'}
-      });
-      this.data.network.countingBasis = 32;
+  ngOnInit() {
+    this.hexCurrentValueDisplay.set(this._formatPipe.transform(this.cloneDevice.currentValue, 'hex', this.cloneDevice.countingBasis));
+    this.hexLoadValueDisplay.set(this._formatPipe.transform(this.cloneDevice.loadValue, 'hex', this.cloneDevice.countingBasis));
+    this.countingBasis.set(this.cloneDevice.countingBasis);
+  }
+
+  protected onCurrentValueChange(newValue: string) {
+    this.hexCurrentValueDisplay.set(newValue);
+    const hexVal = this._formatPipe.transform(this.hexCurrentValueDisplay(), 'dec', this.cloneDevice.countingBasis);
+    if (!isNaN(hexVal)) {
+      this.cloneDevice.currentValue = hexVal;
+    }
+  }
+
+  protected onLoadValueChange(newValue: string) {
+    this.hexLoadValueDisplay.set(newValue);
+    const hexVal = this._formatPipe.transform(this.hexLoadValueDisplay(), 'dec', this.cloneDevice.countingBasis);
+    if (!isNaN(hexVal)) {
+      this.cloneDevice.loadValue = hexVal;
+    }
+  }
+
+  protected applyPadding() {
+    this.hexCurrentValueDisplay.set(this._formatPipe.transform(
+      this.cloneDevice.currentValue,
+      'hex',
+      this.cloneDevice.countingBasis
+    ));
+
+    this.hexLoadValueDisplay.set(this._formatPipe.transform(
+      this.cloneDevice.loadValue,
+      'hex',
+      this.cloneDevice.countingBasis
+    ));
+  }
+
+  protected onCountingBasisChange() {
+    if (isNaN(this.countingBasis())) {
+      this.countingBasis.set(32);
       return;
+    }
+    else if (this.countingBasis() < 2) {
+      this.countingBasis.set(2);
+    }
+    else if (this.countingBasis() > 32) {
+      this.countingBasis.set(32);
     }
 
-    if (this.data.network.loadValue < 0 || this.data.network.loadValue > Math.pow(2, this.data.network.countingBasis)) {
-      this._dialog.open(ErrorDialogComponent, {
-        data: {message: 'Load Values: must be between 1 and ' + Math.pow(2, this.data.network.countingBasis)}
-      });
-      return;
-    }
+    this.cloneDevice.countingBasis = this.countingBasis();
+    this.cloneDevice.asyncReset();
   }
 }
