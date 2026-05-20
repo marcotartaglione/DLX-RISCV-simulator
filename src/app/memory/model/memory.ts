@@ -103,8 +103,4 @@ export class Memory {
   private findDevice(address: number) {
     return this.devices.find(dev => dev.hasAddress(address));
   }
-
-  private checkOverlap(dev1: Device, dev2: Device): boolean {
-    return dev1.minAddress <= dev2.maxAddress && dev1.maxAddress >= dev2.minAddress;
-  }
 }

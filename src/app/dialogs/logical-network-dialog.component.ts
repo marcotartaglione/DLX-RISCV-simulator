@@ -1,4 +1,4 @@
-import {Component, inject, Inject} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent} from '@angular/material/dialog';
 import {LogicalNetwork} from '../memory/model/logical-network';
 import {LedLogicalNetwork} from '../memory/model/logicalNetworks/led-logical-network';
