@@ -69,7 +69,7 @@ export class StartLogicalNetwork extends LogicalNetwork {
     switch (cs.id) {
       case 'CS_READ_STARTUP':
         // Big endian
-        return this.ffd ? 0x01000000 : 0;
+        return this.ffd ? this.positionValue(1, address) : 0;
     }
 
     return 0;

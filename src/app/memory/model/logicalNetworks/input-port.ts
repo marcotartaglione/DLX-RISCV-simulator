@@ -12,7 +12,7 @@ export class InputPort extends LogicalNetwork {
   constructor(
     minAddress: number,
     maxAddress: number,
-    private _data = 0,
+    private _data: number | undefined = 0,
     private _dataSize: InputPortSize = 8,
     private _interrupt = false,
     asyncSetSignal = 'RESET',
@@ -21,6 +21,10 @@ export class InputPort extends LogicalNetwork {
   ) {
     super('INPUT_PORT', minAddress, maxAddress, asyncSetSignal, asyncResetSignal,
       `assets/img/input-port/input_port_bit_${_dataSize}.jpg`, clkType);
+
+    if (_data === undefined) {
+      this._data = Math.floor(Math.random() * (2 ** _dataSize));
+    }
 
     this.setChipSelect(ChipSelect.of('CS_INPUT_PORT', this.minAddress), 0);
     this.setChipSelect(ChipSelect.of('CS_READ_INT_INPUT_PORT', this.minAddress + 0x00000001), 1);
@@ -78,7 +82,6 @@ export class InputPort extends LogicalNetwork {
       case 'CS_INPUT_PORT':
         if (this.clockType === 'MEMRD*') {
           this._interrupt = false;
-          this.generateData();
           this.setChipSelect(ChipSelect.of('CS_INPUT_PORT', this.minAddress), this._data);
           return this.positionValue(this._data, address);
         }
@@ -113,10 +116,5 @@ export class InputPort extends LogicalNetwork {
     this._data = json.data;
     this._dataSize = json.dataSize;
     this._interrupt = json.interrupt;
-  }
-
-  private generateData() {
-    const max = Math.pow(2, this._dataSize);
-    this._data = Math.floor(Math.random() * max);
   }
 }

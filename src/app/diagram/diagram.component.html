@@ -70,7 +70,7 @@
 
   <span>ADDRESS</span>
   @if (diagramService.isAddressVisible()) {
-    <span>{{ registers().mar | format: 'hex' }}h</span>
+    <span>{{ registers().memoryAddressRegister | format: 'hex' }}h</span>
   }
   <div class="diagram">
     <img class="{{diagramService.dlxDiagrams.getDiagram('address').animationClass}}"
@@ -118,7 +118,7 @@
 
   <span>DATA</span>
   @if (diagramService.isAddressVisible()) {
-    <span>   {{ registers().mdr | format: 'hex' }}h</span>
+    <span>   {{ registers().memoryDataRegister | format: 'hex' }}h</span>
   }
   <div class="diagram">
     <img class="{{diagramService.dlxDiagrams.getDiagram('data').animationClass}}"

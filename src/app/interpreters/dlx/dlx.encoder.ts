@@ -3,7 +3,7 @@ import {DLXInstruction, DLXInstructionType} from './dlx.instructions';
 export const inputs_encoder: { [key in DLXInstructionType]: (args: number[]) => string } = {
   Register: ([rd, rs1, rs2]) => rs1.toString(2).padStart(5, '0') + rs2.toString(2).padStart(5, '0') + rd.toString(2).padStart(5, '0') + '00000',
   RegisterMove: ([rd, rs1]) => inputs_encoder['Register']([rd, rs1, 0]),
-  Immediate: ([rd, rs1, immediate]) => rd.toString(2).padStart(5, '0') + rs1.toString(2).padStart(5, '0') + immediate.toString(2).padStart(16, '0'),
+  Immediate: ([rd, rs1, immediate]) => rd.toString(2).padStart(5, '0') + rs1.toString(2).padStart(5, '0') + immediate?.toString(2).padStart(16, '0'),
   ImmediateBranch: ([rs1, name]) => inputs_encoder['Immediate']([0, rs1, name]),
   ImmediateJump: ([rs1]) => inputs_encoder['Immediate']([rs1, 0, 0]),
   ImmediateLoad: ([rd, offset, rs1]) => inputs_encoder['Immediate']([rd, rs1, offset]),

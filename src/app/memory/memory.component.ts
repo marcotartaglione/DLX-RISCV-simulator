@@ -97,14 +97,21 @@ export class MemoryComponent {
     return (this.selectedDevice().name !== 'EPROM') && (index < devices.length - 1);
   }
 
-  protected openDialogImage(n: Device) {
-    const dialogComponent = DeviceDialogRegistry.getDialogComponent(n);
-
-    if (dialogComponent) {
-      this._dialog.open(dialogComponent, {
-        data: {network: n}
-      });
+  protected openDialogImage(logicalNetwork: LogicalNetwork) {
+    const dialogComponent = DeviceDialogRegistry.getDialogComponent(logicalNetwork);
+    if (!dialogComponent) {
+      return;
     }
+
+    const dialogRef = this._dialog.open(dialogComponent, {
+      data: {network: logicalNetwork}
+    });
+
+    dialogRef.afterClosed().subscribe((result: LogicalNetwork) => {
+      if (result) {
+        logicalNetwork.updateFrom(result);
+      }
+    });
   }
 
   protected onAdd(type: Type<Device>) {

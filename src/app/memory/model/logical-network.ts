@@ -99,6 +99,17 @@ export class LogicalNetwork extends Device implements IVisualizable {
     return (word >>> shift) & 0xFF;
   }
 
+  /**
+   * Adapts given data inside a word based on given address
+   *
+   * @param value
+   * @param address
+   * @protected
+   *
+   * @example
+   * positionValue(0xAB, 1) => 0x00AB0000
+   * positionValue(0x9F, 3) => 0x0000009F
+   */
   protected positionValue(value: number, address: number): number {
     const offset = address % 4;
     const shift = (3 - offset) * 8;

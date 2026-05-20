@@ -110,7 +110,6 @@ export class MemoryService {
   }
 
   getCounter(): Counter {
-    console.log('name ' + this._memory.get('COUNTER').name);
     return this._memory.get('COUNTER') as Counter;
   }
 }

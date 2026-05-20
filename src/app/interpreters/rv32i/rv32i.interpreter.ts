@@ -235,6 +235,8 @@ export class RV32Interpreter extends Interpreter {
     },
   };
 
+  protected resetArchitectureState(registers:Registers): void {}
+
   // PREP, Prepares args in the right format to be executed by the instructions
   prepR([rd, rs1, rs2]: number[], registers: RV32IRegisters): number {
     if (rd == 0) {
@@ -384,8 +386,8 @@ export class RV32Interpreter extends Interpreter {
   public interrupt(registers: Registers): number {
     const beforeInterrupt = registers.pc;
 
-    if (this.interruptEnabled) {
-      this.interruptEnabled = false;
+    if (registers.interruptEnabled !== 0) {
+      registers.interruptEnabled = 0;
       (registers as RV32IRegisters).x[5] = registers.pc;
       registers.pc = BASE;
       // in caso di VECTORED INTERRUPTS -> PC = BASE + ExcCode * 4

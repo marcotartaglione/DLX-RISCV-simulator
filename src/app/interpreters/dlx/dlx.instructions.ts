@@ -210,15 +210,15 @@ export const instructions: {
   },
   LB: {
     type: 'ImmediateLoad',
-    func: (registers) => registers.c = signExtend(load(registers.mdr, registers.temp, 'byte'), 8)
+    func: (registers) => registers.c = signExtend(load(registers.memoryDataRegister, registers.temp, 'byte'), 8)
   },
   LBU: {
     type: 'ImmediateLoad',
-    func: (registers) => registers.c = load(registers.mdr, registers.temp, 'byte')
+    func: (registers) => registers.c = load(registers.memoryDataRegister, registers.temp, 'byte')
   },
   LH: {
     type: 'ImmediateLoad',
-    func: (registers) => registers.c = signExtend(load(registers.mdr, registers.temp, 'halfword'))
+    func: (registers) => registers.c = signExtend(load(registers.memoryDataRegister, registers.temp, 'halfword'))
   },
   LHI: {
     type: 'LoadHighImmediate',
@@ -226,11 +226,11 @@ export const instructions: {
   },
   LHU: {
     type: 'ImmediateLoad',
-    func: (registers) => registers.c = load(registers.mdr, registers.temp, 'halfword')
+    func: (registers) => registers.c = load(registers.memoryDataRegister, registers.temp, 'halfword')
   },
   LW: {
     type: 'ImmediateLoad',
-    func: (registers) => registers.c = load(registers.mdr, registers.temp, 'word')
+    func: (registers) => registers.c = load(registers.memoryDataRegister, registers.temp, 'word')
   },
   MOVI2S: {
     type: 'RegisterMove',
@@ -255,11 +255,11 @@ export const instructions: {
   },
   RFE: {
     type: 'ReturnFromException',
-    func: (registers) => registers.pc = registers.iar
+    func: (registers) => registers.pc = registers.instructionAddressRegister
   },
   SB: {
     type: 'ImmediateStore',
-    func: (registers, [stored]) => storeValue(registers.mdr, stored, registers.temp, 'byte')
+    func: (registers, [stored]) => storeValue(registers.memoryDataRegister, stored, registers.temp, 'byte')
   },
   SEQ: {
     type: 'Register',
@@ -287,7 +287,7 @@ export const instructions: {
   },
   SH: {
     type: 'ImmediateStore',
-    func: (registers, [stored]) => storeValue(registers.mdr, stored, registers.temp, 'halfword')
+    func: (registers, [stored]) => storeValue(registers.memoryDataRegister, stored, registers.temp, 'halfword')
   },
   SLE: {
     type: 'Register',
@@ -356,11 +356,11 @@ export const instructions: {
   },
   SW: {
     type: 'ImmediateStore',
-    func: (registers, [stored]) => storeValue(registers.mdr, stored, registers.temp, 'word')
+    func: (registers, [stored]) => storeValue(registers.memoryDataRegister, stored, registers.temp, 'word')
   },
   TRAP: {
     type: 'Jump', func: (registers) => {
-      registers.iar = registers.pc + 4;
+      registers.instructionAddressRegister = registers.pc + 4;
       return registers.pc = registers.temp;
     }, unsigned: true
   },

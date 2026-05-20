@@ -25,6 +25,8 @@ export class Device {
     this._memory.forEach((_, i) => this._memory[i] = Math.floor(Math.random() * 0x100000000)); // Simulate uninitialized memory with random data
   }
 
+  // TODO: spostare i chipselect in LogicalNetwork
+
   public get chipSelects(): ChipSelect[] {
     return this._chipSelects;
   }
@@ -71,6 +73,26 @@ export class Device {
     this._minAddress = json.minAddress;
     this._maxAddress = json.maxAddress;
     this._chipSelects = json.chipSelects.map((cs: any) => ChipSelect.fromJSON(cs));
+  }
+
+  /**
+   * Updates the device based on another device
+   * @param other Source device
+   */
+  public updateFrom(other: Device) {
+    this.name = other.name;
+    this._minAddress = other._minAddress;
+    this._maxAddress = other._maxAddress;
+
+    // Deep copy
+    this._chipSelects = other.chipSelects.map((cs: any) => ChipSelect.fromJSON(cs.toJSON()));
+
+    // Deep copy
+    if (this._memory.length !== other._memory.length) {
+      this._memory = new Uint32Array(other._memory);
+    } else {
+      this._memory = other._memory;
+    }
   }
 
   /**
