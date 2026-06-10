@@ -112,6 +112,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   private _timeout: any;
   private _exRunnedInstruction = -1;
   private _runnedInstruction = -1;
+  private _errorLine = -1
 
   constructor() {
     this.initEditorSettings();
@@ -314,7 +315,9 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
 
   protected executeNextInstruction() {
     if (!this._isRunning()) {
-      this._codeMirror().removeLineClass(this.addressToLine(this._runnedInstruction), 'wrap', 'error');
+      this._codeMirror().removeLineClass(this._errorLine, 'wrap', 'error');
+      this._errorLine = -1;
+
       this.errorMessage.set(undefined);
 
       this._memoryService.devices.forEach(el => {
@@ -356,11 +359,11 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
 
       this.pc.set(newPc);
     } catch (error) {
-      const lineWithError = this.addressToLine(this.pc());
+      this._errorLine = this.addressToLine(this.pc());
       this.stop();
 
       setTimeout(() => {
-        this._codeMirror().addLineClass(lineWithError, 'wrap', 'error');
+        this._codeMirror().addLineClass(this._errorLine, 'wrap', 'error');
         this.errorMessage.set(error.message);
         this._appRef.tick();
       }, 0);
@@ -465,7 +468,6 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
 
     if (!this._isRunning()) {
       for (let i = 0; i < this._codeMirror().lineCount(); i++) {
-        this._codeMirror().removeLineClass(i, 'wrap', 'error');
         this._codeMirror().removeLineClass(i, 'wrap', 'runned');
         this._codeMirror().removeLineClass(i, 'wrap', 'next');
       }
@@ -477,12 +479,14 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       if (currentAddr >= 0) {
         this._codeMirror().removeLineClass(this.addressToLine(currentAddr), 'wrap', 'runned');
         this._codeMirror().removeLineClass(this.addressToLine(currentAddr), 'wrap', 'next');
+        this._codeMirror().removeLineClass(this.addressToLine(currentAddr), 'wrap', 'next');
       }
 
       this._codeMirror().addLineClass(this.addressToLine(currentAddr), 'wrap', 'runned');
 
       const nextLine = this.addressToLine(nextAddr);
       if (nextLine < this._codeMirror().lineCount()) {
+        this._codeMirror().removeLineClass(nextLine, 'wrap', 'error');
         this._codeMirror().addLineClass(nextLine, 'wrap', 'next');
       }
     }
