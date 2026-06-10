@@ -1,18 +1,26 @@
-import CodeMirror from "codemirror";
-import {DLX_INSTRUCTIONS} from '../../interpreters/dlx/dlx.instructions';
+import CodeMirror from 'codemirror';
+import {
+  DLX_INSTRUCTIONS,
+  DLX_INSTRUCTIONS_I,
+  DLX_INSTRUCTIONS_IJ,
+  DLX_INSTRUCTIONS_J,
+  DLX_INSTRUCTIONS_R,
+  specialRegisters
+} from '../../interpreters/dlx/dlx.instructions';
+import {instructions} from '../../interpreters/dlx/dlx.instruction-set';
 import {DLXRegisters} from '../../registers/dlx.registers';
 
-(CodeMirror as any).defineMode('dlx', function () {
-  const instructions_R = 'ADDU|ADD|AND|MOVI2S|MOVS2I|NOP|OR|SEQ|SGE|SGT|SLE|SLL|SLT|SNE|SRA|SRL|SUBU|SUB|XOR';
-  const instructions_I = 'ADDI|ADDUI|ANDI|LBU|LB|LHI|LHU|LH|LW|ORI|SB|SEQI|SGEI|SGTI|SH|SLEI|SLLI|SLTI|SNEI|SRAI|SRLI|SUBI|SUBUI|SW|XORI';
-  const instructions_IJ = 'BEQZ|BNEZ|JALR|JR';
-  const instructions_J = 'JAL|J|RFE|TRAP';
+(CodeMirror as any).defineMode('dlx', function() {
+  const instructions_R = DLX_INSTRUCTIONS_R.join('|');
+  const instructions_I = DLX_INSTRUCTIONS_I.join('|');
+  const instructions_IJ = DLX_INSTRUCTIONS_IJ.join('|');
+  const instructions_J = DLX_INSTRUCTIONS_J.join('|');
 
   return {
-    startState: function () {
+    startState: function() {
       return {first: true, j_instruction: false, indent: 0};
     },
-    token: function (stream: any, state: any) {
+    token: function(stream: any, state: any) {
       let style: string;
       let matched: any;
 
@@ -53,7 +61,7 @@ import {DLXRegisters} from '../../registers/dlx.registers';
 
       return style;
     },
-    indent: function (state: any) {
+    indent: function(state: any) {
       return state.indent;
     }
   };
@@ -62,26 +70,49 @@ import {DLXRegisters} from '../../registers/dlx.registers';
 (CodeMirror as any).registerHelper('hint', 'dlx', (editor: any) => {
   const cursor = editor.getCursor();
   const token = editor.getTokenAt(cursor);
-  const currentWord = token.string.toUpperCase();
 
-  const registers = Array.from({length: DLXRegisters.registersCount}, (_, i) => `R${i}`).concat(['IAR']);
-  const instructions = [...DLX_INSTRUCTIONS];
+  const line = editor.getLine(cursor.line);
+  const beforeCursor = line.slice(0, cursor.ch);
 
-  const suggestions = [...instructions, ...registers];
-  const filtered = suggestions.filter(item => item.startsWith(currentWord));
+  const match = beforeCursor.search(/[\w]+$/) !== -1
+    ? beforeCursor.match(/[\w]+$/)[0].toUpperCase()
+    : '';
+  const currentWord = match;
 
-  const list = filtered.map(item => {
-    const isReg = registers.includes(item);
-    return {
-      text: item,
-      displayText: item,
-      className: isReg ? 'hint-register' : 'hint-instruction'
-    };
-  });
+  if (token.type === 'comment') {
+    return { list: [], from: cursor, to: cursor };
+  }
+
+  const lineUpToCursor = beforeCursor.trimStart();
+  const tokensBefore = lineUpToCursor.split(/\s+/).filter(Boolean);
+
+  const firstMeaningfulToken =
+    tokensBefore[0]?.endsWith(':') ? tokensBefore[1] : tokensBefore[0];
+  const isFirstWord =
+    !firstMeaningfulToken ||
+    firstMeaningfulToken.toUpperCase() === currentWord;
+
+  const registers = Array.from({length: DLXRegisters.registersCount}, (_, i) => `R${i}`).concat(specialRegisters);
+
+  const suggestions = isFirstWord
+    ? DLX_INSTRUCTIONS
+    : [...DLX_INSTRUCTIONS, ...registers];
+
+  const filtered = currentWord
+    ? suggestions.filter((item) => item.startsWith(currentWord))
+    : suggestions;
+
+  const list = filtered.map((item) => ({
+    text: item,
+    displayText: item,
+    className: registers.includes(item) ? 'hint-register' : 'hint-instruction',
+  }));
+
+  const wordRange = editor.findWordAt(cursor);
 
   return {
     list,
-    from: CodeMirror.Pos(cursor.line, token.start),
-    to: CodeMirror.Pos(cursor.line, token.end),
+    from: wordRange.anchor,
+    to: wordRange.head,
   };
 });
