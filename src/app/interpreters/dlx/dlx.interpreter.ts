@@ -7,15 +7,11 @@ import {Interpreter} from '../interpreter';
 import {NotExistingInstructionError, RegisterNotFoundError, WrongArgumentsError} from '../interpreter-errors';
 import {encoder, inputs_encoder} from './dlx.encoder';
 import {
-  DLXInstructionType,
-  DLXStructuredInstruction,
-  InstructionConfig,
-  instructions,
-  signExtend,
   specialRegisters,
-  uintToInt
 } from './dlx.instructions';
 import {StartLogicalNetwork} from '../../memory/model/logicalNetworks/start-logical-network';
+import {DLXInstructionType, DLXStructuredInstruction, InstructionConfig} from './dlx.types';
+import {instructions, signExtend, uintToInt} from './dlx.instruction-set';
 
 // TODO: la gestione dei diagrammi non deve far parte dell'interprete
 
@@ -60,7 +56,7 @@ export class DLXInterpreter extends Interpreter {
 
     Immediate: (ctx, func) => {
       const [rd, rs1, immediate] = ctx.args;
-      if (!(/\w+\s+R[123]?\d\s*,\s*R[123]?\d\s*,\s*0x([0-9A-F]{4})/i.test(ctx.line))) {
+      if (!(/\w+\s+R[123]?\d\s*,\s*R[123]?\d\s*,\s*0x([0-9A-F]{1,4})/i.test(ctx.line))) {
         throw new WrongArgumentsError(ctx.instruction, DLXDocumentation);
       }
       ctx.registers.a = ctx.registers.registersValue[rs1];
@@ -363,7 +359,7 @@ export class DLXInterpreter extends Interpreter {
         return register;
       }
 
-      const specialIndex = specialRegisters.indexOf(arg.toUpperCase());
+      const specialIndex = specialRegisters.findIndex(r => r === arg.toUpperCase());
       if (specialIndex !== -1) {
         return specialIndex + 1;
       }

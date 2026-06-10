@@ -1,4 +1,5 @@
-import {DLXInstruction, DLXInstructionType} from './dlx.instructions';
+import {DLXInstruction} from './dlx.instructions';
+import {DLXInstructionType} from './dlx.types';
 
 export const inputs_encoder: { [key in DLXInstructionType]: (args: number[]) => string } = {
   Register: ([rd, rs1, rs2]) => rs1.toString(2).padStart(5, '0') + rs2.toString(2).padStart(5, '0') + rd.toString(2).padStart(5, '0') + '00000',
