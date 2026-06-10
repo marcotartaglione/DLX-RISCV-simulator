@@ -254,7 +254,8 @@ export class DLXInterpreter extends Interpreter {
       increment = 0;
     }
 
-    return registers.pc + increment;
+    registers.pc = registers.pc + increment;
+    return registers.pc;
   }
 
   /**
