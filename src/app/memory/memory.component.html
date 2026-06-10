@@ -18,7 +18,7 @@
   <div class="memory">
     @for (device of memoryService.devices; track device) {
       @if (deviceImage(device) !== '') {
-        <img (click)="selectedDevice() === device ? selectedDevice.set(null) : selectedDevice.set(device)"
+        <img (click)="selectDevice(device)"
              [class.selected]="selectedDevice() === device"
              [matTooltip]="device.name + (isLogicalNetwork(device) ? ' ' + (device.ffd ? '1' : '0') : '')"
              [style.left]="((device.minAddress / MAX_32_BIT_ADDRESS) * 100 - 3.5).toFixed(2) + '%'"
@@ -38,7 +38,7 @@
           </div>
         }
       } @else {
-        <div (click)="selectedDevice() === device ? selectedDevice.set(null) : selectedDevice.set(device)"
+        <div (click)="selectDevice(device)"
              [class.selected]="selectedDevice() === device"
              [matTooltip]="device.size('MB') + 'MB'"
              [style.left]="((device.minAddress / MAX_32_BIT_ADDRESS) * 100).toFixed(2) + '%'"
@@ -109,7 +109,7 @@
 
           @if (selectedChipSelect() && selectedChipSelect().id.length > 0) {
             <mat-form-field appearance="fill" class="standard_margin_hor" id="csAddr" subscriptSizing="dynamic">
-              <mat-label>address</mat-label>
+              <mat-label>Address Value</mat-label>
               <input (change)="onChangeCS($any($event.target).value, selectedChipSelect().id)"
                      [value]="selectedChipSelect().address | format: 'hex'"
                      matInput

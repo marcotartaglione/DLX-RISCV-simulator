@@ -11,9 +11,15 @@
 
   <div class="btn-container">
     <div class="right">
-      <button mat-raised-button class="mr" [disabled]="!registers().interruptEnabled" (click)="onInterrupt()">
+      <button mat-raised-button class="mr" [matMenuTriggerFor]="menuLed" [disabled]="!registers().interruptEnabled">
         <span class="btn">Int (Led) <i class="fas fa-bolt amber"></i></span>
       </button>
+
+      <mat-menu #menuLed="matMenu">
+        @for (device of leds; track device.name) {
+          <button mat-menu-item (click)="onInterrupt(device)">{{ device.name }}</button>
+        }
+      </mat-menu>
 
       @if (inputPorts.length > 0) {
         <button mat-raised-button class="mr" [matMenuTriggerFor]="menuInputPort" [disabled]="!registers().interruptEnabled">
@@ -23,7 +29,7 @@
 
       <mat-menu #menuInputPort="matMenu">
         @for (device of inputPorts; track device.name) {
-          <button mat-menu-item (click)="onInterruptPort()">{{ device.name }}</button>
+          <button mat-menu-item (click)="onInterrupt(device)">{{ device.name }}</button>
         }
       </mat-menu>
 

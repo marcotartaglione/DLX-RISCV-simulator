@@ -104,6 +104,17 @@ export class MemoryService {
     return this._memory.firstFreeAddr(startAddress);
   }
 
+  /**
+   * Triggers the device interrupt logic
+   *
+   * @param device
+   */
+  public interrupt(device: Device) {
+    if (device instanceof InputPort) {
+      device.interrupt();
+    }
+  }
+
   getEprom(): Eprom {
     return this._memory.get('EPROM') as Eprom;
   }
