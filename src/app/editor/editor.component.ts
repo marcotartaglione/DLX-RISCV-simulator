@@ -84,7 +84,7 @@ import {DLX_INSTRUCTIONS} from '../interpreters/dlx/dlx.instructions';
 export class EditorComponent implements AfterViewInit, OnDestroy {
 
   public registers = input.required<Registers>();
-  public pc = model<number>(0, {alias: 'pc'});
+  public pc = signal(0);
   public wasContentModified = output<boolean>();
 
   protected errorMessage = signal('');
@@ -118,12 +118,9 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     this.initEditorSettings();
 
     effect(() => {
-      if (!this._codeMirror() || !this._isRunning()) {
-        return;
-      }
+      this.pc.set(this.registers().pc);
+    })
 
-      this.updateVisuals(this._exRunnedInstruction, this._runnedInstruction, this.pc());
-    });
 
     effect(() => {
       const newContent = this._codeService.content();
@@ -357,7 +354,13 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
         this._memoryService.memory
       );
 
+      this.registers().pc = newPc;
       this.pc.set(newPc);
+
+      // Call updateVisuals directly to ensure it's called even if PC doesn't change (e.g., jump to same address)
+      if (this._isRunning()) {
+        this.updateVisuals(this._exRunnedInstruction, this._runnedInstruction, this.pc());
+      }
     } catch (error) {
       this._errorLine = this.addressToLine(this.pc());
       this.stop();
@@ -391,6 +394,9 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     this._runnedInstruction = -1;
     this._codeService.interpreter.reset(this.registers());
 
+    this.registers().pc = 0;
+    this.pc.set(0);
+
     if (this._codeMirror()) {
       for (let i = 0; i < this._codeMirror().lineCount(); i++) {
         this._codeMirror().removeLineClass(i, 'wrap', 'error');
@@ -418,6 +424,9 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     this._codeService.load();
     this.storeCodeInEprom();
 
+    this.registers().pc = 0;
+    this.pc.set(0);
+
     if (this._diagramService.isAuto()) {
       this._diagramService.stop();
     }
@@ -427,10 +436,12 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     this._exRunnedInstruction = this._runnedInstruction;
     this._runnedInstruction = this.pc();
     this._codeService.interpreter.interrupt(this.registers());
+    this.pc.set(this.registers().pc);
   }
 
   protected onInterruptPort() {
     this._codeService.interpreter.interrupt(this.registers());
+    this.pc.set(this.registers().pc);
   }
 
   private storeCodeInEprom() {
@@ -470,22 +481,24 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       for (let i = 0; i < this._codeMirror().lineCount(); i++) {
         this._codeMirror().removeLineClass(i, 'wrap', 'runned');
         this._codeMirror().removeLineClass(i, 'wrap', 'next');
+        this._codeMirror().removeLineClass(i, 'wrap', 'error');
       }
     } else {
       if (prevAddr >= 0) {
         this._codeMirror().removeLineClass(this.addressToLine(prevAddr), 'wrap', 'runned');
         this._codeMirror().removeLineClass(this.addressToLine(prevAddr), 'wrap', 'next');
+        this._codeMirror().removeLineClass(this.addressToLine(prevAddr), 'wrap', 'error');
       }
       if (currentAddr >= 0) {
         this._codeMirror().removeLineClass(this.addressToLine(currentAddr), 'wrap', 'runned');
         this._codeMirror().removeLineClass(this.addressToLine(currentAddr), 'wrap', 'next');
-        this._codeMirror().removeLineClass(this.addressToLine(currentAddr), 'wrap', 'next');
+        this._codeMirror().removeLineClass(this.addressToLine(currentAddr), 'wrap', 'error');
       }
 
       this._codeMirror().addLineClass(this.addressToLine(currentAddr), 'wrap', 'runned');
 
       const nextLine = this.addressToLine(nextAddr);
-      if (nextLine < this._codeMirror().lineCount()) {
+      if (nextLine < this._codeMirror().lineCount() && nextLine !== this.addressToLine(currentAddr)) {
         this._codeMirror().removeLineClass(nextLine, 'wrap', 'error');
         this._codeMirror().addLineClass(nextLine, 'wrap', 'next');
       }
