@@ -9,7 +9,6 @@ import {
   HostListener,
   inject,
   input,
-  model,
   OnDestroy,
   output,
   signal,
@@ -38,6 +37,8 @@ import {MatTooltip} from '@angular/material/tooltip';
 import 'codemirror/addon/hint/show-hint';
 import 'codemirror/addon/hint/show-hint.css';
 import {DLX_INSTRUCTIONS} from '../interpreters/dlx/dlx.instructions';
+import {Device} from '../memory/model/device';
+import {LedLogicalNetwork} from '../memory/model/logicalNetworks/led-logical-network';
 
 @Component({
   selector: 'app-editor',
@@ -159,6 +160,10 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
 
   public get keepRunning() {
     return this._keepRunning();
+  }
+
+  public get leds() {
+    return this._memoryService.memory.devices.filter(el => el instanceof LedLogicalNetwork) as LedLogicalNetwork[];
   }
 
   public get inputPorts() {
@@ -432,15 +437,12 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  protected onInterrupt() {
+  protected onInterrupt(device: Device) {
     this._exRunnedInstruction = this._runnedInstruction;
     this._runnedInstruction = this.pc();
     this._codeService.interpreter.interrupt(this.registers());
-    this.pc.set(this.registers().pc);
-  }
+    this._memoryService.interrupt(device);
 
-  protected onInterruptPort() {
-    this._codeService.interpreter.interrupt(this.registers());
     this.pc.set(this.registers().pc);
   }
 

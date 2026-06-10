@@ -211,6 +211,16 @@ export class MemoryComponent {
     this.memoryService.storeInLocalStorage();
   }
 
+  protected selectDevice(device: Device) {
+    if (this.selectedDevice() === device) {
+      this.selectedDevice.set(null);
+    } else {
+      this.selectedDevice.set(device);
+    }
+
+    this.selectedChipSelect.set(null);
+  }
+
   protected memoryInspect(address: string) {
     let startAddress = this.formatPipe.transform(address, 'hex');
 
