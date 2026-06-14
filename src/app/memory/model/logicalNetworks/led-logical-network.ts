@@ -78,25 +78,21 @@ export class LedLogicalNetwork extends LogicalNetwork {
     if (cs == null) {
       return super.store(address, word);
     }
-    const commandByte = this.extractByte(word, address);
-    const isActive = commandByte !== 0;
 
     switch (cs.id) {
       case 'CS_SWITCH_LED':
-        if (isActive) {
-          this._ffd = this.mux(this.ffd, !this.ffd, 1);
-          if ('MEMWR*' === this.clockType) {
-            this.clk();
-          }
+        this._ffd = this.mux(this.ffd, !this.ffd, 1);
+        if ('MEMWR*' === this.clockType) {
+          this.clk();
         }
         break;
       case 'CS_A_SET_LED':
-        if (this.asyncSetSignal === 'CS_A_SET_LED' && isActive) {
+        if (this.asyncSetSignal === 'CS_A_SET_LED') {
           this.asyncSet();
         }
         break;
       case 'CS_A_RES_LED':
-        if (this.asyncSetSignal === 'CS_A_RES_LED' && isActive) {
+        if (this.asyncSetSignal === 'CS_A_RES_LED') {
           this.asyncReset();
         }
         break;
