@@ -279,12 +279,12 @@ export class MemoryComponent {
 
   protected deviceImage(device: Device) {
     if (device instanceof LedLogicalNetwork) {
-      return device.getChipSelect('CS_READ_LED') ?
+      return device.load(device.getChipSelect('CS_READ_LED').address) ?
         'assets/img/led_on.png' :
         'assets/img/led_off.png';
     }
     else if (device instanceof StartLogicalNetwork) {
-      return device.getChipSelect('CS_READ_STARTUP') ?
+      return device.load(device.getChipSelect('CS_READ_STARTUP').address) ?
         'assets/img/led_on.png' :
         'assets/img/led_off.png';
     }
