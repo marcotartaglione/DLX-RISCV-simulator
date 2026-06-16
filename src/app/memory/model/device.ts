@@ -4,7 +4,6 @@ import {ChipSelect} from './ChipSelect';
  * Represents a memory-mapped device with addressable storage and chip select management.
  */
 export class Device {
-  private _chipSelects: ChipSelect[];
   private _memory: Uint32Array;
 
   protected constructor(
@@ -24,6 +23,8 @@ export class Device {
     this._memory = new Uint32Array(size);
     this._memory.forEach((_, i) => this._memory[i] = Math.floor(Math.random() * 0x100000000)); // Simulate uninitialized memory with random data
   }
+
+  private _chipSelects: ChipSelect[];
 
   // TODO: spostare i chipselect in LogicalNetwork
 
@@ -61,18 +62,6 @@ export class Device {
     const lastMaxAddress = this._maxAddress;
     this._maxAddress = value;
     this.updateChipSelectMax(lastMaxAddress);
-  }
-
-  /**
-   * Hydrates a device object with data from a JSON object
-   *
-   * @param json The JSON object containing the properties of the device
-   */
-  protected hydrate(json) {
-    this.name = json.name;
-    this._minAddress = json.minAddress;
-    this._maxAddress = json.maxAddress;
-    this._chipSelects = json.chipSelects.map((cs: any) => ChipSelect.fromJSON(cs));
   }
 
   /**
@@ -141,7 +130,7 @@ export class Device {
     // which may have different logic for handling chip selects
     // =================
     Device.prototype.store.call(this, chipSelect.address, value);
-  }
+  };
 
   /**
    * Retrieves a chip select based on the provided value, which can be either a string (id) or a number (address).
@@ -197,13 +186,27 @@ export class Device {
    * Converts the device instance into a JSON object representation.
    */
   public toJSON(): any {
+    const ctor = this.constructor as { name: string; proto?: string };
+
     return {
-      proto: this.constructor.name,
+      proto: ctor.proto ?? ctor.name,
       name: this.name,
       minAddress: this._minAddress,
       maxAddress: this._maxAddress,
       chipSelects: this._chipSelects.map(cs => cs.toJSON()),
     };
+  }
+
+  /**
+   * Hydrates a device object with data from a JSON object
+   *
+   * @param json The JSON object containing the properties of the device
+   */
+  protected hydrate(json) {
+    this.name = json.name;
+    this._minAddress = json.minAddress;
+    this._maxAddress = json.maxAddress;
+    this._chipSelects = json.chipSelects.map((cs: any) => ChipSelect.fromJSON(cs));
   }
 
   /**

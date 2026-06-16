@@ -1,11 +1,15 @@
 import {LogicalNetwork} from '../logical-network';
+import {DeviceModel} from '../device-registry';
 import {ChipSelect} from '../ChipSelect';
 import {DeviceDialog} from '../../../decorators/device-dialog.decorator';
 import {CounterDialogComponent} from '../../../dialogs/counter-dialog.component';
 import {Device} from '../device';
 
 @DeviceDialog(() => CounterDialogComponent)
+@DeviceModel()
 export class Counter extends LogicalNetwork {
+  public static proto = 'Counter';
+
   constructor(
     minAddress: number,
     maxAddress: number,
