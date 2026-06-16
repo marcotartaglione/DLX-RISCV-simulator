@@ -1,6 +1,10 @@
 import {Device} from './device';
+import {DeviceModel} from './device-registry';
 
+@DeviceModel()
 export class Ram extends Device {
+  public static proto = 'Ram';
+
   constructor(minAddress: number, maxAddress: number) {
     super('RAM', minAddress, maxAddress);
   }

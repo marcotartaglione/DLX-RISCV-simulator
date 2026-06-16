@@ -1,11 +1,15 @@
 import {Device} from './device';
+import {DeviceModel} from './device-registry';
 import {IVisualizable} from './IVisualizable';
 
 /**
  * Standard logical network implementation.
  * Represents a hardware network with TRI-STATE buffers and Flip-Flops (FFD).
  */
+@DeviceModel()
 export class LogicalNetwork extends Device implements IVisualizable {
+  public static proto = 'LogicalNetwork';
+
   public constructor(
     name: string,
     minAddress: number,

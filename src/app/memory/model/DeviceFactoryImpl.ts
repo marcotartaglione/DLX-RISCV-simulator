@@ -1,33 +1,20 @@
 import {Device} from './device';
-import {StartLogicalNetwork} from './logicalNetworks/start-logical-network';
-import {FFDLogicalNetwork} from './logicalNetworks/ffd-logical-network';
-import {InputPort} from './logicalNetworks/input-port';
-import {Counter} from './logicalNetworks/counter';
-import {LedLogicalNetwork} from './logicalNetworks/led-logical-network';
-import {LogicalNetwork} from './logical-network';
-import {Eprom} from './eprom';
-import {Ram} from './ram';
-
-type DeviceFactoryImpl = (json: any) => Device;
-
-const DEVICE_FACTORIES: Record<string, DeviceFactoryImpl> = {
-  '_Ram': (json) => Ram.fromJSON(json),
-  '_Eprom': (json) => Eprom.fromJSON(json),
-  '_LogicalNetwork': (json) => LogicalNetwork.fromJSON(json),
-  '_LedLogicalNetwork': (json) => LedLogicalNetwork.fromJSON(json),
-  '_Counter': (json) => Counter.fromJSON(json),
-  '_InputPort': (json) => InputPort.fromJSON(json),
-  '_FFDLogicalNetwork': (json) => FFDLogicalNetwork.fromJSON(json),
-  '_StartLogicalNetwork': (json) => StartLogicalNetwork.fromJSON(json)
-};
+import {getDeviceFactory} from './device-registry';
 
 export class DeviceFactory {
   public static create(json: any): Device {
-    const type = json.proto;
-    const factory = DEVICE_FACTORIES[type];
+    if (!json || !json.proto) {
+      throw new Error('Invalid device json');
+    }
+
+    const rawType: string = String(json.proto);
+    const type = rawType.startsWith('_') ? rawType.substring(1) : rawType;
+
+    const normalizedType = type.replace(/\d+$/, '');
+    const factory = getDeviceFactory(type) ?? getDeviceFactory(normalizedType);
 
     if (!factory) {
-      throw new Error(`Unknown device type: ${type}`);
+      throw new Error(`Unknown device type: ${rawType}`);
     }
 
     return factory(json);

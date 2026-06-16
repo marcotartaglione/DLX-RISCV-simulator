@@ -1,11 +1,15 @@
 import {LogicalNetwork} from '../logical-network';
+import {DeviceModel} from '../device-registry';
 import {ChipSelect} from '../ChipSelect';
 import {DeviceDialog} from '../../../decorators/device-dialog.decorator';
 import {LogicalNetworkDialogComponent} from '../../../dialogs/logical-network-dialog.component';
 import {Device} from '../device';
 
 @DeviceDialog(() => LogicalNetworkDialogComponent)
+@DeviceModel()
 export class StartLogicalNetwork extends LogicalNetwork {
+  public static proto = 'StartLogicalNetwork';
+
   constructor(
     chipSelectRead: number,
     chipSelectWrite: number,

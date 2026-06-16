@@ -1,6 +1,10 @@
 import {Device} from './device';
+import {DeviceModel} from './device-registry';
 
+@DeviceModel()
 export class Eprom extends Device {
+  public static proto = 'Eprom';
+
   constructor(minAddress: number, maxAddress: number) {
     super('EPROM', minAddress, maxAddress);
   }

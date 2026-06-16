@@ -3,10 +3,13 @@ import {ChipSelect} from '../ChipSelect';
 import {DeviceDialog} from '../../../decorators/device-dialog.decorator';
 import {LogicalNetworkDialogComponent} from '../../../dialogs/logical-network-dialog.component';
 import {Device} from '../device';
-import {StartLogicalNetwork} from './start-logical-network';
+import {DeviceModel} from '../device-registry';
 
 @DeviceDialog(() => LogicalNetworkDialogComponent)
+@DeviceModel()
 export class FFDLogicalNetwork extends LogicalNetwork {
+  public static proto = 'FFDLogicalNetwork';
+
   constructor(
     chipSelectRead: number,
     chipSelectWrite: number,
@@ -34,10 +37,6 @@ export class FFDLogicalNetwork extends LogicalNetwork {
     }
 
     super.updateFrom(other);
-  }
-
-  protected hydrate(json) {
-    super.hydrate(json);
   }
 
   public load(address: number): number {
@@ -74,5 +73,9 @@ export class FFDLogicalNetwork extends LogicalNetwork {
   public toJSON(): any {
     const json = super.toJSON();
     return json;
+  }
+
+  protected hydrate(json) {
+    super.hydrate(json);
   }
 }
