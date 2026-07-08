@@ -1,18 +1,34 @@
 <div class="btn-container">
-  @if (selectedDevice(); as device) {
-    @if (isLogicalNetwork(device)) {
-      <button (click)="openDialogImage(device)" class="mr" mat-raised-button>
-        <span class="btn">View logic circuit <i class="fa fa-code-branch"></i></span>
-      </button>
-    }
-  }
-
-  <div class="right">
+  <div class="left">
     <button (click)="openInterruptImage()" class="mr" mat-raised-button>
       <span class="btn">View interrupt circuit <i class="fa fa-bolt"></i></span>
     </button>
+    @if (selectedDevice(); as device) {
+      @if (isLogicalNetwork(device)) {
+        <button (click)="openDialogImage(device)" class="mr" mat-raised-button>
+          <span class="btn">View logic circuit <i class="fa fa-code-branch"></i></span>
+        </button>
+      }
+    }
+  </div>
+
+  <div class="right">
+
+    <button (click)="defaultMemory()" class="mr" mat-raised-button matTooltip="Reset memory map to the default layout">
+      <span class="btn">Reset memory to default <i class="fa fa-memory"></i></span>
+    </button>
   </div>
 </div>
+
+@if (resetStatus() !== 'idle') {
+  <div class="reset-banner" [class.working]="resetStatus() === 'working'" [class.done]="resetStatus() === 'done'">
+    <i class="fa"
+       [class.fa-spinner]="resetStatus() === 'working'"
+       [class.fa-spin]="resetStatus() === 'working'"
+       [class.fa-check]="resetStatus() === 'done'"></i>
+    <span>{{ resetMessage }}</span>
+  </div>
+}
 
 <div class="main-container">
   <div class="memory">

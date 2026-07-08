@@ -31,10 +31,10 @@ $DLX-RISCV-simulator-light-theme: mat.m2-define-light-theme($DLX-RISCV-simulator
         background-color: #10101099
     .memory
         background-color: map-get(mat.$m2-grey-palette, 800)
-    .gpr-back
+    .gpr-container
         background-color: #2c2c2c
         color: #d4d4d4
-    .register
+    .value
         background-color: map-get(mat.$m2-grey-palette, 800)
         color: #f0f0f0
     .mat-sidenav
@@ -49,9 +49,9 @@ $DLX-RISCV-simulator-light-theme: mat.m2-define-light-theme($DLX-RISCV-simulator
     @include mat.all-component-themes($DLX-RISCV-simulator-light-theme)
     .memory
         background-color: white
-    .gpr-back
+    .gpr-container
         background-color: #f0f0f0
-    .register
+    .value
         background-color: white
     ::-webkit-scrollbar-thumb
         background: #bbbbbb

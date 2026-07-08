@@ -1,6 +1,6 @@
 import {Pipe, PipeTransform} from '@angular/core';
 
-export type FormatByteType = 'dec' | 'bin' | 'hex';
+export type FormatByteType = 'dec' | 'bin' | 'hex' | 'oct';
 
 @Pipe({
   name: 'formatByte',

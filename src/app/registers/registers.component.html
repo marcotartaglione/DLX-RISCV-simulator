@@ -1,102 +1,100 @@
 <div class="registers {{fType}}">
   <div class="gpr">
-    <span>GPR</span>
-    @if (isDLX(registers())) {
-      <div class="gpr-back">
+    <div class="gpr-container">
+      @if (isDLX(registers())) {
         @for (r of dlxRegisters().registersValue; track r; let i = $index) {
-          <div class="gpr-row">
+          <div class="register">
             <div class="index">R{{ i }}</div>
-            <div [ngStyle]="{'font-weight': dlxRegisters().registersBoldness[i], 'background-color': (dlxRegisters().registersBoldness[i]=='bold') ? '#5a5a5a' : ''}"
-                 class="register">
-              {{ r | format: fType }}
-            </div>
+            <div [ngClass]="fType" class="value">{{ r | format: fType }}</div>
           </div>
         }
-      </div>
-    } @else if (isRV32I(registers())) {
-      <div class="gpr-back">
+      } @else if (isRV32I(registers())) {
         @for (x of rv32iRegisters().x; track x; let i = $index) {
-          <div class="gpr-row">
+          <div class="register">
             <div class="index">x{{ i }}</div>
-            <div class="register">{{ x | format: fType }}</div>
+            <div [ngClass]="fType" class="value">{{ x | format: fType }}</div>
           </div>
         }
-      </div>
-    }
+      }
+    </div>
+
+  </div>
+  <div class="special-registers">
+    <div class="special-registers-container">
+      @if (isDLX(registers())) {
+        <div class="register">
+          <div class="index" matTooltip="Program Counter">PC</div>
+          <div class="value" [ngClass]="fType">{{ registers().pc | format: fType }}</div>
+        </div>
+        <div class="register">
+          <div class="index" matTooltip="Instruction Address Register">IAR</div>
+          <div class="value" [ngClass]="fType">{{ dlxRegisters().instructionAddressRegister | format: fType }}</div>
+        </div>
+        <div class="register">
+          <div class="index" matTooltip="Instruction Register">IR</div>
+          <div class="value" [ngClass]="fType">{{ dlxRegisters().instructionRegister | format: fType }}</div>
+        </div>
+        <div class="register">
+          <div class="index" matTooltip="Interrupt Enabled">IEN</div>
+          <div class="value" [ngClass]="fType">{{ dlxRegisters().interruptEnabled | format: fType }}</div>
+        </div>
+        <div class="register">
+          <div class="index" matTooltip="Memory Address Register">MAR</div>
+          <div class="value" [ngClass]="fType">{{ dlxRegisters().memoryAddressRegister | format: fType }}</div>
+        </div>
+        <div class="register">
+          <div class="index" matTooltip="Memory Data Register">MDR</div>
+          <div class="value" [ngClass]="fType">{{ dlxRegisters().memoryDataRegister | format: fType }}</div>
+        </div>
+      } @else if (isRV32I(registers())) {
+        <div class="register">
+          <div class="index" matTooltip="Program Counter">PC</div>
+          <div class="value" [ngClass]="fType">{{ rv32iRegisters().pc | format: fType }}</div>
+        </div>
+        <div class="register">
+          <div class="index" matTooltip="Opcode">OC</div>
+          <div class="value" [ngClass]="fType">{{ rv32iRegisters().opcode | format: fType }}</div>
+        </div>
+        <div class="register">
+          <div class="index" matTooltip="Destination Register">DR</div>
+          <div class="value" [ngClass]="fType">{{ rv32iRegisters().rd | format: fType }}</div>
+        </div>
+        <div class="register">
+          <div class="index" matTooltip="Source Register 1">RS1</div>
+          <div class="value" [ngClass]="fType">{{ rv32iRegisters().rs1 | format: fType }}</div>
+        </div>
+        <div class="register">
+          <div class="index" matTooltip="Source Register 2">RS2</div>
+          <div class="value" [ngClass]="fType">{{ rv32iRegisters().rs2 | format: fType }}</div>
+        </div>
+        <div class="register">
+          <div class="index" matTooltip="Func3">F3</div>
+          <div class="value" [ngClass]="fType">{{ rv32iRegisters().func3 | format: fType }}</div>
+        </div>
+        <div class="register">
+          <div class="index" matTooltip="Func7">F7</div>
+          <div class="value" [ngClass]="fType">{{ rv32iRegisters().func7 | format: fType }}</div>
+        </div>
+        <div class="register">
+          <div class="index" matTooltip="Immediate">I</div>
+          <div class="value" [ngClass]="fType">{{ rv32iRegisters().immediate | format: fType }}</div>
+        </div>
+        <div class="register">
+          <div class="index" matTooltip="Jump-Offset">JO</div>
+          <div class="value" [ngClass]="fType">{{ rv32iRegisters().jumpOffset | format: fType }}</div>
+        </div>
+      }
+    </div>
+
   </div>
 
-  @if (isDLX(registers())) {
-    <div>
-      <span>PC</span>
-      <div [ngStyle]="{'font-weight': 'bold', 'background-color': '#5a5a5a'}"
-           class="register special">{{ registers().pc | format: fType }}
-      </div>
-      <span>IAR</span>
-      <div [ngStyle]="{'font-weight': dlxRegisters().iarBoldness, 'background-color': (dlxRegisters().iarBoldness=='bold') ? '#5a5a5a' : ''}"
-           class="register special">
-        {{ dlxRegisters().instructionAddressRegister | format: fType }}
-      </div>
-      <span>IEN</span>
-      <div [ngStyle]="{'font-weight': dlxRegisters().ienBoldness, 'background-color': (dlxRegisters().ienBoldness=='bold') ? '#5a5a5a' : ''}"
-           class="register special">
-        {{ dlxRegisters().interruptEnabled | format: 'dec' }}
-      </div>
-      <span>MAR</span>
-      <div [ngStyle]="{'font-weight': dlxRegisters().marBoldness, 'background-color': (dlxRegisters().marBoldness=='bold') ? '#5a5a5a' : ''}"
-           class="register special">
-        {{ dlxRegisters().memoryAddressRegister | format: fType }}
-      </div>
-      <span>IR</span>
-      <div [ngStyle]="{'font-weight': 'bold', 'background-color': '#5a5a5a'}"
-           class="register special">{{ dlxRegisters().instructionRegister | format: fType }}
-      </div>
-      <span>MDR</span>
-      <div [ngStyle]="{'font-weight': dlxRegisters().mdrBoldness, 'background-color': (dlxRegisters().mdrBoldness=='bold') ? '#5a5a5a' : ''}"
-           class="register special">
-        {{ dlxRegisters().memoryDataRegister | format: fType }}
-      </div>
-      <br/>
-      <mat-form-field appearance="fill">
-        <mat-label>Format values</mat-label>
-        <mat-select [(value)]="fType">
-          <mat-option value="hex">Hexadecimal</mat-option>
-          <mat-option value="dec">Decimal</mat-option>
-          <mat-option value="oct">Octal</mat-option>
-          <mat-option value="bin">Binary</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-  }
-  @else if (isRV32I(registers())) {
-    <div>
-      <span>PC</span>
-      <div class="register special">{{ rv32iRegisters().pc | format: fType }}</div>
-      <span>Opcode</span>
-      <div class="register special">{{ rv32iRegisters().opcode | format: fType: 7 }}</div>
-      <span>RD</span>
-      <div class="register special">{{ rv32iRegisters().rd | format: fType: 5 }}</div>
-      <span>RS1</span>
-      <div class="register special">{{ rv32iRegisters().rs1 | format: fType: 5 }}</div>
-      <span>RS2</span>
-      <div class="register special">{{ rv32iRegisters().rs2 | format: fType: 5 }}</div>
-      <span>Func3</span>
-      <div class="register special">{{ rv32iRegisters().func3 | format: fType: 3 }}</div>
-      <span>Func7</span>
-      <div class="register special">{{ rv32iRegisters().func7 | format: fType: 7 }}</div>
-      <span>Immediate</span>
-      <div class="register special">{{ rv32iRegisters().immediate | format: fType: 20 }}</div>
-      <span>Jump-Offset</span>
-      <div class="register special">{{ rv32iRegisters().jumpOffset | format: fType: 20 }}</div>
-      <br/>
-      <mat-form-field appearance="fill">
-        <mat-label>Formato valori</mat-label>
-        <mat-select [(value)]="fType">
-          <mat-option value="hex">Hexadecimal</mat-option>
-          <mat-option value="dec">Decimal</mat-option>
-          <mat-option value="oct">Octal</mat-option>
-          <mat-option value="bin">Binary</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-  }
+  <mat-form-field appearance="fill" subscriptSizing="dynamic">
+    <mat-label>Format values</mat-label>
+    <mat-select [(value)]="fType">
+      <mat-option value="hex">Hexadecimal</mat-option>
+      <mat-option value="dec">Decimal</mat-option>
+      <mat-option value="oct">Octal</mat-option>
+      <mat-option value="bin">Binary</mat-option>
+    </mat-select>
+  </mat-form-field>
 </div>

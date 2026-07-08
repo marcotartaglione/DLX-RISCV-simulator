@@ -1,64 +1,97 @@
 @use '@angular/material' as mat
 
 :host
-    display: flex
-    flex-direction: column
-    justify-content: space-between
-    align-items: flex-end
-    height: 100%
+  display: flex
+  flex-direction: column
+  justify-content: space-between
+  align-items: flex-end
+  height: 100%
 
 .registers
+  display: flex
+  flex-direction: column
+  gap: 1rem
+
+  & > *
+    width: 100%
+
+  .special-registers-container
+    overflow: hidden
+    border-radius: 5px
+    @include mat.elevation(2)
+    display: grid
+    grid-template-columns: 1fr
+    background-color: transparent !important
+
+  .gpr-container
+    overflow: hidden
+    border-radius: 5px
+    @include mat.elevation(2)
+    display: grid
+    grid-template-columns: 1fr 1fr
+    background-color: transparent !important
+
+    .value
+      border-radius: 0
+
+  .gpr-container
+    & > :not(:nth-last-child(-n + 2))
+      border-bottom: 1px solid map-get(mat.$m2-grey-palette, 700)
+
+  .special-registers-container
+    & > :not(:nth-last-child(1))
+      border-bottom: 1px solid map-get(mat.$m2-grey-palette, 700)
+
+  .register
     display: grid
     grid-template-columns: auto auto
-    grid-column-gap: .5rem
-    margin-bottom: 1rem
-    .gpr-back
-        overflow: hidden
-        border-radius: 5px
-        margin: .5rem 0
+
+    .index
+      text-align: right
+      width: 2rem
+      padding: 0.25rem 0.5rem
+      background-color: #2c2c2c
+
+    .value
+      padding: .25rem .5rem
+      white-space: nowrap
+      box-sizing: border-box
+
+      &.special
         @include mat.elevation(2)
-        .register
-            border-radius: 0
-        &>:not(:last-of-type)
-            border-bottom: 1px solid map-get(mat.$m2-grey-palette, 700)
-        .gpr-row
-            display: grid
-            grid-template-columns: auto auto
-            .index
-                width: 3ch
-                text-align: right
-                height: 1em
-                padding: .2rem
-    .register
-        height: 1em
-        padding: .2rem
-        border-radius: 5px
-        &.special
-            @include mat.elevation(2)
-            margin: .5rem 0
+        margin: 0
 
+    .hex, .dec
+      width: 12ch
+    .oct
+      width: 18ch
+    .bin
+      width: 34ch
 
-.register, .index
+  .special-registers
+    .hex, .dec
+      width: 29ch
+    .oct
+      width: 41ch
+    .bin
+      width: 73ch
+
+  .value, .index
     font-family: 'Fira Code', monospace
     font-size: .9rem
     font-weight: 300
-    transition: font-size 300ms, width 300ms, height 300ms, background .4s cubic-bezier(.25,.8,.25,1)
+    transition: font-size 300ms cubic-bezier(.25, .8, .25, 1), width 300ms cubic-bezier(.25, .8, .25, 1), height 300ms cubic-bezier(.25, .8, .25, 1), background-color 300ms cubic-bezier(.25, .8, .25, 1), box-shadow 300ms cubic-bezier(.25, .8, .25, 1), transform 300ms cubic-bezier(.25, .8, .25, 1)
+    will-change: font-size, width, height, background-color, box-shadow, transform
 
-.bin .register
-    width: 32ch
-.oct, .dec, .hex
-    .register
-        width: 22ch
-
-#fType
+  #fType
     @include mat.elevation(2)
     border: none
     width: 100%
 
-@media screen and (min-height: 866px)
-    .register, .index
-        font-size: .9rem
+  @media screen and (min-height: 866px)
+    .value, .index
+      font-size: .9rem
 
-@media screen and (min-height: 906px)
-    .register, .index
-        font-size: 1rem
+  @media screen and (min-height: 906px)
+    .value, .index
+      font-size: 1rem

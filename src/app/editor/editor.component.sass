@@ -35,6 +35,7 @@ form
 .btn
   display: flex
   align-items: center
+  padding: .5rem 1rem
 
   svg
     margin-left: .5em
@@ -53,24 +54,37 @@ button[disabled=true] svg
 
 .btn-container
   margin-top: 1rem
+  display: flex
+  flex-direction: row
+  justify-content: space-between
+  flex-wrap: wrap
+  gap: 2rem
 
-  .right
-    float: right
+  & > *
+    display: flex
+    flex-direction: column
+    gap: 0.5rem
 
-  .mat-raised-button
+  .top, .bottom
+    display: flex
+    gap: 0.5rem
+
+  .execution
+    button
+      width: 100%
+
+  .configuration
     height: fit-content
-    margin: 13.5px 0
+    flex-direction: row
 
-.input-interval, .input-label
-  min-width: 2rem
-  max-width: 6rem
+  .input-interval, .input-label
+    min-width: 2rem
+    max-width: 6rem
 
-.select
-  min-width: 5rem
-  max-width: 10rem
+  .select
+    min-width: 5rem
+    max-width: 10rem
 
-.input-interval, .input-label, .mr
-  margin-right: .5rem !important
 
 input[type=number]
   -webkit-appearance: textfield

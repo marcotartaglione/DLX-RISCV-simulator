@@ -32,15 +32,22 @@ export class MemoryService {
     if (storedMemory) {
       this._memory = new Memory(storedMemory);
     } else {
-      this._memory = new Memory();
-      this._memory.add(new Eprom(0x00000000, 0x1FFFFFFF));
-      this._memory.add(new InputPort(0x30000000, 0x3000000C));
-      this._memory.add(new Ram(0x40000000, 0x7FFFFFFF));
-      this._memory.add(new LedLogicalNetwork(0x90000000, 0x9000000C));
-      this._memory.add(new Counter(0xA4000000, 0xA4000014));
-      this._memory.add(new StartLogicalNetwork(0xC0000000, 0xC000000C));
-      this._memory.add(new Ram(0xE0000000, 0xFFFFFFFF));
+      this.default();
     }
+  }
+
+  /**
+   * Initializes the default memory configuration.
+   */
+  public default() {
+    this._memory = new Memory();
+    this._memory.add(new Eprom(0x00000000, 0x1FFFFFFF));
+    this._memory.add(new InputPort(0x30000000, 0x3000000C));
+    this._memory.add(new Ram(0x40000000, 0x7FFFFFFF));
+    this._memory.add(new LedLogicalNetwork(0x90000000, 0x9000000C));
+    this._memory.add(new Counter(0xA4000000, 0xA4000014));
+    this._memory.add(new StartLogicalNetwork(0xC0000000, 0xC000000C));
+    this._memory.add(new Ram(0xE0000000, 0xFFFFFFFF));
   }
 
   /**

@@ -25,7 +25,6 @@ $color-value: A200
 .main-container
   width: 100%
   display: grid
-  margin-top: 1rem
   grid-template-columns: auto 2rem
   grid-column-gap: .5rem
   grid-row-gap: .5rem
@@ -47,6 +46,14 @@ $color-value: A200
     width: 2rem
     height: 3.6rem
     padding: .5rem
+
+.btn
+  display: flex
+  align-items: center
+  padding: .5rem 1rem
+
+  svg
+    margin-left: .5em
 
 .memory
   position: relative
@@ -137,6 +144,34 @@ $color-value: A200
     height: calc(100% - 5px)
 
 .btn-container
-  .right
-    float: right
-    padding: 10px
+  display: flex
+  flex-direction: row
+  justify-content: space-between
+  flex-wrap: wrap
+  margin-top: 1rem
+  margin-bottom: .5rem
+
+  & > *
+    display: flex
+    gap: .5rem
+
+.reset-banner
+  display: flex
+  align-items: center
+  gap: .5rem
+  margin: .5rem 0 .5rem
+  padding: .75rem 1rem
+  border-radius: .5rem
+  font-weight: 500
+  border: 1px solid transparent
+
+  &.working
+    background: rgba(255, 193, 7, .12)
+    border-color: rgba(255, 193, 7, .35)
+    color: #8a6d00
+
+  &.done
+    background: rgba(76, 175, 80, .12)
+    border-color: rgba(76, 175, 80, .35)
+    color: #256029
+

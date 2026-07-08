@@ -13,13 +13,14 @@
           (wasContentModified)="contentModified.set($event)"
         />
 
-        <button mat-raised-button class="mr" (click)="toggleDiagrams()">
+<!--   TODO: temporarily disabled due implementation bugs     -->
+        <!--<button mat-raised-button class="mr" (click)="toggleDiagrams()">
           @if (this.diagramsOpened()) {
             <span class="btn">Hide Waves Form <i class="fas fa-wave-square"></i></span>
           } @else {
             <span class="btn">Show Waves Form <i class="fas fa-wave-square"></i></span>
           }
-        </button>
+        </button>-->
 
         <app-memory />
       </div>
