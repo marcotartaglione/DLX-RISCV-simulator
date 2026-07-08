@@ -27,5 +27,5 @@ import {FormatPipe} from '../pipes/format.pipe';
 
 export class DiagramComponent {
   protected diagramService = inject(DiagramService);
-  protected registers = input.required<DLXRegisters>();
+  public registers = input.required<DLXRegisters>();
 }

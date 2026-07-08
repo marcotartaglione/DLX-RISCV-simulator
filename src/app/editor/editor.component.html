@@ -10,7 +10,60 @@
   }
 
   <div class="btn-container">
-    <div class="right">
+    <div class="execution">
+      <div class="top">
+        <button mat-raised-button class="mr"
+                [matTooltip]="'F8'"
+                (click)="executeNextInstruction()"
+                [disabled]="isRunDisabled()">
+          <span class="btn">Step <i class="fas fa-step-forward fa-lg green"></i></span>
+        </button>
+
+        <button mat-raised-button class="mr"
+                [matTooltip]="'F9'"
+                (click)="keepRunning ? pause() : run()"
+                [disabled]="isContinuousRunDisabled()">
+          @if (!keepRunning) {
+            <span class="btn">Run <i class="fas fa-play green"></i></span>
+          }
+          @else {
+            <span class="btn">Pause <i class="fas fa-pause green"></i></span>
+          }
+        </button>
+      </div>
+      <div class="bottom">
+        <button mat-raised-button class="mr stop"
+                [matTooltip]="'F10'"
+                (click)="stop()"
+                [disabled]="isStopDisabled()" >
+          <span class="btn">Stop <i class="fas fa-square red"></i></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="configuration">
+        <mat-form-field class="input-interval" subscriptSizing="dynamic">
+          <mat-label>Interval (ms)</mat-label>
+          <input matInput type="number" name="interval" [(ngModel)]="intervalTime" min="1">
+        </mat-form-field>
+
+        <mat-form-field class="input-label" subscriptSizing="dynamic">
+          <mat-label>Start tag</mat-label>
+          <input matInput type="text" name="start" [(ngModel)]="startTag">
+        </mat-form-field>
+        <mat-form-field class="input-label select" subscriptSizing="dynamic">
+          <mat-label>Start script</mat-label>
+          <mat-select name="scriptSelector"
+                      [ngModel]="selectedScript()"
+                      (selectionChange)="selectedScriptChange($event.value)">
+            @for (script of CodeService.STARTING_SCRIPT[editorMode()]; track script) {
+              <mat-option [value]="script">{{ script.replace('_', ' ') }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+    </div>
+
+    <div class="interrupts">
       <button mat-raised-button class="mr" [matMenuTriggerFor]="menuLed" [disabled]="!registers().interruptEnabled">
         <span class="btn">Int (Led) <i class="fas fa-bolt amber"></i></span>
       </button>
@@ -32,7 +85,9 @@
           <button mat-menu-item (click)="onInterrupt(device)">{{ device.name }}</button>
         }
       </mat-menu>
+    </div>
 
+    <div class="operations">
       <button mat-raised-button class="mr" [matMenuTriggerFor]="menu">
         <span class="btn">Save code<i class="fas fa-save"></i></span>
       </button>
@@ -46,54 +101,5 @@
         <span class="btn">Restore default code<i class="fas fa-trash"></i></span>
       </button>
     </div>
-
-    <button mat-raised-button class="mr"
-            [matTooltip]="'F8'"
-            (click)="executeNextInstruction()"
-            [disabled]="isRunDisabled()">
-      <span class="btn">Step <i class="fas fa-step-forward fa-lg green"></i></span>
-    </button>
-
-    <button mat-raised-button class="mr"
-            [matTooltip]="'F9'"
-            (click)="keepRunning ? pause() : run()"
-            [disabled]="isContinuousRunDisabled()">
-      @if (!keepRunning) {
-        <span class="btn">Run <i class="fas fa-play green"></i></span>
-      }
-      @else {
-        <span class="btn">Pause <i class="fas fa-pause green"></i></span>
-      }
-    </button>
-
-    <mat-form-field class="input-interval">
-      <mat-label>Interval (ms)</mat-label>
-      <input matInput type="number" name="interval" [(ngModel)]="intervalTime" min="1">
-    </mat-form-field>
-
-    <button mat-raised-button class="mr"
-            [matTooltip]="'F10'"
-            (click)="stop()"
-            [disabled]="isStopDisabled()" >
-      <span class="btn">Stop <i class="fas fa-square red"></i></span>
-    </button>
-
-    <mat-form-field class="input-label">
-      <mat-label>Start tag</mat-label>
-      <input matInput type="text" name="start" [(ngModel)]="startTag">
-    </mat-form-field>
-
-    <mat-form-field class="input-label select">
-      <mat-label>Start script</mat-label>
-      <mat-select name="scriptSelector"
-                  [ngModel]="selectedScript()"
-                  (selectionChange)="selectedScriptChange($event.value)">
-        @for (script of CodeService.STARTING_SCRIPT[editorMode()]; track script) {
-          <mat-option [value]="script">{{ script.replace('_', ' ') }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-    <div style="clear:both"></div>
   </div>
 </form>

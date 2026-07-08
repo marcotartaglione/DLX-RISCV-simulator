@@ -2,6 +2,7 @@ import {animate, style, transition, trigger} from '@angular/animations';
 import {Component, effect, inject, signal, Type, untracked} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {MessageDialogComponent} from '../dialogs/message-dialog.component';
+import {ConfirmDialogComponent} from '../dialogs/confirm-dialog.component';
 import {MemoryService} from '../services/memory.service';
 import {Device} from './model/device';
 import {LogicalNetwork} from './model/logical-network';
@@ -63,12 +64,14 @@ import {FFDLogicalNetwork} from './model/logicalNetworks/ffd-logical-network';
 export class MemoryComponent {
   protected memoryService = inject(MemoryService);
   private _dialog = inject(MatDialog);
+  private _resetNoticeTimeout: number | undefined;
 
   protected formatPipe = new FormatPipe();
 
   protected readonly inputAddr = signal<string>('');
   protected readonly selectedChipSelect = signal<ChipSelect>(null);
   protected readonly selectedDevice = signal<Device>(null);
+  protected readonly resetStatus = signal<'idle' | 'working' | 'done'>('idle');
 
   protected readonly MAX_32_BIT_ADDRESS = 0xFFFFFFFF;
 
@@ -259,6 +262,53 @@ export class MemoryComponent {
     this._dialog.open(ImageDialogComponent, {
       data: {src: 'assets/img/rete-interrupt2.jpg'}
     });
+  }
+
+  protected defaultMemory() {
+    const dialogRef = this._dialog.open(ConfirmDialogComponent, {
+      data: {
+        message: 'This will reset the memory layout to the default configuration and remove any custom devices. Continue?',
+        ok: 'Reset',
+        ko: 'Cancel'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (!confirmed) {
+        return;
+      }
+
+      this.resetStatus.set('working');
+
+      if (this._resetNoticeTimeout) {
+        clearTimeout(this._resetNoticeTimeout);
+        this._resetNoticeTimeout = undefined;
+      }
+
+      this._resetNoticeTimeout = window.setTimeout(() => {
+        this.memoryService.default();
+        this.memoryService.storeInLocalStorage();
+        this.selectedDevice.set(null);
+        this.selectedChipSelect.set(null);
+
+        this.resetStatus.set('done');
+        this._resetNoticeTimeout = window.setTimeout(() => {
+          this.resetStatus.set('idle');
+          this._resetNoticeTimeout = undefined;
+        }, 2500);
+      }, 150);
+    });
+  }
+
+  protected get resetMessage(): string {
+    switch (this.resetStatus()) {
+      case 'working':
+        return 'Ripristino memoria in corso...';
+      case 'done':
+        return 'Memoria ripristinata ai valori predefiniti.';
+      default:
+        return '';
+    }
   }
 
   private spaceBetweenDevices(indexSelectedDevice: number, sizeOfSelected: number, side: string): number {
