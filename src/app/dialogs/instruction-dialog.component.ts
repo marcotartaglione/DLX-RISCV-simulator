@@ -9,10 +9,9 @@ import {
   MatDialogTitle
 } from '@angular/material/dialog';
 import {MemoryService} from '../services/memory.service';
-import {FormatPipe} from '../pipes/format.pipe';
+import {FormatPipe, FormatType} from '../pipes/format.pipe';
 import {MatGridList, MatGridTile} from '@angular/material/grid-list';
 import {MatCard} from '@angular/material/card';
-import {FormatBytePipe, FormatByteType} from '../pipes/formatByte.pipe';
 import {MatButton} from '@angular/material/button';
 import {MatTooltip} from '@angular/material/tooltip';
 import {MatButtonToggle, MatButtonToggleGroup} from '@angular/material/button-toggle';
@@ -27,14 +26,14 @@ import {FormsModule} from '@angular/forms';
     MatGridList,
     MatGridTile,
     MatCard,
-    FormatBytePipe,
     MatButton,
     MatTooltip,
     MatButtonToggleGroup,
     MatButtonToggle,
     FormsModule,
     MatDialogActions,
-    MatDialogClose
+    MatDialogClose,
+    FormatPipe
   ]
 })
 export class InstructionDialogComponent {
@@ -43,7 +42,7 @@ export class InstructionDialogComponent {
   private dialog = inject(MatDialog);
   private dialogRef = inject(MatDialogRef<InstructionDialogComponent>);
 
-  protected formatByteType: FormatByteType = 'bin';
+  protected formatByteType: FormatType = 'bin';
   protected instruction: string;
   protected readonly iv: number;
 
@@ -155,7 +154,7 @@ export class InstructionDialogComponent {
 
     arrData.reverse();
 
-    this.dialog.open(InstructionDialogComponent, {
+    this.dialog.open( InstructionDialogComponent, {
       data: {values: arrData, service: this.service},
     });
 

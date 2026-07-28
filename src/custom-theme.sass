@@ -1,69 +1,249 @@
-
-// Custom Theming for Angular Material
-// For more information: https://material.angular.io/guide/theming
 @use '@angular/material' as mat
-// Plus imports for other components in your app.
 
-// Include the common styles for Angular Material. We include this here so that you only
-// have to load a single css file for Angular Material in your app.
-// Be sure that you only ever include this mixin once!
 @include mat.core()
 
-// Define the palettes for your theme using the Material Design palettes available in palette.scss
-// (imported above). For each palette, you can optionally specify a default, lighter, and darker
-// hue. Available color palettes: https://material.io/design/color/
-$DLX-RISCV-simulator-primary: mat.m2-define-palette(mat.$m2-blue-palette)
-$DLX-RISCV-simulator-accent: mat.m2-define-palette(mat.$m2-amber-palette, A200, A100, A400)
+$slate-palette: (50: #f8fafc, 100: #f1f5f9, 200: #e2e8f0, 300: #cbd5e1, 400: #94a3b8, 500: #64748b, 600: #475569, 700: #334155, 800: #1e293b, 900: #0f172a, contrast: (50: #0f172a, 100: #0f172a, 200: #0f172a, 300: #0f172a, 400: #0f172a, 500: #ffffff, 600: #ffffff, 700: #ffffff, 800: #ffffff, 900: #ffffff))
 
-// The warn palette is optional (defaults to red).
+$DLX-RISCV-simulator-primary: mat.m2-define-palette($slate-palette, 800, 700, 900)
+$DLX-RISCV-simulator-accent: mat.m2-define-palette(mat.$m2-amber-palette, A200, A100, A400)
 $DLX-RISCV-simulator-warn: mat.m2-define-palette(mat.$m2-red-palette)
 
-// Create the theme object (a Sass map containing all of the palettes).
 $DLX-RISCV-simulator-dark-theme: mat.m2-define-dark-theme($DLX-RISCV-simulator-primary, $DLX-RISCV-simulator-accent, $DLX-RISCV-simulator-warn)
 $DLX-RISCV-simulator-light-theme: mat.m2-define-light-theme($DLX-RISCV-simulator-primary, $DLX-RISCV-simulator-accent, $DLX-RISCV-simulator-warn)
 
-// Include theme styles for core and each component used in your app.
-// Alternatively, you can import and @include the theme mixins for each component
-// that you are using.
-.dark-theme
-    @include mat.all-component-themes($DLX-RISCV-simulator-dark-theme)
-    .mat-drawer-backdrop.mat-drawer-shown
-        background-color: #10101099
-    .memory
-        background-color: map-get(mat.$m2-grey-palette, 800)
-    .gpr-container
-        background-color: #2c2c2c
-        color: #d4d4d4
-    .value
-        background-color: map-get(mat.$m2-grey-palette, 800)
-        color: #f0f0f0
-    .mat-sidenav
-        background: #383838
-    ::-webkit-scrollbar-thumb
-        background: #5a5a5a
-        border-radius: 3px
-        &:hover
-            background: #707070
+:root
+  --bg-app: #0F172A
+  --bg-panel: #1E293B
+  --bg-element: #334155
+  --border-color: #334155
+  --border-subtle: #1E293B
+
+  --text-main: #F8FAFC
+  --text-muted: #94A3B8
+
+  --scrollbar-thumb: #334155
+  --scrollbar-thumb-hover: #475569
+  --controls-panel-width: 16rem
 
 .light-theme
-    @include mat.all-component-themes($DLX-RISCV-simulator-light-theme)
-    .memory
-        background-color: white
-    .gpr-container
-        background-color: #f0f0f0
-    .value
-        background-color: white
-    ::-webkit-scrollbar-thumb
-        background: #bbbbbb
-        border-radius: 3px
-        &:hover
-            background: #aaaaaa
+  --bg-app: #fafafa
+  --bg-panel: #ebebeb
+  --bg-element: #8095B3
+  --border-color: #5C7BAD
+  --border-subtle: #5C7BAD
 
-.device-size
-    font-size: 1rem
+  --text-main: #0a0a0a
+  --text-muted: #292929
+
+  --scrollbar-thumb: #CBD5E1
+  --scrollbar-thumb-hover: #94A3B8
+
+.dark-theme
+  @include mat.all-component-themes($DLX-RISCV-simulator-dark-theme)
+
+  --mat-app-background-color: var(--bg-app)
+  --mdc-filled-text-field-container-color: var(--bg-panel)
+  --mdc-outlined-text-field-outline-color: var(--border-color)
+  --mdc-plain-tooltip-container-color: var(--bg-element)
+  --mdc-filled-text-field-input-text-color: var(--text-main)
+  --mdc-outlined-text-field-input-text-color: var(--text-main)
+  --mdc-filled-text-field-label-text-color: var(--text-muted)
+  --mdc-outlined-text-field-label-text-color: var(--text-muted)
+  --mat-select-panel-background-color: var(--bg-panel)
+  --mat-select-enabled-trigger-text-color: var(--text-main)
+
+  --accent-sky: #7dd3fc
+  --accent-teal: #6ee7b7
+  --accent-amber: #fcd34d
+  --accent-rose: #fda4af
+  --accent-violet: #c4b5fd
+
+  background-color: var(--bg-app) !important
+  color: var(--text-main) !important
+
+  &.mat-app-background, .mat-app-background, .mat-drawer-container, .mat-sidenav-container, .mat-drawer-content, .mat-sidenav-content
+    background-color: var(--bg-app) !important
+    color: var(--text-main) !important
+
+  .mat-drawer-backdrop.mat-drawer-shown
+    background-color: rgba(15, 23, 42, 0.8)
+
+  .mat-sidenav
+    background-color: var(--bg-panel)
+    border-right: 1px solid var(--border-color)
+
+.light-theme
+  @include mat.all-component-themes($DLX-RISCV-simulator-light-theme)
+
+  --mat-app-background-color: var(--bg-app)
+  --mdc-filled-text-field-container-color: var(--bg-element)
+  --mdc-outlined-text-field-outline-color: var(--border-color)
+  --mdc-plain-tooltip-container-color: var(--bg-element)
+  --mdc-filled-text-field-input-text-color: var(--text-main)
+  --mdc-outlined-text-field-input-text-color: var(--text-main)
+  --mdc-filled-text-field-label-text-color: var(--text-muted)
+  --mdc-outlined-text-field-label-text-color: var(--text-muted)
+  --mat-select-panel-background-color: var(--bg-panel)
+  --mat-select-enabled-trigger-text-color: var(--text-main)
+
+  --accent-sky: #0369a1
+  --accent-teal: #047857
+  --accent-amber: #b45309
+  --accent-rose: #be123c
+  --accent-violet: #6d28d9
+
+  background-color: var(--bg-app) !important
+  color: var(--text-main) !important
+
+  &.mat-app-background, .mat-app-background, .mat-drawer-container, .mat-sidenav-container, .mat-drawer-content, .mat-sidenav-content
+    background-color: var(--bg-app) !important
+    color: var(--text-main) !important
+
+  .mat-drawer-backdrop.mat-drawer-shown
+    background-color: rgba(15, 23, 42, 0.4)
+
+  .mat-sidenav
+    background-color: var(--bg-panel)
+    border-right: 1px solid var(--border-color)
+
+.mat-toolbar, #navbar
+  background-color: var(--bg-panel) !important
+  color: var(--text-main) !important
+
+  #title, span, mat-icon, .mat-icon, i
+    color: var(--text-main) !important
+
+.mat-mdc-button,
+.mat-mdc-outlined-button,
+.mat-mdc-icon-button
+  color: var(--text-main) !important
+
+  .mat-icon, i, span
+    color: var(--text-main) !important
+
+.mat-mdc-raised-button,
+.mat-mdc-unelevated-button
+  background-color: var(--bg-element) !important
+  color: var(--text-main) !important
+
+  .mat-icon, i, span
+    color: var(--text-main) !important
+
+.memory, .value
+  background-color: var(--bg-panel)
+  color: var(--text-main)
+  border: 1px solid var(--border-color)
+  border-radius: 4px
+
+::-webkit-scrollbar-thumb
+  background: var(--scrollbar-thumb)
+  border-radius: 3px
+
+  &:hover
+    background: var(--scrollbar-thumb-hover)
+
+.mat-mdc-option
+  .mat-pseudo-checkbox-minimal.mat-pseudo-checkbox-checked::after, .mat-pseudo-checkbox-full.mat-pseudo-checkbox-checked
+    color: var(--text-main) !important
+    border-color: var(--text-main) !important
+
+  .mat-mdc-option-pseudo-checkbox
+    --mat-minimal-pseudo-checkbox-selected-checkmark-color: var(--text-main)
+    color: var(--text-main) !important
+
+  &.mdc-list-item--selected, &:hover, &:focus
+    .mdc-list-item__primary-text
+      color: var(--text-main) !important
+
+  &.mdc-list-item--selected:not(.mdc-list-item--disabled)
+    background-color: var(--bg-element) !important
+
+.mat-mdc-form-field
+  .mat-mdc-text-field-wrapper
+    background-color: var(--bg-panel) !important
+
+  input.mat-mdc-input-element, .mat-mdc-select-value
+    color: var(--text-main) !important
+
+  .mdc-floating-label, .mat-mdc-floating-label
+    color: var(--text-muted) !important
+
+  &.mat-focused .mdc-floating-label, &.mat-focused .mat-mdc-floating-label
+    color: var(--accent-sky) !important
+
+  .mdc-notched-outline__leading,
+  .mdc-notched-outline__notch,
+  .mdc-notched-outline__trailing
+    border-color: var(--border-color) !important
+
+  .mat-mdc-select-arrow, .mat-icon
+    color: var(--text-muted) !important
+
+.cdk-overlay-container
+  .cdk-overlay-backdrop.mat-overlay-transparent-backdrop,
+  .cdk-overlay-backdrop.cdk-overlay-backdrop-showing
+    &.mat-dialog-backdrop
+      background-color: rgba(15, 23, 42, 0.75)
+
+  .mat-mdc-dialog-container
+    .mdc-dialog__surface
+      background-color: var(--bg-panel) !important
+      border: 1px solid var(--border-color)
+      border-radius: 8px
+
+    .mat-mdc-dialog-title,
+    .mat-mdc-dialog-content
+      color: var(--text-main) !important
+
+    .mat-mdc-dialog-actions
+      border-top: 1px solid var(--border-subtle)
+
+  .mat-mdc-select-panel, .mat-mdc-menu-panel
+    background-color: var(--bg-panel) !important
+    border: 1px solid var(--border-color)
+
+  .mat-mdc-option
+    color: var(--text-main) !important
+
+    &:hover
+      background-color: var(--bg-element) !important
+
+.mat-mdc-card
+  background-color: var(--bg-panel) !important
+  color: var(--text-main) !important
+  border: 1px solid var(--border-color)
+  border-radius: 8px
+
+  .mat-mdc-card-title,
+  .mat-mdc-card-header .mat-mdc-card-title,
+  .mat-mdc-card-content
+    color: var(--text-main) !important
+
+  .mat-mdc-card-subtitle,
+  .mat-mdc-card-header .mat-mdc-card-subtitle
+    color: var(--text-muted) !important
+
+.mat-accordion
+  .mat-expansion-panel
+    background-color: var(--bg-panel) !important
+    color: var(--text-main) !important
+    border: 1px solid var(--border-color)
+
+    .mat-expansion-panel-header
+      .mat-expansion-panel-header-title
+        color: var(--text-main) !important
+      .mat-expansion-panel-header-description,
+      .mat-expansion-indicator::after
+        color: var(--text-muted) !important
+
+    .mat-expansion-panel-content
+      color: var(--text-main) !important
+      background-color: var(--bg-panel)
 
 html, body
-    height: 100%
+  min-width: 600px
+  height: 100%
+
 body
-    margin: 0
-    font-family: Roboto, "Helvetica Neue", sans-serif
+  margin: 0
+  font-family: Roboto, "Helvetica Neue", sans-serif

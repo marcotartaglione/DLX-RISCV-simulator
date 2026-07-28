@@ -1,28 +1,51 @@
-<body link="white" vlink="red">
-  <mat-form-field class="search-field">
-    <input matInput placeholder="Search" name="search" autocomplete="0" [(ngModel)]="searchQuery">
+<div class="documentation-container">
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-label>Search instructions...</mat-label>
+    <mat-icon matPrefix>search</mat-icon>
+    <input matInput type="text" autocomplete="off" name="search" [(ngModel)]="searchQuery">
+    @if (searchQuery) {
+      <button mat-icon-button matSuffix aria-label="Clear" (click)="searchQuery = ''">
+        <mat-icon>close</mat-icon>
+      </button>
+    }
   </mat-form-field>
+
   <div class="mat-accordion-container">
     <div class="info-documentation">
-      <span>
+      <p>
         Formato delle istruzioni DLX compatibile con il materiale del corso di Calcolatori Elettronici T (Stefano
-        Mattoccia), Corso di Laurea in Ingegneria Informatica, Università di Bologna.<br />
-        Per segnalazioni di errori o suggerimenti:<br /> Stefano Mattoccia: stefano.mattoccia&#64;unibo.it
-        <br><br>
-        Click <a href="https://www.csd.uoc.gr/~hy425/2002s/dlxmap.html">here</a> to view operational codes
-      </span>
+        Mattoccia), Corso di Laurea in Ingegneria Informatica, Università di Bologna.
+      </p>
+
+      <div class="info-links">
+        <span>
+          Per segnalazioni di errori o suggerimenti:
+          <a class="doc-link" href="mailto:stefano.mattoccia@unibo.it">stefano.mattoccia&#64;unibo.it</a>
+        </span>
+        <span class="separator">•</span>
+        <span>
+          Clicca <a class="doc-link external" href="https://www.csd.uoc.gr/~hy425/2002s/dlxmap.html" target="_blank" rel="noopener">qui <mat-icon class="external-icon">open_in_new</mat-icon></a> per gli OP CODES
+        </span>
+      </div>
     </div>
+
     <mat-accordion>
       @for (instr of documentationFiltered; track instr.name) {
         <mat-expansion-panel>
           <mat-expansion-panel-header>
-            <mat-panel-title class="name">{{instr.name}}</mat-panel-title>
-            <mat-panel-description class="type">{{instr.type}}</mat-panel-description>
-            <mat-panel-description class="syntax">{{instr.syntax}}</mat-panel-description>
+            <mat-panel-title class="name">{{ instr.name }}</mat-panel-title>
+            <mat-panel-description class="type">{{ instr.type }}</mat-panel-description>
+            <mat-panel-description class="syntax">{{ instr.syntax }}</mat-panel-description>
           </mat-expansion-panel-header>
+
           <p class="description" [innerHTML]="instr.description"></p>
         </mat-expansion-panel>
+      } @empty {
+        <div class="no-results">
+          <mat-icon>search_off</mat-icon>
+          <span>Nessuna istruzione trovata</span>
+        </div>
       }
     </mat-accordion>
   </div>
-</body>
+</div>
