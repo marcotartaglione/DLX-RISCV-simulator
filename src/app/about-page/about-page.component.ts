@@ -1,6 +1,8 @@
 import {Component} from '@angular/core';
-import {MatCard} from '@angular/material/card';
+import {MatCard, MatCardContent, MatCardFooter, MatCardHeader, MatCardSubtitle, MatCardTitle} from '@angular/material/card';
 import {MatTooltip} from '@angular/material/tooltip';
+import {MatActionList, MatListItem} from '@angular/material/list';
+import {MatIcon} from '@angular/material/icon';
 
 @Component({
   selector: 'app-about-page',
@@ -8,7 +10,15 @@ import {MatTooltip} from '@angular/material/tooltip';
   styleUrls: ['./about-page.component.sass'],
   imports: [
     MatCard,
-    MatTooltip
+    MatTooltip,
+    MatCardHeader,
+    MatCardTitle,
+    MatCardSubtitle,
+    MatCardContent,
+    MatActionList,
+    MatIcon,
+    MatListItem,
+    MatCardFooter
   ],
   standalone: true
 })
