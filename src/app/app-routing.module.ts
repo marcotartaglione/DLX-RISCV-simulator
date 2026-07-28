@@ -8,8 +8,6 @@ import {RV32Interpreter} from './interpreters/rv32i/rv32i.interpreter';
 import {MainPageComponent} from './main-page/main-page.component';
 import {DLXRegisters} from './registers/dlx.registers';
 import {RV32IRegisters} from './registers/rv32i.registers';
-import {trackRegisters} from './registers/trackRegisters';
-import {logRegisterChange} from './registers/register-change.store';
 
 
 export const routes: Routes = [
@@ -20,7 +18,7 @@ export const routes: Routes = [
     data: {
       interpreter: new DLXInterpreter(),
       editorMode: 'dlx',
-      registers: trackRegisters(new DLXRegisters(), logRegisterChange),
+      registers: new DLXRegisters(),
       documentation: DLXDocumentation
     },
     canDeactivate: [CanDeactivateGuard]
@@ -31,7 +29,7 @@ export const routes: Routes = [
     data: {
       interpreter: new RV32Interpreter(),
       editorMode: 'rv32i',
-      registers: trackRegisters(new RV32IRegisters(), logRegisterChange),
+      registers: new RV32IRegisters(),
       documentation: RV32IDocumentation
     },
     canDeactivate: [CanDeactivateGuard]

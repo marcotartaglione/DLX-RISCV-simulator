@@ -1,11 +1,11 @@
 <div class="btn-container">
   <div class="left">
-    <button (click)="openInterruptImage()" class="mr" mat-raised-button color="primary">
+    <button (click)="openInterruptImage()" class="mr" mat-raised-button>
       <span class="btn">View interrupt circuit <i class="fa fa-bolt"></i></span>
     </button>
     @if (selectedDevice(); as device) {
       @if (isLogicalNetwork(device)) {
-        <button (click)="openDialogImage(device)" class="mr" mat-raised-button color="primary">
+        <button (click)="openDialogImage(device)" class="mr" mat-raised-button>
           <span class="btn">View logic circuit <i class="fa fa-code-branch"></i></span>
         </button>
       }
@@ -14,7 +14,7 @@
 
   <div class="right">
 
-    <button (click)="defaultMemory()" class="mr" mat-raised-button color="primary" matTooltip="Reset memory map to the default layout">
+    <button (click)="defaultMemory()" class="mr" mat-raised-button matTooltip="Reset memory map to the default layout">
       <span class="btn">Reset memory to default <i class="fa fa-memory"></i></span>
     </button>
   </div>
@@ -75,7 +75,7 @@
     </div>
   </div>
 
-  <button [matMenuTriggerFor]="menuAdd" id="add" mat-raised-button color="primary">
+  <button [matMenuTriggerFor]="menuAdd" id="add" mat-raised-button>
     <i class="fas fa-plus"></i>
   </button>
 
@@ -85,12 +85,12 @@
               [disabled]="!canSelectedMoveLeft"
               class="standard_margin_hor"
               id="move-left"
-              mat-raised-button color="primary">
+              mat-raised-button>
         <i class="fas fa-caret-left"></i>
       </button>
 
       <div class="group">
-        <mat-form-field id="min" subscriptSizing="dynamic" color="primary">
+        <mat-form-field id="min" subscriptSizing="dynamic">
           <mat-label>Address start</mat-label>
           <input (change)="onChange($event, 'min')"
                  (ngModelChange)="selectedDevice().minAddress = formatPipe.transform($event, 'dec')"
@@ -101,7 +101,7 @@
                  minlength="10"/>
         </mat-form-field>
 
-        <mat-form-field appearance="fill" class="standard_margin_hor" id="name" subscriptSizing="dynamic" color="primary">
+        <mat-form-field appearance="fill" class="standard_margin_hor" id="name" subscriptSizing="dynamic">
           <mat-label>Device name</mat-label>
           <input (change)="onChange($event, 'name')"
                  [(ngModel)]="selectedDevice().name"
@@ -124,7 +124,7 @@
           </mat-form-field>
 
           @if (selectedChipSelect() && selectedChipSelect().id.length > 0) {
-            <mat-form-field appearance="fill" class="standard_margin_hor" id="csAddr" subscriptSizing="dynamic" color="primary">
+            <mat-form-field appearance="fill" class="standard_margin_hor" id="csAddr" subscriptSizing="dynamic">
               <mat-label>Address Value</mat-label>
               <input (change)="onChangeCS($any($event.target).value, selectedChipSelect().id)"
                      [value]="selectedChipSelect().address | format: 'hex'"
@@ -136,7 +136,7 @@
         }
 
         @if (isMemory(selectedDevice())) {
-          <mat-form-field appearance="fill" subscriptSizing="dynamic" color="primary">
+          <mat-form-field appearance="fill" subscriptSizing="dynamic">
             <mat-label>Address Value</mat-label>
             <input (ngModelChange)="inputAddr.set($event)"
                    [ngModel]="inputAddr()"
@@ -147,7 +147,7 @@
                    maxlength="10" minlength="10"/>
           </mat-form-field>
 
-          <button [matMenuTriggerFor]="menuSearch" class="detail standard_margin_hor" mat-raised-button color="primary">
+          <button [matMenuTriggerFor]="menuSearch" class="detail standard_margin_hor" mat-raised-button>
             <i class="fas fa-search"></i>
           </button>
 
@@ -158,7 +158,7 @@
       </div>
 
       <div class="group">
-        <mat-form-field appearance="fill" id="max" subscriptSizing="dynamic" color="primary">
+        <mat-form-field appearance="fill" id="max" subscriptSizing="dynamic">
           <mat-label>Address end</mat-label>
           <input (change)="onChange($event, 'max')"
                  (ngModelChange)="selectedDevice().maxAddress = formatPipe.transform($event, 'dec')"
@@ -172,7 +172,7 @@
       <button (click)="moveSelectedRight()"
               [disabled]="!canSelectedMoveRight"
               id="move-right"
-              mat-raised-button color="primary">
+              mat-raised-button>
         <i class="fas fa-caret-right"></i>
       </button>
     </div>
@@ -181,7 +181,7 @@
             @showHideTrigger
             [disabled]="isEprom(selectedDevice()) || isStartLogicalNetwork(selectedDevice())"
             id="del"
-            mat-raised-button color="primary">
+            mat-raised-button>
       <i class="fas fa-trash"></i>
     </button>
   }

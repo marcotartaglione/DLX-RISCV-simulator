@@ -1,29 +1,12 @@
 import {Pipe, PipeTransform} from '@angular/core';
 
-export type FormatType = 'dec' | 'bin' | 'hex' | 'oct';
-
 @Pipe({
   name: 'format',
   standalone: true,
 })
 export class FormatPipe implements PipeTransform {
 
-  public static getFormattedLength(format: FormatType, length: number = 32): number {
-    switch (format) {
-      case 'bin':
-        return length;
-      case 'hex':
-        return "0x".length + Math.ceil(length / 4);
-      case 'oct':
-        return Math.ceil(length / 3);
-      case 'dec':
-        return Math.pow(2, length).toString().length;
-      default:
-        return 0;
-    }
-  }
-
-  public transform(n: number | string, type: FormatType, length: number = 32): any {
+  transform(n: number | string, type: 'dec' | 'bin' | 'hex' | 'oct' | string, length: number = 32): any {
     let value: number | string = n;
     if (typeof n === 'string') {
       const s = n.trim();
@@ -57,7 +40,7 @@ export class FormatPipe implements PipeTransform {
       case 'hex':
         return '0x' + unsigned.toString(16).padStart(Math.ceil(length / 4), '0').toUpperCase();
       case 'oct':
-        return unsigned.toString(8).padStart(Math.ceil(length / 3), '0').toUpperCase();
+        return unsigned.toString(8).padStart(Math.ceil(length / 2), '0').toUpperCase();
       default:
         return n;
     }

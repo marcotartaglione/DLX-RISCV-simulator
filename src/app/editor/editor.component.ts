@@ -39,7 +39,6 @@ import 'codemirror/addon/hint/show-hint.css';
 import {DLX_INSTRUCTIONS} from '../interpreters/dlx/dlx.instructions';
 import {Device} from '../memory/model/device';
 import {LedLogicalNetwork} from '../memory/model/logicalNetworks/led-logical-network';
-import {clearRegistersChangeLog} from '../registers/register-change.store';
 
 @Component({
   selector: 'app-editor',
@@ -120,7 +119,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     this.initEditorSettings();
 
     effect(() => {
-      this.pc.set(this.registers().specialRegisters['pc'].value);
+      this.pc.set(this.registers().pc);
     })
 
 
@@ -179,8 +178,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       theme: 'dlx-riscv-theme',
       mode: this._codeService.editorMode,
       styleActiveLine: true,
-      lineWrapping: false,
-      // viewportMargin: Infinity,
+      viewportMargin: Infinity,
       extraKeys: {
         'Ctrl-Space': 'autocomplete',
         'Ctrl-S': () => {
@@ -239,7 +237,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       }
 
       if (this.errorMessage()) {
-        this.removeLineState(this.addressToLine(this._runnedInstruction), 'error');
+        this._codeMirror().removeLineClass(this.addressToLine(this._runnedInstruction), 'wrap', 'error');
         this.errorMessage.set(undefined);
       }
     });
@@ -318,10 +316,8 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   }
 
   protected executeNextInstruction() {
-    clearRegistersChangeLog();
-
     if (!this._isRunning()) {
-      this.removeLineState(this._errorLine, 'error');
+      this._codeMirror().removeLineClass(this._errorLine, 'wrap', 'error');
       this._errorLine = -1;
 
       this.errorMessage.set(undefined);
@@ -363,7 +359,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
         this._memoryService.memory
       );
 
-      this.registers().specialRegisters['pc'].value = newPc;
+      this.registers().pc = newPc;
       this.pc.set(newPc);
 
       // Call updateVisuals directly to ensure it's called even if PC doesn't change (e.g., jump to same address)
@@ -375,7 +371,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       this.stop();
 
       setTimeout(() => {
-        this.addLineState(this._errorLine, 'error');
+        this._codeMirror().addLineClass(this._errorLine, 'wrap', 'error');
         this.errorMessage.set(error.message);
         this._appRef.tick();
       }, 0);
@@ -403,15 +399,14 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     this._runnedInstruction = -1;
     this._codeService.interpreter.reset(this.registers());
 
-    this.registers().specialRegisters['pc'].value = 0;
+    this.registers().pc = 0;
     this.pc.set(0);
 
     if (this._codeMirror()) {
       for (let i = 0; i < this._codeMirror().lineCount(); i++) {
-
-        this.removeLineState(i, 'error');
-        this.removeLineState(i, 'runned');
-        this.removeLineState(i, 'next');
+        this._codeMirror().removeLineClass(i, 'wrap', 'error');
+        this._codeMirror().removeLineClass(i, 'wrap', 'runned');
+        this._codeMirror().removeLineClass(i, 'wrap', 'next');
       }
     }
   }
@@ -434,7 +429,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     this._codeService.load();
     this.storeCodeInEprom();
 
-    this.registers().specialRegisters['pc'].value = 0;
+    this.registers().pc = 0;
     this.pc.set(0);
 
     if (this._diagramService.isAuto()) {
@@ -443,18 +438,12 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   }
 
   protected onInterrupt(device: Device) {
-    clearRegistersChangeLog();
-
     this._exRunnedInstruction = this._runnedInstruction;
     this._runnedInstruction = this.pc();
     this._codeService.interpreter.interrupt(this.registers());
     this._memoryService.interrupt(device);
 
-    this.pc.set(this.registers().specialRegisters['pc'].value);
-
-    if (this._isRunning()) {
-      this.updateVisuals(this._exRunnedInstruction, this._runnedInstruction, this.pc());
-    }
+    this.pc.set(this.registers().pc);
   }
 
   private storeCodeInEprom() {
@@ -492,39 +481,29 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
 
     if (!this._isRunning()) {
       for (let i = 0; i < this._codeMirror().lineCount(); i++) {
-        this.removeLineState(i, 'runned');
-        this.removeLineState(i, 'next');
-        this.removeLineState(i, 'error');
+        this._codeMirror().removeLineClass(i, 'wrap', 'runned');
+        this._codeMirror().removeLineClass(i, 'wrap', 'next');
+        this._codeMirror().removeLineClass(i, 'wrap', 'error');
       }
     } else {
       if (prevAddr >= 0) {
-        this.removeLineState(this.addressToLine(prevAddr), 'runned');
-        this.removeLineState(this.addressToLine(prevAddr), 'next');
-        this.removeLineState(this.addressToLine(prevAddr), 'error');
+        this._codeMirror().removeLineClass(this.addressToLine(prevAddr), 'wrap', 'runned');
+        this._codeMirror().removeLineClass(this.addressToLine(prevAddr), 'wrap', 'next');
+        this._codeMirror().removeLineClass(this.addressToLine(prevAddr), 'wrap', 'error');
       }
       if (currentAddr >= 0) {
-        this.removeLineState(this.addressToLine(currentAddr), 'runned');
-        this.removeLineState(this.addressToLine(currentAddr), 'next');
-        this.removeLineState(this.addressToLine(currentAddr), 'error');
+        this._codeMirror().removeLineClass(this.addressToLine(currentAddr), 'wrap', 'runned');
+        this._codeMirror().removeLineClass(this.addressToLine(currentAddr), 'wrap', 'next');
+        this._codeMirror().removeLineClass(this.addressToLine(currentAddr), 'wrap', 'error');
       }
 
-      this.addLineState(this.addressToLine(currentAddr), 'runned');
+      this._codeMirror().addLineClass(this.addressToLine(currentAddr), 'wrap', 'runned');
 
       const nextLine = this.addressToLine(nextAddr);
       if (nextLine < this._codeMirror().lineCount() && nextLine !== this.addressToLine(currentAddr)) {
-        this.removeLineState(nextLine, 'error');
-        this.addLineState(nextLine, 'next');
+        this._codeMirror().removeLineClass(nextLine, 'wrap', 'error');
+        this._codeMirror().addLineClass(nextLine, 'wrap', 'next');
       }
     }
-  }
-
-  private addLineState(line: number, cls: string) {
-    this._codeMirror().addLineClass(line, 'wrap', cls);
-    this._codeMirror().addLineClass(line, 'gutter', `${cls}-gutter`);
-  }
-
-  private removeLineState(line: number, cls: string) {
-    this._codeMirror().removeLineClass(line, 'wrap', cls);
-    this._codeMirror().removeLineClass(line, 'gutter', `${cls}-gutter`);
   }
 }

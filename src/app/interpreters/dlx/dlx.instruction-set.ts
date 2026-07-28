@@ -18,7 +18,7 @@ export const instructions: {
   },
   ADDUI: {
     type: 'Immediate',
-    func: (registers) => registers.specialRegisters['c'].value = registers.specialRegisters['a'].value + registers.specialRegisters['temp'].value,
+    func: (registers) => registers.c = registers.a + registers.temp,
     unsigned: true
   },
   AND: {
@@ -27,69 +27,69 @@ export const instructions: {
   },
   ANDI: {
     type: 'Immediate',
-    func: (registers) => registers.specialRegisters['c'].value = registers.specialRegisters['a'].value & registers.specialRegisters['temp'].value,
+    func: (registers) => registers.c = registers.a & registers.temp,
     unsigned: true
   },
   BEQZ: {
     type: 'ImmediateBranch',
-    func: (registers) => registers.specialRegisters['a'].value === 0 ? registers.specialRegisters['pc'].value = registers.specialRegisters['temp'].value : 0
+    func: (registers) => registers.a === 0 ? registers.pc = registers.temp : 0
   },
   BNEZ: {
     type: 'ImmediateBranch',
-    func: (registers) => registers.specialRegisters['a'].value !== 0 ? registers.specialRegisters['pc'].value = registers.specialRegisters['temp'].value : 0
+    func: (registers) => registers.a !== 0 ? registers.pc = registers.temp : 0
   },
   J: {
     type: 'Jump',
-    func: (registers) => registers.specialRegisters['pc'].value = registers.specialRegisters['temp'].value
+    func: (registers) => registers.pc = registers.temp
   },
   JAL: {
     type: 'Jump',
     func: (registers) => {
-      registers.registersValue[31] = registers.specialRegisters['c'].value = registers.specialRegisters['pc'].value;
-      return registers.specialRegisters['pc'].value = registers.specialRegisters['temp'].value;
+      registers.registersValue[31] = registers.c = registers.pc;
+      return registers.pc = registers.temp;
     }
   },
   JALR: {
     type: 'ImmediateJump', func: (registers) => {
-      registers.registersValue[31] = registers.specialRegisters['c'].value = registers.specialRegisters['pc'].value;
-      return registers.specialRegisters['pc'].value = registers.specialRegisters['a'].value;
+      registers.registersValue[31] = registers.c = registers.pc;
+      return registers.pc = registers.a;
     }
   },
   JR: {
     type: 'ImmediateJump',
-    func: (registers) => registers.specialRegisters['pc'].value = registers.specialRegisters['a'].value
+    func: (registers) => registers.pc = registers.a
   },
   LB: {
     type: 'ImmediateLoad',
-    func: (registers) => registers.specialRegisters['c'].value = signExtend(loadValue(registers.specialRegisters['mdr'].value, registers.specialRegisters['temp'].value, 'byte'), 8)
+    func: (registers) => registers.c = signExtend(loadValue(registers.memoryDataRegister, registers.temp, 'byte'), 8)
   },
   LBU: {
     type: 'ImmediateLoad',
-    func: (registers) => registers.specialRegisters['c'].value = loadValue(registers.specialRegisters['mdr'].value, registers.specialRegisters['temp'].value, 'byte')
+    func: (registers) => registers.c = loadValue(registers.memoryDataRegister, registers.temp, 'byte')
   },
   LH: {
     type: 'ImmediateLoad',
-    func: (registers) => registers.specialRegisters['c'].value = signExtend(loadValue(registers.specialRegisters['mdr'].value, registers.specialRegisters['temp'].value, 'halfword'), 16)
+    func: (registers) => registers.c = signExtend(loadValue(registers.memoryDataRegister, registers.temp, 'halfword'))
   },
   LHI: {
     type: 'LoadHighImmediate',
-    func: (registers) => registers.specialRegisters['c'].value = registers.specialRegisters['temp'].value << 16
+    func: (registers) => registers.c = registers.temp << 16
   },
   LHU: {
     type: 'ImmediateLoad',
-    func: (registers) => registers.specialRegisters['c'].value = loadValue(registers.specialRegisters['mdr'].value, registers.specialRegisters['temp'].value, 'halfword')
+    func: (registers) => registers.c = loadValue(registers.memoryDataRegister, registers.temp, 'halfword')
   },
   LW: {
     type: 'ImmediateLoad',
-    func: (registers) => registers.specialRegisters['c'].value = loadValue(registers.specialRegisters['mdr'].value, registers.specialRegisters['temp'].value, 'word')
+    func: (registers) => registers.c = loadValue(registers.memoryDataRegister, registers.temp, 'word')
   },
   MOVI2S: {
     type: 'RegisterMove',
-    func: (registers, [rd, rs1]) => registers.specialRegisters[specialRegisters[rd - 1].toLowerCase()].value = registers.specialRegisters['a'].value = registers.registersValue[rs1]
+    func: (registers, [rd, rs1]) => registers[specialRegisters[rd - 1].toLowerCase()] = registers.a = registers.registersValue[rs1]
   },
   MOVS2I: {
     type: 'RegisterMove',
-    func: (registers, [rd, rs1]) => rd ? registers.registersValue[rd] = registers.specialRegisters['c'].value = registers.specialRegisters[specialRegisters[rs1 - 1].toLowerCase()].value : 0
+    func: (registers, [rd, rs1]) => rd ? registers.registersValue[rd] = registers.c = registers[specialRegisters[rs1 - 1].toLowerCase()] : 0
   },
   NOP: {
     type: 'NoOperation',
@@ -97,20 +97,20 @@ export const instructions: {
   },
   OR: {
     type: 'Register',
-    func: (registers) => registers.specialRegisters['c'].value = registers.specialRegisters['a'].value | registers.specialRegisters['temp'].value
+    func: (registers) => registers.c = registers.a | registers.temp
   },
   ORI: {
     type: 'Immediate',
-    func: (registers) => registers.specialRegisters['c'].value = registers.specialRegisters['a'].value | registers.specialRegisters['temp'].value,
+    func: (registers) => registers.c = registers.a | registers.temp,
     unsigned: true
   },
   RFE: {
     type: 'ReturnFromException',
-    func: (registers) => registers.specialRegisters['pc'].value = registers.specialRegisters['instructionAddressRegister'].value
+    func: (registers) => registers.pc = registers.instructionAddressRegister
   },
   SB: {
     type: 'ImmediateStore',
-    func: (registers, [stored]) => storeValue(registers.specialRegisters['mdr'].value, stored, registers.specialRegisters['temp'].value, 'byte')
+    func: (registers, [stored]) => storeValue(registers.memoryDataRegister, stored, registers.temp, 'byte')
   },
   SEQ: {
     type: 'Register',
@@ -118,7 +118,7 @@ export const instructions: {
   },
   SEQI: {
     type: 'Immediate',
-    func: (registers) => registers.specialRegisters['c'].value = registers.specialRegisters['a'].value == registers.specialRegisters['temp'].value ? 1 : 0
+    func: (registers) => registers.c = registers.a == registers.temp ? 1 : 0
   },
   SGE: {
     type: 'Register',
@@ -126,7 +126,7 @@ export const instructions: {
   },
   SGEI: {
     type: 'Immediate',
-    func: (registers) => registers.specialRegisters['c'].value = registers.specialRegisters['a'].value >= registers.specialRegisters['temp'].value ? 1 : 0
+    func: (registers) => registers.c = registers.a >= registers.temp ? 1 : 0
   },
   SGT: {
     type: 'Register',
@@ -134,11 +134,11 @@ export const instructions: {
   },
   SGTI: {
     type: 'Immediate',
-    func: (registers) => registers.specialRegisters['c'].value = registers.specialRegisters['a'].value > registers.specialRegisters['temp'].value ? 1 : 0
+    func: (registers) => registers.c = registers.a > registers.temp ? 1 : 0
   },
   SH: {
     type: 'ImmediateStore',
-    func: (registers, [stored]) => storeValue(registers.specialRegisters['mdr'].value, stored, registers.specialRegisters['temp'].value, 'halfword')
+    func: (registers, [stored]) => storeValue(registers.memoryDataRegister, stored, registers.temp, 'halfword')
   },
   SLE: {
     type: 'Register',
@@ -146,7 +146,7 @@ export const instructions: {
   },
   SLEI: {
     type: 'Immediate',
-    func: (registers) => registers.specialRegisters['c'].value = registers.specialRegisters['a'].value <= registers.specialRegisters['temp'].value ? 1 : 0
+    func: (registers) => registers.c = registers.a <= registers.temp ? 1 : 0
   },
   SLL: {
     type: 'Register',
@@ -154,7 +154,7 @@ export const instructions: {
   },
   SLLI: {
     type: 'Immediate',
-    func: (registers) => registers.specialRegisters['c'].value = registers.specialRegisters['a'].value << (registers.specialRegisters['temp'].value & 0x1F)
+    func: (registers) => registers.c = registers.a << (registers.temp & 0x1F)
   },
   SLT: {
     type: 'Register',
@@ -162,7 +162,7 @@ export const instructions: {
   },
   SLTI: {
     type: 'Immediate',
-    func: (registers) => registers.specialRegisters['c'].value = registers.specialRegisters['a'].value < registers.specialRegisters['temp'].value ? 1 : 0
+    func: (registers) => registers.c = registers.a < registers.temp ? 1 : 0
   },
   SNE: {
     type: 'Register',
@@ -170,7 +170,7 @@ export const instructions: {
   },
   SNEI: {
     type: 'Immediate',
-    func: (registers) => registers.specialRegisters['c'].value = registers.specialRegisters['a'].value != registers.specialRegisters['temp'].value ? 1 : 0
+    func: (registers) => registers.c = registers.a != registers.temp ? 1 : 0
   },
   SRA: {
     type: 'Register',
@@ -178,7 +178,7 @@ export const instructions: {
   },
   SRAI: {
     type: 'Immediate',
-    func: (registers) => registers.specialRegisters['c'].value = registers.specialRegisters['a'].value >> (registers.specialRegisters['temp'].value & 0x1F)
+    func: (registers) => registers.c = registers.a >> (registers.temp & 0x1F)
   },
   SRL: {
     type: 'Register',
@@ -186,7 +186,7 @@ export const instructions: {
   },
   SRLI: {
     type: 'Immediate',
-    func: (registers) => registers.specialRegisters['c'].value = registers.specialRegisters['a'].value >>> (registers.specialRegisters['temp'].value & 0x1F)
+    func: (registers) => registers.c = registers.a >>> (registers.temp & 0x1F)
   },
   SUB: {
     type: 'Register',
@@ -198,21 +198,21 @@ export const instructions: {
   },
   SUBU: {
     type: 'Register',
-    func: (registers) => registers.specialRegisters['c'].value = registers.specialRegisters['a'].value - registers.specialRegisters['temp'].value
+    func: (registers) => registers.c = registers.a - registers.temp
   },
   SUBUI: {
     type: 'Immediate',
-    func: (registers) => registers.specialRegisters['c'].value = registers.specialRegisters['a'].value - registers.specialRegisters['temp'].value,
+    func: (registers) => registers.c = registers.a - registers.temp,
     unsigned: true
   },
   SW: {
     type: 'ImmediateStore',
-    func: (registers, [stored]) => storeValue(registers.specialRegisters['mdr'].value, stored, registers.specialRegisters['temp'].value, 'word')
+    func: (registers, [stored]) => storeValue(registers.memoryDataRegister, stored, registers.temp, 'word')
   },
   TRAP: {
     type: 'Jump', func: (registers) => {
-      registers.specialRegisters['iar'].value = registers.specialRegisters['pc'].value + 4;
-      return registers.specialRegisters['pc'].value = registers.specialRegisters['temp'].value;
+      registers.instructionAddressRegister = registers.pc + 4;
+      return registers.pc = registers.temp;
     }, unsigned: true
   },
   XOR: {
@@ -221,7 +221,7 @@ export const instructions: {
   },
   XORI: {
     type: 'Immediate',
-    func: (registers) => registers.specialRegisters['c'].value = registers.specialRegisters['a'].value ^ registers.specialRegisters['temp'].value,
+    func: (registers) => registers.c = registers.a ^ registers.temp,
     unsigned: true
   },
 };

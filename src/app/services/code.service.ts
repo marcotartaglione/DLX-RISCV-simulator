@@ -35,10 +35,9 @@ export class CodeService {
     }
 
     if (this.editorMode === 'dlx') {
-      const url = `assets/scripts/${script}.${this.editorMode}`
+      const url = `/assets/scripts/${script}.${this.editorMode}`
       this._httpClient.get(url, {responseType: 'text'}).subscribe({
         next: (val) => this.content.set(val),
-        error: (err) => console.error("Errore nel caricamento dello script:", err),
       });
     }
   }

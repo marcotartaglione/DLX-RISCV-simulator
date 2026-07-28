@@ -1,113 +1,22 @@
 :host
-  display: flex
-  justify-content: center
-  align-items: center
-  min-height: 100%
-  padding: 2rem
+    display: block
+    position: absolute
+    top: 0
+    left: 0
+    bottom: 0
+    right: 0
+    padding: 3rem
 
 mat-card
-  max-width: 520px
-  width: 100%
+  display: flex
+  flex-direction: column
+  justify-content: space-around
+  align-items: center
+  width: fit-content
+  margin: 0 auto
 
-  .center-header
-    display: flex
-    flex-direction: column
-    align-items: center
-    text-align: center
-    margin-bottom: 1.5rem
-
-    mat-card-title
-      font-size: 1.5rem
-      font-weight: 600
-
-  mat-card-content
-    padding: 0
-
-  mat-action-list
-    padding: 0
-
-    a[mat-list-item], mat-list-item
-      border-radius: 6px
-      transition: background-color 0.2s ease
-
-      // SPAZIATURA TRA I NOMI
-      margin-bottom: 0.75rem
-      padding-top: 0.5rem
-      padding-bottom: 0.5rem
-
-      &:last-child
-        margin-bottom: 0
-
-      // Centra il blocco interno del list item
-      ::ng-deep .mdc-list-item__content
-        text-align: center
-
-      // Riga Titolo: Icona e Nome perfettamente affiancati al centro
-      .title-with-icon
-        display: inline-flex
-        align-items: center
-        justify-content: center
-        gap: 0.5rem
-        width: 100%
-
-        .list-icon
-          color: var(--text-muted)
-          font-size: 1.25rem
-          width: 1.25rem
-          height: 1.25rem
-
-          &.disabled-icon
-            opacity: 0.5
-
-      // Riga Anno: Staccata dal nome e centrata
-      .subtitle-year
-        display: block
-        text-align: center
-        margin-top: 0.25rem
-        color: var(--text-muted)
-
-      &:hover
-        .list-icon:not(.disabled-icon)
-          color: var(--text-main)
-
-  mat-card-footer
-    padding: 1rem 1.5rem
-    border-top: 1px solid var(--border-subtle)
-    margin-top: 1rem
-
-    .footer-info
-      display: flex
-      flex-wrap: wrap
-      justify-content: center
-      align-items: center
-      gap: 0.5rem
-      font-size: 0.875rem
-      color: var(--text-muted)
-      text-align: center
-
-      .separator
-        opacity: 0.5
-
-      .prof-link
-        display: inline-flex
-        align-items: center
-        gap: 0.25rem
-        color: var(--text-main)
-        text-decoration: none
-        font-weight: 500
-        border-bottom: 1px dashed var(--border-color)
-        transition: color 0.2s ease, border-color 0.2s ease
-
-        .external-icon
-          font-size: 0.875rem
-          width: 0.875rem
-          height: 0.875rem
-          color: var(--text-muted)
-          transition: color 0.2s ease
-
-        &:hover
-          color: #38bdf8
-          border-bottom-color: #38bdf8
-
-          .external-icon
-            color: #38bdf8
+.line
+  width: fit-content
+  padding: 1rem
+  border-radius: 1rem
+  font-weight: 500
