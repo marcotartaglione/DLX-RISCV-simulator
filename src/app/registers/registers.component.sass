@@ -1,8 +1,5 @@
 @use '@angular/material' as mat
 
-:root
-  interpolate-size: allow-keywords
-
 :host
   display: flex
   flex-direction: column
@@ -18,7 +15,7 @@
   & > *
     width: 100%
 
-  .special-registers-container, .gpr-container
+  .special-registers-container
     overflow: hidden
     border-radius: 5px
     @include mat.elevation(2)
@@ -27,63 +24,64 @@
     background-color: transparent !important
 
   .gpr-container
+    overflow: hidden
+    border-radius: 5px
+    @include mat.elevation(2)
+    display: grid
     grid-template-columns: 1fr 1fr
+    background-color: transparent !important
 
-  .special-registers-container, .gpr-container
+    .value
+      border-radius: 0
+
+  .gpr-container
     & > :not(:nth-last-child(-n + 2))
-      border-bottom: 1px solid var(--border-subtle)
+      border-bottom: 1px solid map-get(mat.$m2-grey-palette, 700)
+
+  .special-registers-container
+    & > :not(:nth-last-child(1))
+      border-bottom: 1px solid map-get(mat.$m2-grey-palette, 700)
 
   .register
     display: grid
-    grid-template-columns: auto 1fr
-    border: 1px solid var(--border-subtle)
-    border-radius: 5px
-    overflow: hidden
-    transition: border-color 0.3s ease-in-out
-
-    &.changed
-      border-color: var(--accent-sky) !important
-
-      .index, .value
-        font-weight: bold
+    grid-template-columns: auto auto
 
     .index
       text-align: right
       width: 2rem
       padding: 0.25rem 0.5rem
-      background-color: var(--bg-app)
+      background-color: #2c2c2c
 
     .value
       padding: .25rem .5rem
       white-space: nowrap
-      box-sizing: content-box
-      font-family: 'Fira Code', monospace
-      font-size: .9rem
-      font-weight: 300
-      overflow: hidden
-      display: inline-block
-      transition: max-width 300ms ease-in-out, font-size 300ms cubic-bezier(.25, .8, .25, 1), background-color 300ms cubic-bezier(.25, .8, .25, 1), box-shadow 300ms cubic-bezier(.25, .8, .25, 1), transform 300ms cubic-bezier(.25, .8, .25, 1)
-      will-change: max-width, font-size, background-color, box-shadow, transform
+      box-sizing: border-box
 
       &.special
         @include mat.elevation(2)
         margin: 0
 
-  .special-registers
-    .register
-      .value
-        max-width: 100% !important
+    .hex, .dec
+      width: 12ch
+    .oct
+      width: 18ch
+    .bin
+      width: 34ch
 
-  .value-inner
-    display: inline-block
-    white-space: nowrap
+  .special-registers
+    .hex, .dec
+      width: 29ch
+    .oct
+      width: 41ch
+    .bin
+      width: 73ch
 
   .value, .index
     font-family: 'Fira Code', monospace
     font-size: .9rem
     font-weight: 300
-    transition: font-size 300ms cubic-bezier(.25, .8, .25, 1), max-width 300ms ease-in-out, height 300ms cubic-bezier(.25, .8, .25, 1), background-color 300ms cubic-bezier(.25, .8, .25, 1), box-shadow 300ms cubic-bezier(.25, .8, .25, 1), transform 300ms cubic-bezier(.25, .8, .25, 1)
-    will-change: font-size, max-width, height, background-color, box-shadow, transform
+    transition: font-size 300ms cubic-bezier(.25, .8, .25, 1), width 300ms cubic-bezier(.25, .8, .25, 1), height 300ms cubic-bezier(.25, .8, .25, 1), background-color 300ms cubic-bezier(.25, .8, .25, 1), box-shadow 300ms cubic-bezier(.25, .8, .25, 1), transform 300ms cubic-bezier(.25, .8, .25, 1)
+    will-change: font-size, width, height, background-color, box-shadow, transform
 
   #fType
     @include mat.elevation(2)

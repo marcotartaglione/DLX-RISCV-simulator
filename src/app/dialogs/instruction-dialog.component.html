@@ -6,11 +6,9 @@
     @for (el of data.values; track el) {
       <mat-grid-tile>
         <mat-card><h4>0x{{ el.hexAddress }}</h4>
-          <span>{{ el.value | format: formatByteType }}
-            @if (formatByteType === 'bin') {
-              <sub>2</sub>
-            }
-          </span>
+          <span>{{ el.value | formatByte: formatByteType }}@if (formatByteType === 'bin') {
+            <sub>2</sub>
+          }</span>
         </mat-card>
       </mat-grid-tile>
     }

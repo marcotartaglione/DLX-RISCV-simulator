@@ -21,204 +21,204 @@ export class RV32Interpreter extends Interpreter {
   readonly instructions: { [key: string]: (args: number[], registers: RV32IRegisters, memory: Memory, usnigned ?: boolean) => number } = {
     // R-type instructions
     ADD: (args, registers) => {
-      registers.specialRegisters['f3'].value = 0;
-      registers.specialRegisters['f7'].value = 0;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepR(args, registers)] = registers.specialRegisters['rs1'].value + registers.specialRegisters['rs2'].value;
+      registers.func3 = 0;
+      registers.func7 = 0;
+      return registers.rd = registers.x[this.prepR(args, registers)] = registers.rs1 + registers.rs2;
     },
     SUB: (args, registers) => {
-      registers.specialRegisters['f3'].value = 0;
-      registers.specialRegisters['f7'].value = 32;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepR(args, registers)] = registers.specialRegisters['rs1'].value - registers.specialRegisters['rs2'].value;
+      registers.func3 = 0;
+      registers.func7 = 32;
+      return registers.rd = registers.x[this.prepR(args, registers)] = registers.rs1 - registers.rs2;
     },
     SLL: (args, registers) => {
-      registers.specialRegisters['f3'].value = 1;
-      registers.specialRegisters['f7'].value = 0;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepR(args, registers)] = registers.specialRegisters['rs2'].value > 31 ? 0 : (registers.specialRegisters['rs1'].value << registers.specialRegisters['rs2'].value) >>> 0;
+      registers.func3 = 1;
+      registers.func7 = 0;
+      return registers.rd = registers.x[this.prepR(args, registers)] = registers.rs2 > 31 ? 0 : (registers.rs1 << registers.rs2) >>> 0;
     },
     SLT: (args, registers) => {
-      registers.specialRegisters['f3'].value = 2;
-      registers.specialRegisters['f7'].value = 0;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepR(args, registers)] = registers.specialRegisters['rs1'].value < registers.specialRegisters['rs2'].value ? 1 : 0;
+      registers.func3 = 2;
+      registers.func7 = 0;
+      return registers.rd = registers.x[this.prepR(args, registers)] = registers.rs1 < registers.rs2 ? 1 : 0;
     },
     SLTU: (args, registers) => {
-      registers.specialRegisters['f3'].value = 3;
-      registers.specialRegisters['f7'].value = 0;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepR(args, registers)] = (registers.specialRegisters['rs1'].value == 0) ? (registers.specialRegisters['rs2'].value != 0 ? 1 : 0) : (registers.specialRegisters['rs1'].value < registers.specialRegisters['rs2'].value ? 1 : 0);
+      registers.func3 = 3;
+      registers.func7 = 0;
+      return registers.rd = registers.x[this.prepR(args, registers)] = (registers.rs1 == 0) ? (registers.rs2 != 0 ? 1 : 0) : (registers.rs1 < registers.rs2 ? 1 : 0);
     },
     XOR: (args, registers) => {
-      registers.specialRegisters['f3'].value = 4;
-      registers.specialRegisters['f7'].value = 0;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepR(args, registers)] = registers.specialRegisters['rs1'].value ^ registers.specialRegisters['rs2'].value;
+      registers.func3 = 4;
+      registers.func7 = 0;
+      return registers.rd = registers.x[this.prepR(args, registers)] = registers.rs1 ^ registers.rs2;
     },
     SRL: (args, registers) => {
-      registers.specialRegisters['f3'].value = 5;
-      registers.specialRegisters['f7'].value = 0;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepR(args, registers)] = registers.specialRegisters['rs1'].value >>> (registers.specialRegisters['rs2'].value & 0x1F);
+      registers.func3 = 5;
+      registers.func7 = 0;
+      return registers.rd = registers.x[this.prepR(args, registers)] = registers.rs1 >>> (registers.rs2 & 0x1F);
     },
     SRA: (args, registers) => {
-      registers.specialRegisters['f3'].value = 5;
-      registers.specialRegisters['f7'].value = 32;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepR(args, registers)] = registers.specialRegisters['rs1'].value >> (registers.specialRegisters['rs2'].value & 0x1F);
+      registers.func3 = 5;
+      registers.func7 = 32;
+      return registers.rd = registers.x[this.prepR(args, registers)] = registers.rs1 >> (registers.rs2 & 0x1F);
     },
     OR: (args, registers) => {
-      registers.specialRegisters['f3'].value = 6;
-      registers.specialRegisters['f7'].value = 32;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepR(args, registers)] = registers.specialRegisters['rs1'].value | registers.specialRegisters['rs2'].value & 0x1F;
+      registers.func3 = 6;
+      registers.func7 = 32;
+      return registers.rd = registers.x[this.prepR(args, registers)] = registers.rs1 | registers.rs2 & 0x1F;
     },
     AND: (args, registers) => {
-      registers.specialRegisters['f3'].value = 7;
-      registers.specialRegisters['f7'].value = 32;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepR(args, registers)] = registers.specialRegisters['rs1'].value & registers.specialRegisters['rs2'].value & 0x1F;
+      registers.func3 = 7;
+      registers.func7 = 32;
+      return registers.rd = registers.x[this.prepR(args, registers)] = registers.rs1 & registers.rs2 & 0x1F;
     },
 
     // I-type instructions
     ADDI: (args, registers) => {
-      registers.specialRegisters['f3'].value = 0;
-      registers.specialRegisters['f7'].value = 0;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepI(args, registers)] = registers.specialRegisters['rs1'].value + registers.specialRegisters['i'].value;
+      registers.func3 = 0;
+      registers.func7 = 0;
+      return registers.rd = registers.x[this.prepI(args, registers)] = registers.rs1 + registers.immediate;
     },
     SLTI: (args, registers) => {
-      registers.specialRegisters['f3'].value = 2;
-      registers.specialRegisters['f7'].value = 0;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepI(args, registers)] = this.signExtend(registers.specialRegisters['rs1'].value) < registers.specialRegisters['i'].value ? 1 : 0;
+      registers.func3 = 2;
+      registers.func7 = 0;
+      return registers.rd = registers.x[this.prepI(args, registers)] = this.signExtend(registers.rs1) < registers.immediate ? 1 : 0;
     },
     SLTIU: (args, registers) => {
-      registers.specialRegisters['f3'].value = 3;
-      registers.specialRegisters['f7'].value = 0;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepI(args, registers, true)] = registers.specialRegisters['i'].value == 1 ? (registers.specialRegisters['rs1'].value == 0 ? 1 : 0) : (registers.specialRegisters['rs1'].value < registers.specialRegisters['i'].value ? 1 : 0);
+      registers.func3 = 3;
+      registers.func7 = 0;
+      return registers.rd = registers.x[this.prepI(args, registers, true)] = registers.immediate == 1 ? (registers.rs1 == 0 ? 1 : 0) : (registers.rs1 < registers.immediate ? 1 : 0);
     },
     XORI: (args, registers) => {
-      registers.specialRegisters['f3'].value = 4;
-      registers.specialRegisters['f7'].value = 0;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepI(args, registers)] = registers.specialRegisters['i'].value == -1 ? (registers.specialRegisters['rs1'].value ^ 1) : (registers.specialRegisters['rs1'].value ^ registers.specialRegisters['i'].value);
+      registers.func3 = 4;
+      registers.func7 = 0;
+      return registers.rd = registers.x[this.prepI(args, registers)] = registers.immediate == -1 ? (registers.rs1 ^ 1) : (registers.rs1 ^ registers.immediate);
     },
     ORI: (args, registers) => {
-      registers.specialRegisters['f3'].value = 6;
-      registers.specialRegisters['f7'].value = 0;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepI(args, registers)] = registers.specialRegisters['rs1'].value | registers.specialRegisters['i'].value;
+      registers.func3 = 6;
+      registers.func7 = 0;
+      return registers.rd = registers.x[this.prepI(args, registers)] = registers.rs1 | registers.immediate;
     },
     ANDI: (args, registers) => {
-      registers.specialRegisters['f3'].value = 7;
-      registers.specialRegisters['f7'].value = 0;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepI(args, registers)] = registers.specialRegisters['rs1'].value & registers.specialRegisters['i'].value;
+      registers.func3 = 7;
+      registers.func7 = 0;
+      return registers.rd = registers.x[this.prepI(args, registers)] = registers.rs1 & registers.immediate;
     },
     SLLI: (args, registers) => {
-      registers.specialRegisters['f3'].value = 1;
-      registers.specialRegisters['f7'].value = 0;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepI(args, registers, true)] = registers.specialRegisters['i'].value > 31 ? 0 : (registers.specialRegisters['rs1'].value << registers.specialRegisters['i'].value) >>> 0;
+      registers.func3 = 1;
+      registers.func7 = 0;
+      return registers.rd = registers.x[this.prepI(args, registers, true)] = registers.immediate > 31 ? 0 : (registers.rs1 << registers.immediate) >>> 0;
     },
     SRLI: (args, registers) => {
-      registers.specialRegisters['f3'].value = 5;
-      registers.specialRegisters['f7'].value = 0;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepI(args, registers, true)] = registers.specialRegisters['rs1'].value >>> (registers.specialRegisters['i'].value & 0x1F);
+      registers.func3 = 5;
+      registers.func7 = 0;
+      return registers.rd = registers.x[this.prepI(args, registers, true)] = registers.rs1 >>> (registers.immediate & 0x1F);
     },
     SRAI: (args, registers) => {
-      registers.specialRegisters['f3'].value = 5;
-      registers.specialRegisters['f7'].value = 32;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepI(args, registers, true)] = registers.specialRegisters['rs1'].value >> (registers.specialRegisters['i'].value & 0x1F);
+      registers.func3 = 5;
+      registers.func7 = 32;
+      return registers.rd = registers.x[this.prepI(args, registers, true)] = registers.rs1 >> (registers.immediate & 0x1F);
     },
     // I-type instructions [LOAD]
     LB: (args, registers, memory) => {
-      registers.specialRegisters['f3'].value = 0;
-      registers.specialRegisters['f7'].value = 0;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepI_Load(args, registers)] = ((1 << 7) & ((memory.load(Math.floor(registers.specialRegisters['rs1'].value + registers.specialRegisters['i'].value) / 4)) & 0x000000FF)) ? (memory.load(Math.floor(registers.specialRegisters['rs1'].value + registers.specialRegisters['i'].value) / 4) & 0x000000FF) | 0xFFFFFF00 : (memory.load(Math.floor(registers.specialRegisters['rs1'].value + registers.specialRegisters['i'].value) / 4) & 0x000000FF);
+      registers.func3 = 0;
+      registers.func7 = 0;
+      return registers.rd = registers.x[this.prepI_Load(args, registers)] = ((1 << 7) & ((memory.load(Math.floor(registers.rs1 + registers.immediate) / 4)) & 0x000000FF)) ? (memory.load(Math.floor(registers.rs1 + registers.immediate) / 4) & 0x000000FF) | 0xFFFFFF00 : (memory.load(Math.floor(registers.rs1 + registers.immediate) / 4) & 0x000000FF);
     },
     LH: (args, registers, memory) => {
-      registers.specialRegisters['f3'].value = 1;
-      registers.specialRegisters['f7'].value = 0;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepI_Load(args, registers)] = ((1 << 15) & (memory.load(Math.floor(registers.specialRegisters['rs1'].value + registers.specialRegisters['i'].value) / 4) & 0x0000FFFF)) ? (memory.load(Math.floor(registers.specialRegisters['rs1'].value + registers.specialRegisters['i'].value) / 4) & 0x0000FFFF) | 0xFFFF0000 : (memory.load(Math.floor(registers.specialRegisters['rs1'].value + registers.specialRegisters['i'].value) / 4) & 0x00000FFFF);
+      registers.func3 = 1;
+      registers.func7 = 0;
+      return registers.rd = registers.x[this.prepI_Load(args, registers)] = ((1 << 15) & (memory.load(Math.floor(registers.rs1 + registers.immediate) / 4) & 0x0000FFFF)) ? (memory.load(Math.floor(registers.rs1 + registers.immediate) / 4) & 0x0000FFFF) | 0xFFFF0000 : (memory.load(Math.floor(registers.rs1 + registers.immediate) / 4) & 0x00000FFFF);
     },
     LW: (args, registers, memory) => {
-      registers.specialRegisters['f3'].value = 2;
-      registers.specialRegisters['f7'].value = 0;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepI_Load(args, registers)] = memory.load(Math.floor(registers.specialRegisters['rs1'].value + registers.specialRegisters['i'].value) / 4);
+      registers.func3 = 2;
+      registers.func7 = 0;
+      return registers.rd = registers.x[this.prepI_Load(args, registers)] = memory.load(Math.floor(registers.rs1 + registers.immediate) / 4);
     },
     LBU: (args, registers, memory) => {
-      registers.specialRegisters['f3'].value = 4;
-      registers.specialRegisters['f7'].value = 0;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepI_Load(args, registers)] = memory.load(Math.floor(registers.specialRegisters['rs1'].value + registers.specialRegisters['i'].value) / 4) & 0x000000FF;
+      registers.func3 = 4;
+      registers.func7 = 0;
+      return registers.rd = registers.x[this.prepI_Load(args, registers)] = memory.load(Math.floor(registers.rs1 + registers.immediate) / 4) & 0x000000FF;
     },
     LHU: (args, registers, memory) => {
-      registers.specialRegisters['f3'].value = 5;
-      registers.specialRegisters['f7'].value = 0;
-      return registers.specialRegisters['dr'].value = registers.registersValue[this.prepI_Load(args, registers)] = memory.load(Math.floor(registers.specialRegisters['rs1'].value + registers.specialRegisters['i'].value) / 4) & 0x0000FFFF;
+      registers.func3 = 5;
+      registers.func7 = 0;
+      return registers.rd = registers.x[this.prepI_Load(args, registers)] = memory.load(Math.floor(registers.rs1 + registers.immediate) / 4) & 0x0000FFFF;
     },
     // I-type instructions [JUMP]
     JALR: (args, registers) => {
       console.log('eseguo JALR');
-      registers.specialRegisters['f3'].value = 0;
-      registers.specialRegisters['f7'].value = 0;
-      registers.specialRegisters['dr'].value = registers.registersValue[this.prepI_Jump(args, registers)] = registers.specialRegisters['pc'].value;
-      return registers.specialRegisters['pc'].value = registers.specialRegisters['i'].value = (registers.specialRegisters['rs1'].value + registers.specialRegisters['fo'].value) & ~(1 << 0);
+      registers.func3 = 0;
+      registers.func7 = 0;
+      registers.rd = registers.x[this.prepI_Jump(args, registers)] = registers.pc;
+      return registers.pc = registers.immediate = (registers.rs1 + registers.jumpOffset) & ~(1 << 0);
     },
 
     // S-type instructions
     SB: (args, registers, memory) => {
-      registers.specialRegisters['f3'].value = 0;
-      registers.specialRegisters['f7'].value = 0;
-      registers.specialRegisters['rs2'].value = registers.registersValue[this.prepS(args, registers)] & 0x000000FF;
-      memory.store(Math.floor(registers.specialRegisters['rs1'].value + registers.specialRegisters['i'].value) / 4, registers.specialRegisters['rs2'].value);
+      registers.func3 = 0;
+      registers.func7 = 0;
+      registers.rs2 = registers.x[this.prepS(args, registers)] & 0x000000FF;
+      memory.store(Math.floor(registers.rs1 + registers.immediate) / 4, registers.rs2);
       return 0;
     },
     SH: (args, registers, memory) => {
-      registers.specialRegisters['f3'].value = 1;
-      registers.specialRegisters['f7'].value = 0;
-      registers.specialRegisters['rs2'].value = registers.registersValue[this.prepS(args, registers)] & 0x0000FFFF;
-      memory.store(Math.floor(registers.specialRegisters['rs1'].value + registers.specialRegisters['i'].value) / 4, registers.specialRegisters['rs2'].value);
+      registers.func3 = 1;
+      registers.func7 = 0;
+      registers.rs2 = registers.x[this.prepS(args, registers)] & 0x0000FFFF;
+      memory.store(Math.floor(registers.rs1 + registers.immediate) / 4, registers.rs2);
       return 1;
     },
     SW: (args, registers, memory) => {
-      registers.specialRegisters['f3'].value = 2;
-      registers.specialRegisters['f7'].value = 0;
-      registers.specialRegisters['rs2'].value = registers.registersValue[this.prepS(args, registers)] & 0xFFFFFFFF;
-      memory.store(Math.floor(registers.specialRegisters['rs1'].value + registers.specialRegisters['i'].value) / 4, registers.specialRegisters['rs2'].value);
+      registers.func3 = 2;
+      registers.func7 = 0;
+      registers.rs2 = registers.x[this.prepS(args, registers)] & 0xFFFFFFFF;
+      memory.store(Math.floor(registers.rs1 + registers.immediate) / 4, registers.rs2);
       return 2;
     },
 
     // B-type instructions
     BEQ: (args, registers) => {
-      registers.specialRegisters['f3'].value = 0;
+      registers.func3 = 0;
       let jumpOffset = this.prepB(args, registers);
-      return registers.specialRegisters['pc'].value += (registers.specialRegisters['rs1'].value == registers.specialRegisters['rs2'].value ? jumpOffset : registers.specialRegisters['pc'].value) - 4;
+      return registers.pc += (registers.rs1 == registers.rs2 ? jumpOffset : registers.pc) - 4;
     },
     BNE: (args, registers) => {
-      registers.specialRegisters['f3'].value = 1;
+      registers.func3 = 1;
       let jumpOffset = this.prepB(args, registers);
-      return registers.specialRegisters['pc'].value += (registers.specialRegisters['rs1'].value != registers.specialRegisters['rs2'].value ? jumpOffset : registers.specialRegisters['pc'].value) - 4;
+      return registers.pc += (registers.rs1 != registers.rs2 ? jumpOffset : registers.pc) - 4;
     },
     BLT: (args, registers) => {
-      registers.specialRegisters['f3'].value = 4;
+      registers.func3 = 4;
       let jumpOffset = this.prepB(args, registers);
-      return registers.specialRegisters['pc'].value += (this.signExtend(registers.specialRegisters['rs1'].value) < this.signExtend(registers.specialRegisters['rs2'].value) ? jumpOffset : registers.specialRegisters['pc'].value) - 4;
+      return registers.pc += (this.signExtend(registers.rs1) < this.signExtend(registers.rs2) ? jumpOffset : registers.pc) - 4;
     },
     BGE: (args, registers) => {
-      registers.specialRegisters['f3'].value = 5;
+      registers.func3 = 5;
       let jumpOffset = this.prepB(args, registers);
-      return registers.specialRegisters['pc'].value += (this.signExtend(registers.specialRegisters['rs1'].value) >= this.signExtend(registers.specialRegisters['rs2'].value) ? jumpOffset : registers.specialRegisters['pc'].value) - 4;
+      return registers.pc += (this.signExtend(registers.rs1) >= this.signExtend(registers.rs2) ? jumpOffset : registers.pc) - 4;
     },
     BLTU: (args, registers) => {
-      registers.specialRegisters['f3'].value = 6;
+      registers.func3 = 6;
       let jumpOffset = this.prepB(args, registers);
-      return registers.specialRegisters['pc'].value += (registers.specialRegisters['rs1'].value < registers.specialRegisters['rs2'].value ? jumpOffset : registers.specialRegisters['pc'].value) - 4;
+      return registers.pc += (registers.rs1 < registers.rs2 ? jumpOffset : registers.pc) - 4;
     },
     BGEU: (args, registers) => {
-      registers.specialRegisters['f3'].value = 7;
+      registers.func3 = 7;
       let jumpOffset = this.prepB(args, registers);
-      return registers.specialRegisters['pc'].value += (registers.specialRegisters['rs1'].value >= registers.specialRegisters['rs2'].value ? jumpOffset : registers.specialRegisters['pc'].value) - 4;
+      return registers.pc += (registers.rs1 >= registers.rs2 ? jumpOffset : registers.pc) - 4;
     },
 
     // U-type instructions
     LUI: ([rd, immediate], registers) => {
-      registers.specialRegisters['f3'].value = 0;
-      registers.specialRegisters['f7'].value = 0;
-      registers.specialRegisters['oc'].value = 55;
-      return registers.specialRegisters['rd'].value = registers.registersValue[this.prepU([rd, immediate], registers)] = registers.specialRegisters['i'].value;
+      registers.func3 = 0;
+      registers.func7 = 0;
+      registers.opcode = 55;
+      return registers.rd = registers.x[this.prepU([rd, immediate], registers)] = registers.immediate;
     },
     AUIPC: ([rd, immediate], registers) => {
-      registers.specialRegisters['f3'].value = 0;
-      registers.specialRegisters['f7'].value = 0;
-      registers.specialRegisters['oc'].value = 23;
-      return registers.specialRegisters['rd'].value = registers.registersValue[this.prepU([rd, immediate], registers)] = (registers.specialRegisters['pc'].value - 4) + registers.specialRegisters['i'].value;
+      registers.func3 = 0;
+      registers.func7 = 0;
+      registers.opcode = 23;
+      return registers.rd = registers.x[this.prepU([rd, immediate], registers)] = (registers.pc - 4) + registers.immediate;
     },
 
     // J-type instructions
@@ -226,12 +226,12 @@ export class RV32Interpreter extends Interpreter {
       if (rd == 0) {
         throw new Error('Cannot write into register x0');
       }
-      registers.specialRegisters['f3'].value = 0;
-      registers.specialRegisters['f7'].value = 0;
-      registers.specialRegisters['oc'].value = 111;
-      registers.specialRegisters['rd'].value = registers.registersValue[rd] = registers.specialRegisters['pc'].value;
-      registers.specialRegisters['fo'].value = immediate;
-      return registers.specialRegisters['pc'].value = registers.specialRegisters['fo'].value;
+      registers.func3 = 0;
+      registers.func7 = 0;
+      registers.opcode = 111;
+      registers.rd = registers.x[rd] = registers.pc;
+      registers.jumpOffset = immediate;
+      return registers.pc = registers.jumpOffset;
     },
   };
 
@@ -242,9 +242,9 @@ export class RV32Interpreter extends Interpreter {
     if (rd == 0) {
       throw new Error('Cannot write into register x0');
     }
-    registers.specialRegisters['oc'].value = 51;
-    registers.specialRegisters['rs1'].value = registers.registersValue[rs1];
-    registers.specialRegisters['rs2'].value = registers.registersValue[rs2];
+    registers.opcode = 51;
+    registers.rs1 = registers.x[rs1];
+    registers.rs2 = registers.x[rs2];
     return rd;
   }
 
@@ -252,9 +252,9 @@ export class RV32Interpreter extends Interpreter {
     if (rd == 0) {
       throw new Error('Cannot write into register x0');
     }
-    registers.specialRegisters['oc'].value = 19;
-    registers.specialRegisters['rs1'].value = registers.registersValue[rs1];
-    registers.specialRegisters['i'].value = unsigned ? immediate : this.signExtend(immediate);
+    registers.opcode = 19;
+    registers.rs1 = registers.x[rs1];
+    registers.immediate = unsigned ? immediate : this.signExtend(immediate);
     return rd;
   }
 
@@ -262,23 +262,23 @@ export class RV32Interpreter extends Interpreter {
     if (rd == 0) {
       throw new Error('Cannot write into register x0');
     }
-    registers.specialRegisters['oc'].value = 3;
-    registers.specialRegisters['rs1'].value = registers.registersValue[rs1];
-    registers.specialRegisters['i'].value = unsigned ? immediate : this.signExtend(immediate);
+    registers.opcode = 3;
+    registers.rs1 = registers.x[rs1];
+    registers.immediate = unsigned ? immediate : this.signExtend(immediate);
     return rd;
   }
 
   prepI_Jump([rd, rs1, immediate]: number[], registers: RV32IRegisters) {
-    registers.specialRegisters['oc'].value = 111;
-    registers.specialRegisters['rs1'].value = registers.registersValue[rs1];
-    registers.specialRegisters['fo'].value = this.signExtend(immediate);
+    registers.opcode = 111;
+    registers.rs1 = registers.x[rs1];
+    registers.jumpOffset = this.signExtend(immediate);
     return rd;
   }
 
   prepS([rs2, immediate, rs1]: number[], registers: RV32IRegisters): number {
-    registers.specialRegisters['oc'].value = 35;
-    registers.specialRegisters['rs1'].value = registers.registersValue[rs1];
-    registers.specialRegisters['i'].value = this.signExtend(immediate);
+    registers.opcode = 35;
+    registers.rs1 = registers.x[rs1];
+    registers.immediate = this.signExtend(immediate);
     return rs2;
   }
 
@@ -286,16 +286,16 @@ export class RV32Interpreter extends Interpreter {
     if (rd == 0) {
       throw new Error('Cannot write into register x0');
     }
-    registers.specialRegisters['i'].value = (immediate) << 12;
+    registers.immediate = (immediate) << 12;
     return rd;
   }
 
   prepB([rs1, rs2, immediate]: number[], registers: RV32IRegisters): number {
-    registers.specialRegisters['oc'].value = 99;
-    registers.specialRegisters['f7'].value = 0;
-    registers.specialRegisters['rs1'].value = registers.registersValue[rs1];
-    registers.specialRegisters['rs2'].value = registers.registersValue[rs2];
-    return registers.specialRegisters['fo'].value = this.signExtend(immediate);
+    registers.opcode = 99;
+    registers.func7 = 0;
+    registers.rs1 = registers.x[rs1];
+    registers.rs2 = registers.x[rs2];
+    return registers.jumpOffset = this.signExtend(immediate);
   }
 
   signExtend(immediate: number): number {
@@ -369,26 +369,27 @@ export class RV32Interpreter extends Interpreter {
       this.instructions[instruction](argsFixed, registers as RV32IRegisters, memory);
     }
 
-    return registers.specialRegisters['pc'].value + 4;
+    return registers.pc + 4;
   }
 
   encode(line: string): number {
     try {
       this.execute(line, this.tmpRegisters, this.myMem);
-      this.tmpRegisters.specialRegisters['in'].value = this.tmpRegisters.specialRegisters['oc'].value + this.tmpRegisters.specialRegisters['rd'].value + this.tmpRegisters.specialRegisters['rs1'].value + this.tmpRegisters.specialRegisters['rs2'].value + this.tmpRegisters.specialRegisters['f3'].value + this.tmpRegisters.specialRegisters['f7'].value + this.tmpRegisters.specialRegisters['fo'].value + this.tmpRegisters.specialRegisters['i'].value;
-      return this.tmpRegisters.specialRegisters['in'].value;
+      this.tmpRegisters.instruction = this.tmpRegisters.opcode + this.tmpRegisters.rd + this.tmpRegisters.rs1 + this.tmpRegisters.rs2 + this.tmpRegisters.func3 + this.tmpRegisters.func7 + this.tmpRegisters.jumpOffset + +this.tmpRegisters.immediate;
+      // console.log(this.tmpRegisters.instruction);
+      return this.tmpRegisters.instruction;
     } catch (error) {
       return 0;
     }
   }
 
   public interrupt(registers: Registers): number {
-    const beforeInterrupt = registers.specialRegisters['pc'].value;
+    const beforeInterrupt = registers.pc;
 
-    if (registers.specialRegisters['ien'].value !== 0) {
-      registers.specialRegisters['ien'].value = 0;
-      (registers as RV32IRegisters).registersValue[5] = registers.specialRegisters['pc'].value;
-      registers.specialRegisters['pc'].value = BASE;
+    if (registers.interruptEnabled !== 0) {
+      registers.interruptEnabled = 0;
+      (registers as RV32IRegisters).x[5] = registers.pc;
+      registers.pc = BASE;
       // in caso di VECTORED INTERRUPTS -> PC = BASE + ExcCode * 4
       // ExcCode = 11 (Machine external interrupt)
     }

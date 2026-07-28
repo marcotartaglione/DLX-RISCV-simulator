@@ -2,49 +2,20 @@
 
 .main
     display: flex
-    flex-direction: row
     flex-wrap: wrap
     padding: .5rem
-
+    max-height: calc( calc( 100vh - 40px ) - 1rem )
     .left
         display: flex
         flex-direction: column
         flex: 1
         min-width: 384px
-
     .left, .right
         padding: .5rem
-
-@media (max-width: 1079px), (max-height: 599px)
-  .main
-    display: none !important
-
-  .mobile-warning
-    display: flex !important
-    flex-direction: column
-    align-items: center
-    justify-content: center
-    text-align: center
-    padding: 2rem 1rem
-    min-height: 80vh
-    color: var(--text-muted)
-
-    mat-icon
-      font-size: 3rem
-      width: 3rem
-      height: 3rem
-      margin-bottom: 1rem
-      color: var(--text-muted)
-
-    h2
-      color: var(--text-muted)
-      margin-bottom: .5rem
-
-    p
-      margin: 0
-
-.mobile-warning
-  display: none
+        max-height: calc( calc( 100vh - 40px ) - 2rem )
+    .right
+        height: 100vh
+        overflow: auto
 
 .container
     position: absolute
@@ -52,7 +23,6 @@
     left: 0
     right: 0
     bottom: 0
-
 .mat-sidenav
     border: none
     width: 23rem

@@ -11,7 +11,6 @@ import {MemoryComponent} from '../memory/memory.component';
 import {DiagramComponent} from '../diagram/diagram.component';
 import {RegistersComponent} from '../registers/registers.component';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {MatIcon} from '@angular/material/icon';
 
 @Component({
   selector: 'app-main-page',
@@ -27,8 +26,7 @@ import {MatIcon} from '@angular/material/icon';
     MemoryComponent,
     DiagramComponent,
     RegistersComponent,
-    MatSidenavContent,
-    MatIcon
+    MatSidenavContent
   ]
 })
 export class MainPageComponent {
