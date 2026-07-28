@@ -1,33 +1,25 @@
 <form #form="ngForm">
-  <div #hostElement class="editor-host">
-    <textarea name="content" style="display: none"></textarea>
-  </div>
-
-  @if (errorMessage()) {
-    <div class="error-message" @showHideTrigger>
-      <mat-card>{{ errorMessage() }}</mat-card>
-    </div>
-  }
-
   <div class="btn-container">
     <div class="execution">
       <div class="top">
         <button mat-raised-button class="mr"
                 [matTooltip]="'F8'"
                 (click)="executeNextInstruction()"
-                [disabled]="isRunDisabled()">
-          <span class="btn">Step <i class="fas fa-step-forward fa-lg green"></i></span>
+                [disabled]="isRunDisabled()"
+                color="primary">
+          <span class="btn">Step <i class="fas fa-step-forward fa-lg"></i></span>
         </button>
 
         <button mat-raised-button class="mr"
                 [matTooltip]="'F9'"
                 (click)="keepRunning ? pause() : run()"
-                [disabled]="isContinuousRunDisabled()">
+                [disabled]="isContinuousRunDisabled()"
+                color="primary">
           @if (!keepRunning) {
-            <span class="btn">Run <i class="fas fa-play green"></i></span>
+            <span class="btn">Run <i class="fas fa-play"></i></span>
           }
           @else {
-            <span class="btn">Pause <i class="fas fa-pause green"></i></span>
+            <span class="btn">Pause <i class="fas fa-pause"></i></span>
           }
         </button>
       </div>
@@ -35,23 +27,27 @@
         <button mat-raised-button class="mr stop"
                 [matTooltip]="'F10'"
                 (click)="stop()"
-                [disabled]="isStopDisabled()" >
-          <span class="btn">Stop <i class="fas fa-square red"></i></span>
+                [disabled]="isStopDisabled()"
+                color="primary">
+          <span class="btn">Stop <i class="fas fa-square"></i></span>
         </button>
       </div>
     </div>
 
     <div class="configuration">
-        <mat-form-field class="input-interval" subscriptSizing="dynamic">
+      <div class="top">
+        <mat-form-field class="input-interval" subscriptSizing="dynamic" color="primary">
           <mat-label>Interval (ms)</mat-label>
           <input matInput type="number" name="interval" [(ngModel)]="intervalTime" min="1">
         </mat-form-field>
 
-        <mat-form-field class="input-label" subscriptSizing="dynamic">
+        <mat-form-field class="input-label" subscriptSizing="dynamic" color="primary">
           <mat-label>Start tag</mat-label>
           <input matInput type="text" name="start" [(ngModel)]="startTag">
         </mat-form-field>
-        <mat-form-field class="input-label select" subscriptSizing="dynamic">
+      </div>
+      <div class="bottom">
+        <mat-form-field class="input-label select" subscriptSizing="dynamic" color="primary">
           <mat-label>Start script</mat-label>
           <mat-select name="scriptSelector"
                       [ngModel]="selectedScript()"
@@ -61,34 +57,37 @@
             }
           </mat-select>
         </mat-form-field>
+      </div>
     </div>
 
-    <div class="interrupts">
-      <button mat-raised-button class="mr" [matMenuTriggerFor]="menuLed" [disabled]="!registers().interruptEnabled">
-        <span class="btn">Int (Led) <i class="fas fa-bolt amber"></i></span>
-      </button>
-
-      <mat-menu #menuLed="matMenu">
-        @for (device of leds; track device.name) {
-          <button mat-menu-item (click)="onInterrupt(device)">{{ device.name }}</button>
-        }
-      </mat-menu>
-
-      @if (inputPorts.length > 0) {
-        <button mat-raised-button class="mr" [matMenuTriggerFor]="menuInputPort" [disabled]="!registers().interruptEnabled">
-          <span class="btn">Int (Input Port) <i class="fas fa-bolt amber"></i></span>
+    @if (editorMode() === 'dlx') {
+      <div class="interrupts">
+        <button mat-raised-button class="mr" [matMenuTriggerFor]="menuLed" [disabled]="registers().specialRegisters['ien'].value === 0" color="primary">
+          <span class="btn">Int (Led) <i class="fas fa-bolt"></i></span>
         </button>
-      }
 
-      <mat-menu #menuInputPort="matMenu">
-        @for (device of inputPorts; track device.name) {
-          <button mat-menu-item (click)="onInterrupt(device)">{{ device.name }}</button>
+        <mat-menu #menuLed="matMenu">
+          @for (device of leds; track device.name) {
+            <button mat-menu-item (click)="onInterrupt(device)">{{ device.name }}</button>
+          }
+        </mat-menu>
+
+        @if (inputPorts.length > 0) {
+          <button mat-raised-button class="mr" [matMenuTriggerFor]="menuInputPort" [disabled]="registers().specialRegisters['ien'].value === 0" color="primary">
+            <span class="btn">Int (Input Port) <i class="fas fa-bolt"></i></span>
+          </button>
         }
-      </mat-menu>
-    </div>
+
+        <mat-menu #menuInputPort="matMenu">
+          @for (device of inputPorts; track device.name) {
+            <button mat-menu-item (click)="onInterrupt(device)">{{ device.name }}</button>
+          }
+        </mat-menu>
+      </div>
+    }
 
     <div class="operations">
-      <button mat-raised-button class="mr" [matMenuTriggerFor]="menu">
+      <button mat-raised-button class="mr" color="primary" [matMenuTriggerFor]="menu">
         <span class="btn">Save code<i class="fas fa-save"></i></span>
       </button>
 
@@ -97,9 +96,21 @@
         <button mat-menu-item (click)="save(false)">Save</button>
       </mat-menu>
 
-      <button mat-raised-button class="mr" (click)="clear()">
+      <button mat-raised-button class="mr" color="primary" (click)="clear()">
         <span class="btn">Restore default code<i class="fas fa-trash"></i></span>
       </button>
     </div>
+  </div>
+
+  <div class="editor-container">
+    <div #hostElement class="editor-host">
+      <textarea name="content" style="display: none"></textarea>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="error-message" @showHideTrigger>
+        <mat-card>{{ errorMessage() }}</mat-card>
+      </div>
+    }
   </div>
 </form>

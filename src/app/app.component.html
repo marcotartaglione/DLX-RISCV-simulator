@@ -2,25 +2,26 @@
   <button mat-icon-button matTooltip="Documentation" (click)="toggleSidenav()">
     @if (!this.isSidebarOpened()) {
       <span><i class="fas fa-book"></i></span>
-    }
-    @else {
+    } @else {
       <span><i class="fas fa-book-open"></i></span>
     }
   </button>
-  <span id="title">Simulator</span>
-  <a mat-button routerLink="/dlx" routerLinkActive="active">DLX</a>
-  <a mat-button routerLink="/rv32i" routerLinkActive="active">RV32I</a>
+  <a mat-button class="navigation-link" routerLink="/dlx" routerLinkActive="active">DLX</a>
+  <a mat-button class="navigation-link" routerLink="/rv32i" routerLinkActive="active">RV32I</a>
   <span class="spacer"></span>
-  <a mat-button routerLink="/about" routerLinkActive="active">About</a>
+  <span><i class="fas fa-microchip"></i></span>
+  <span id="title">DLX-RISCV Simulator</span>
+  <span class="spacer"></span>
+  <a mat-button class="navigation-link" routerLink="/about" routerLinkActive="active" [disableRipple]="true">About</a>
   <button mat-icon-button matTooltip="Theme" (click)="toggleTheme()">
-    @if (this.theme() === 'light') {
+    @if (this.currentTheme() === 'light') {
       <span><i class="fas fa-lightbulb"></i></span>
-    }
-    @else {
+    } @else {
       <span><i class="far fa-lightbulb"></i></span>
     }
   </button>
 </mat-toolbar>
-<div class="mat-app-background basic-container">
+
+<main class="basic-container mat-app-background">
   <router-outlet (activate)="onRouterOutletActivate($event)"></router-outlet>
-</div>
+</main>

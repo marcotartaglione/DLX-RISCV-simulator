@@ -37,13 +37,12 @@ export class DLXInterpreter extends Interpreter {
         throw new WrongArgumentsError(ctx.instruction, DLXDocumentation);
       }
 
-      ctx.registers.a = ctx.registers.registersValue[register1];
-      ctx.registers.temp = ctx.registers.b = ctx.registers.registersValue[register2];
+      ctx.registers.specialRegisters['a'].value = ctx.registers.registersValue[register1];
+      ctx.registers.specialRegisters['temp'].value = ctx.registers.specialRegisters['b'].value = ctx.registers.registersValue[register2];
       func(ctx.registers);
 
       if (destination) {
-        ctx.registers.registersValue[destination] = ctx.registers.c;
-        ctx.registers.setBold(destination);
+        ctx.registers.registersValue[destination] = ctx.registers.specialRegisters['c'].value;
       }
 
       this.updateDiagramAuto();
@@ -59,14 +58,13 @@ export class DLXInterpreter extends Interpreter {
       if (!(/\w+\s+R[123]?\d\s*,\s*R[123]?\d\s*,\s*0x([0-9A-F]{1,4})/i.test(ctx.line))) {
         throw new WrongArgumentsError(ctx.instruction, DLXDocumentation);
       }
-      ctx.registers.a = ctx.registers.registersValue[rs1];
-      ctx.registers.b = ctx.registers.registersValue[rd];
-      ctx.registers.temp = ctx.unsigned ? immediate : uintToInt(immediate, 16);
+      ctx.registers.specialRegisters['a'].value = ctx.registers.registersValue[rs1];
+      ctx.registers.specialRegisters['b'].value = ctx.registers.registersValue[rd];
+      ctx.registers.specialRegisters['temp'].value = ctx.unsigned ? immediate : uintToInt(immediate, 16);
       func(ctx.registers);
 
       if (rd) {
-        ctx.registers.registersValue[rd] = ctx.registers.c;
-        ctx.registers.setBold(rd);
+        ctx.registers.registersValue[rd] = ctx.registers.specialRegisters['c'].value;
       }
       this.updateDiagramAuto();
     },
@@ -78,13 +76,13 @@ export class DLXInterpreter extends Interpreter {
       }
 
       if (ctx.tagged === true) {
-        ctx.registers.a = ctx.registers.registersValue[rs1];
-        ctx.registers.temp = name;
+        ctx.registers.specialRegisters['a'].value = ctx.registers.registersValue[rs1];
+        ctx.registers.specialRegisters['temp'].value = name;
         func(ctx.registers);
       } else {
-        ctx.registers.a = ctx.registers.registersValue[rs1];
+        ctx.registers.specialRegisters['a'].value = ctx.registers.registersValue[rs1];
         name = uintToInt(name, 16);
-        ctx.registers.temp = ctx.registers.pc + name;
+        ctx.registers.specialRegisters['temp'].value = ctx.registers.specialRegisters['pc'].value + name;
         func(ctx.registers);
       }
 
@@ -96,7 +94,7 @@ export class DLXInterpreter extends Interpreter {
       if (!(/\w+\s+R[123]?\d/i.test(ctx.line))) {
         throw new WrongArgumentsError(ctx.instruction, DLXDocumentation);
       }
-      ctx.registers.a = ctx.registers.registersValue[rs1];
+      ctx.registers.specialRegisters['a'].value = ctx.registers.registersValue[rs1];
       func(ctx.registers);
       this.updateDiagramAuto();
     },
@@ -106,22 +104,21 @@ export class DLXInterpreter extends Interpreter {
       if (!(/\w+\s+R[123]?\d\s*,\s*0x([0-9A-F]{4})\s*\(\s*R[123]?\d\s*\)\s*/i.test(ctx.line))) {
         throw new WrongArgumentsError(ctx.instruction, DLXDocumentation);
       }
-      ctx.registers.a = ctx.registers.registersValue[rs1];
-      ctx.registers.b = ctx.registers.registersValue[rd];
+      ctx.registers.specialRegisters['a'].value = ctx.registers.registersValue[rs1];
+      ctx.registers.specialRegisters['b'].value = ctx.registers.registersValue[rd];
 
-      ctx.registers.memoryAddressRegister = signExtend(offset) + ctx.registers.a;
+      ctx.registers.specialRegisters['mar'].value = signExtend(offset) + ctx.registers.specialRegisters['a'].value;
 
-      let rest = (ctx.registers.memoryAddressRegister >>> 0) % 4;
-      let addr = (ctx.registers.memoryAddressRegister >>> 0);
+      let rest = (ctx.registers.specialRegisters['mar'].value >>> 0) % 4;
+      let addr = (ctx.registers.specialRegisters['mar'].value >>> 0);
 
-      ctx.registers.memoryDataRegister = ctx.memory!.load(addr);
-      ctx.registers.temp = rest;
+      ctx.registers.specialRegisters['mdr'].value = ctx.memory!.load(addr);
+      ctx.registers.specialRegisters['temp'].value = rest;
 
       func(ctx.registers);
 
       if (rd) {
-        ctx.registers.registersValue[rd] = ctx.registers.c;
-        ctx.registers.setBold(rd);
+        ctx.registers.registersValue[rd] = ctx.registers.specialRegisters['c'].value;
       }
 
       if (DiagramService.instance.isAuto()) {
@@ -134,13 +131,11 @@ export class DLXInterpreter extends Interpreter {
       if (!(/\w+\s+R[123]?\d\s*,\s*0x([0-9A-F]{4})\s*\(\s*R[123]?\d\s*\)\s*/i.test(ctx.line))) {
         throw new WrongArgumentsError(ctx.instruction, DLXDocumentation);
       }
-      ctx.registers.a = ctx.registers.registersValue[rs1];
-      ctx.registers.memoryDataRegister = ctx.registers.b = ctx.registers.registersValue[rd];
-      ctx.registers.memoryAddressRegister = signExtend(offset) + ctx.registers.a;
-      ctx.registers.setMarBold();
-      ctx.registers.setMdrBold();
-      ctx.registers.temp = (ctx.registers.memoryAddressRegister >>> 0) % 4;
-      let addr = (ctx.registers.memoryAddressRegister >>> 0);
+      ctx.registers.specialRegisters['a'].value = ctx.registers.registersValue[rs1];
+      ctx.registers.specialRegisters['mdr'].value = ctx.registers.specialRegisters['b'].value = ctx.registers.registersValue[rd];
+      ctx.registers.specialRegisters['mar'].value = signExtend(offset) + ctx.registers.specialRegisters['a'].value;
+      ctx.registers.specialRegisters['temp'].value = (ctx.registers.specialRegisters['mar'].value >>> 0) % 4;
+      let addr = (ctx.registers.specialRegisters['mar'].value >>> 0);
       ctx.memory!.store(addr, func(ctx.registers, [ctx.memory!.load(addr)]));
 
       if (DiagramService.instance.isAuto()) {
@@ -154,14 +149,14 @@ export class DLXInterpreter extends Interpreter {
         throw new WrongArgumentsError(ctx.instruction, DLXDocumentation);
       }
       if (ctx.tagged === true) {
-        ctx.registers.temp = name;
+        ctx.registers.specialRegisters['temp'].value = name;
         func(ctx.registers);
       } else {
         if (ctx.unsigned) {
-          ctx.registers.temp = ctx.registers.pc + 4 + name;
+          ctx.registers.specialRegisters['temp'].value = ctx.registers.specialRegisters['pc'].value + 4 + name;
         } else {
           name = uintToInt(name, 26);
-          ctx.registers.temp = ctx.registers.pc + name;
+          ctx.registers.specialRegisters['temp'].value = ctx.registers.specialRegisters['pc'].value + name;
         }
         func(ctx.registers);
       }
@@ -173,11 +168,10 @@ export class DLXInterpreter extends Interpreter {
       if (!(/\w+\s+R[123]?\d\s*,\s*0x([0-9A-F]{4})/i.test(ctx.line))) {
         throw new WrongArgumentsError(ctx.instruction, DLXDocumentation);
       }
-      ctx.registers.temp = immediate;
+      ctx.registers.specialRegisters['temp'].value = immediate;
       func(ctx.registers);
       if (rd) {
-        ctx.registers.registersValue[rd] = ctx.registers.c;
-        ctx.registers.setBold(rd);
+        ctx.registers.registersValue[rd] = ctx.registers.specialRegisters['c'].value;
       }
       this.updateDiagramAuto();
     },
@@ -191,8 +185,7 @@ export class DLXInterpreter extends Interpreter {
         throw new WrongArgumentsError(ctx.instruction, DLXDocumentation);
       }
       func(ctx.registers);
-      ctx.registers.interruptEnabled = 1;
-      ctx.registers.resetIenBold();
+      ctx.registers.specialRegisters['ien'].value = 1;
       DiagramService.instance.dlxDiagrams.ienDown();
       this.updateDiagramAuto();
     }
@@ -220,9 +213,7 @@ export class DLXInterpreter extends Interpreter {
     }
 
     let [opcode, alucode] = encoder[instructionName];
-    (registers as DLXRegisters).instructionRegister = parseInt(opcode + inputs_encoder[instructionConfig.type](argsFixed) + alucode, 2); //otteniamo l'istruzione scritta in 32 bit
-    (registers as DLXRegisters).setBold(0);
-    (registers as DLXRegisters).resetRegistersBoldness();
+    (registers as DLXRegisters).specialRegisters['ir'].value = parseInt(opcode + inputs_encoder[instructionConfig.type](argsFixed) + alucode, 2); //otteniamo l'istruzione scritta in 32 bit
 
     const ctx: DLXInstructionContext = {
       line: lineFixed,
@@ -239,10 +230,10 @@ export class DLXInterpreter extends Interpreter {
     const startNetwork = memory.devices.find(el => el instanceof StartLogicalNetwork) as StartLogicalNetwork | undefined;
     if (startNetwork) {
       if (startNetwork.startup) {
-        registers.interruptEnabled = 0;
+        registers.specialRegisters['ien'].value = 0;
       }
       else if (this._wasInStartup && !startNetwork.startup) {
-        registers.interruptEnabled = 1;
+        registers.specialRegisters['ien'].value = 1;
       }
 
       this._wasInStartup = startNetwork.startup;
@@ -254,8 +245,8 @@ export class DLXInterpreter extends Interpreter {
       increment = 0;
     }
 
-    registers.pc = registers.pc + increment;
-    return registers.pc;
+    registers.specialRegisters['pc'].value = registers.specialRegisters['pc'].value + increment;
+    return registers.specialRegisters['pc'].value;
   }
 
   /**
@@ -284,17 +275,15 @@ export class DLXInterpreter extends Interpreter {
    * @returns The program counter value before the interrupt jump
    */
   public override interrupt(registers: DLXRegisters): number {
-    if (registers.interruptEnabled === 0) {
-      return registers.pc;
+    if (registers.specialRegisters['ien'].value === 0) {
+      return registers.specialRegisters['pc'].value;
     }
 
-    const beforeJump = registers.pc;
+    const beforeJump = registers.specialRegisters['pc'].value;
 
-    registers.instructionAddressRegister = registers.pc;
-    registers.setIarBold();
-    registers.pc = 0;
-    registers.interruptEnabled = 0;
-    registers.setIenBold();
+    registers.specialRegisters['iar'].value = registers.specialRegisters['pc'].value;
+    registers.specialRegisters['pc'].value = 0;
+    registers.specialRegisters['ien'].value = 0;
 
     DiagramService.instance.dlxDiagrams.ienUp();
 

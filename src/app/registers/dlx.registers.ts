@@ -1,33 +1,74 @@
-import {Registers} from './registers';
+import {Registers, SpecialRegisterDescriptor} from './registers';
 
 export class DLXRegisters extends Registers {
-  public static readonly registersCount = 32;
-
-  public registersValue = Array<number>(DLXRegisters.registersCount);
-  public registersBoldness = Array<string>(DLXRegisters.registersCount);
-
-  private _previousRegister: number = 0;
-
-  public instructionAddressRegister: number = 0;
-  public instructionRegister: number = 0;
-
-  public memoryAddressRegister: number = 0;
-  public memoryDataRegister: number = 0;
-
-
-  public temp: number = 0;
-
-  public a: number = 0;
-  public b: number = 0;
-  public c: number = 0;
-
-  public marBoldness: string = 'normal';
-  public mdrBoldness: string = 'normal';
-  public iarBoldness: string = 'normal';
-  public ienBoldness: string = 'normal';
-
   constructor() {
-    super();
+    const specialRegisters: SpecialRegisterDescriptor[] = [
+      {
+        key: 'ien',
+        label: 'IEN',
+        tooltip: 'Interrupt Enabled',
+        value: 0,
+        isVisible: true,
+      },
+      {
+        key: 'iar',
+        label: 'IAR',
+        tooltip: 'Instruction Address Register',
+        value: 0,
+        isVisible: true
+      },
+      {
+        key: 'ir',
+        label: 'IR',
+        tooltip: 'Instruction Register',
+        value: 0,
+        isVisible: true
+      },
+      {
+        key: 'mar',
+        label: 'MAR',
+        tooltip: 'Memory Address Register',
+        value: 0,
+        isVisible: true
+      },
+      {
+        key: 'mdr',
+        label: 'MDR',
+        tooltip: 'Memory Data Register',
+        value: 0,
+        isVisible: true
+      },
+      {
+        key: 'temp',
+        label: 'TEMP',
+        tooltip: 'Temporary Register',
+        value: 0,
+        isVisible: false
+      },
+      {
+        key: 'a',
+        label: 'A',
+        tooltip: 'Register A',
+        value: 0,
+        isVisible: false
+      },
+      {
+        key: 'b',
+        label: 'B',
+        tooltip: 'Register B',
+        value: 0,
+        isVisible: false
+      },
+      {
+        key: 'c',
+        label: 'C',
+        tooltip: 'Register C',
+        value: 0,
+        isVisible: false
+      }
+    ];
+
+    super(specialRegisters);
 
     this.registersValue[0] = 0;
     for (let i = 0; i < DLXRegisters.registersCount; i++) {
@@ -36,49 +77,6 @@ export class DLXRegisters extends Registers {
       } else {
         this.registersValue[i] = Math.floor(Math.random() * 0x100000000);
       }
-
-      this.registersBoldness[i] = 'normal';
     }
-  }
-
-  public setBold(registerIndex: number) {
-    if (registerIndex < 0 || registerIndex >= DLXRegisters.registersCount) {
-      throw new Error(`Invalid register index: ${registerIndex}. It must be between 0 and ${DLXRegisters.registersCount - 1}.`);
-    }
-
-    this.registersBoldness[this._previousRegister] = 'normal';
-    this._previousRegister = registerIndex;
-    this.registersBoldness[registerIndex] = 'bold';
-  }
-
-  public resetRegistersBoldness() {
-    for (let i = 0; i < DLXRegisters.registersCount; i++) {
-      this.registersBoldness[i] = 'normal';
-    }
-
-    this.marBoldness = 'normal';
-    this.mdrBoldness = 'normal';
-    this.iarBoldness = 'normal';
-    this.ienBoldness = 'normal';
-  }
-
-  public setMarBold() {
-    this.marBoldness = 'bold';
-  }
-
-  public setMdrBold() {
-    this.mdrBoldness = 'bold';
-  }
-
-  public setIarBold() {
-    this.iarBoldness = 'bold';
-  }
-
-  public setIenBold() {
-    this.ienBoldness = 'bold';
-  }
-
-  public resetIenBold() {
-    this.ienBoldness = 'normal'
   }
 }
