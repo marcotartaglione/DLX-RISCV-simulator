@@ -22,7 +22,6 @@ import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
   ]
 })
 export class AppComponent implements OnInit {
-  protected readonly theme = signal<'light' | 'dark'>('light');
   protected readonly currentTheme = signal<'light' | 'dark'>('dark');
   protected readonly isSidebarOpened = signal(false);
 
@@ -30,13 +29,13 @@ export class AppComponent implements OnInit {
 
   constructor() {
     effect(() => {
-      const theme = this.theme();
+      const theme = this.currentTheme();
       this.applyTheme(theme);
     });
   }
 
   ngOnInit() {
-    this.theme.set('dark');
+    this.currentTheme.set('dark');
   }
 
   public onRouterOutletActivate(component: any) {

@@ -11,6 +11,8 @@ import {
   MatExpansionPanelHeader,
   MatExpansionPanelTitle
 } from '@angular/material/expansion';
+import {MatIcon} from '@angular/material/icon';
+import {MatIconButton} from '@angular/material/button';
 
 export type Documentation = { name: string, type: string, syntax: string, description: string };
 
@@ -26,7 +28,9 @@ export type Documentation = { name: string, type: string, syntax: string, descri
     MatExpansionPanel,
     MatExpansionPanelTitle,
     MatExpansionPanelDescription,
-    MatExpansionPanelHeader
+    MatExpansionPanelHeader,
+    MatIcon,
+    MatIconButton
   ],
   standalone: true
 })

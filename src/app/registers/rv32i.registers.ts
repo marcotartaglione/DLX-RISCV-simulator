@@ -1,33 +1,82 @@
-import {Registers} from './registers';
+import {Registers, SpecialRegisterDescriptor} from './registers';
 
 export class RV32IRegisters extends Registers {
-
-  x: [0, number, number, number, number, number, number, number,
-    number, number, number, number, number, number, number, number,
-    number, number, number, number, number, number, number, number,
-    number, number, number, number, number, number, number, number];
-
-  instruction: number;
-  opcode: number;
-  rd: number;
-  rs1: number;
-  rs2: number;
-  func3: number;
-  func7: number;
-  immediate: number;
-  jumpOffset: number;
-
   constructor() {
-    super();
-    this.x = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    this.instruction = 0;
-    this.opcode = 0;
-    this.rd = 0;
-    this.rs1 = 0;
-    this.rs2 = 0;
-    this.func3 = 0;
-    this.func7 = 0;
-    this.immediate = 0;
-    this.jumpOffset = 0;
+    const specialRegisters: SpecialRegisterDescriptor[] = [
+      {
+        key: 'in',
+        label: 'IN',
+        tooltip: "Instruction",
+        value: 0,
+        isVisible: false,
+      },
+      {
+        key: 'oc',
+        label: 'OC',
+        tooltip: "Opcode",
+        value: 0,
+        isVisible: true,
+      },
+      {
+        key: 'dr',
+        label: 'DR',
+        tooltip: "Destination Register",
+        value: 0,
+        isVisible: true
+      },
+      {
+        key: 'rs1',
+        label: 'RS1',
+        tooltip: "Source Register 1",
+        value: 0,
+        isVisible: true
+      },
+      {
+        key: 'rs2',
+        label: 'RS2',
+        tooltip: "Source Register 2",
+        value: 0,
+        isVisible: true
+      },
+      {
+        key: 'f3',
+        label: 'F3',
+        tooltip: "Function 3",
+        value: 0,
+        isVisible: true
+      },
+      {
+        key: 'f7',
+        label: 'F7',
+        tooltip: "Function 7",
+        value: 0,
+        isVisible: true
+      },
+      {
+        key: 'i',
+        label: 'I',
+        tooltip: "Immediate",
+        value: 0,
+        isVisible: true
+      },
+      {
+        key: 'jo',
+        label: 'JO',
+        tooltip: "Jump Offset",
+        value: 0,
+        isVisible: true
+      },
+    ];
+
+    super(specialRegisters);
+
+    this.registersValue[0] = 0;
+    for (let i = 0; i < RV32IRegisters.registersCount; i++) {
+      if (i === 0) {
+        this.registersValue[i] = 0;
+      } else {
+        this.registersValue[i] = Math.floor(Math.random() * 0x100000000);
+      }
+    }
   }
 }

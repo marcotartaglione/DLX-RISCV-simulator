@@ -1,27 +1,63 @@
-# DLX-RISCV-simulator
+# Processore / Simulatore di Architetture — Reti di Calcolatori
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.3.19.
+Simulatore di architetture DLX e RISC-V creato come progetto didattico per facilitare l'apprendimento delle architetture di calcolo e dei concetti base di una CPU.
+Il simulatore permette di vedere e usare i registri della CPU, eseguire le istruzioni una alla volta e capire come si svolgono le operazioni.
 
-## Development server
+---
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+## 📋 Indice
+- [Informazioni sul Progetto](#-informazioni-sul-progetto)
+- [Installazione e Avvio](#-installazione-e-avvio)
+- [Autori e Riconoscimenti](#-autori-e-riconoscimenti)
 
-## Code scaffolding
+---
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## ℹ️ Informazioni sul Progetto
 
-## Build
+Questo simulatore permette di comprendere il funzionamento interno di un'architettura DLX o RISC-V, consentendo l'esecuzione di istruzioni
+step-by-step, il tracciamento dei registri e la visualizzazione dello stato interno del processore.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+Nel caso dell'architettura DLX, si può anche lavorare con la memoria e con diversi dispositivi di input e output.
 
-## Running unit tests
+---
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## ⚙️ Installazione e Avvio
 
-## Running end-to-end tests
+Il simulatore è stato sviluppato in Angular con TypeScript e può essere eseguito localmente seguendo questi passaggi:
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+1. **Clonare il repository**:
+   ```bash
+   git clone https://github.com/marcotartaglione/DLX-RISCV-simulator
 
-## Further help
+2. **Vai alla cartella del progetto**.
+   ```bash
+   cd DLX-RISCV-simulator
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+3. **Installare le dipendenze**:
+   ```bash
+    npm install
+
+4. **Avviare l'applicazione**:
+   ```bash
+   npm run start
+
+5. **Apri il browser** e vai all'indirizzo:
+   ```
+   http://localhost:4200
+
+---
+
+## 🧑‍💻 Autori e Riconoscimenti
+
+Il progetto è stato sviluppato con la supervisione del **Prof. [Stefano Mattoccia](https://github.com/stefanomattoccia)** dell'**Università di Bologna**.
+per il corso di Reti di Calcolatori della facoltà di Ingegneria Informatica. Per altre informazioni o per partecipare al progetto, contatta il team di 
+sviluppo usando il repository GitHub.
+
+Autori principali:
+- [Marco Tartaglione](https://github.com/marcotartaglione)
+- [Gabriele Piazzi](https://github.com/Piazzoscan)
+- [Umberto Laghi](https://github.com/ubolakes)
+- [Filippo Comastri](https://github.com/FilippoComastri)
+- [Federico Pomponi](https://github.com/pmpwith2i)
+- [Alessandro Foglia](https://github.com/Leaaaf)
+- [Fabrizione Maccagnani](https://github.com/Mack3397)
