@@ -22,21 +22,21 @@ main:		LHI R1, 0x4000				; set R1 = 0x40000000 (array start)
       		ADDI R2, R2, 0x000A			; set R2 = 10 (array size)
 			J byte
 
-byte:		LBU R4, 0x0000(R1)
+byte:		LBU R4, 0x0008(R1)
       		ADD R3, R3, R4
       		SUBI R2, R2, 0x0001
       		BEQZ R2, main
       		ADDI R1, R1, 0x0001
       		J byte
 
-halfword:	LHU R4, 0x0000(R1)
+halfword:	LHU R4, 0x0008(R1)
       		ADD R3, R3, R4
       		SUBI R2, R2, 0x0001
       		BEQZ R2, main
       		ADDI R1, R1, 0x0002
       		J halfword
 
-word:		LW R4, 0x0000(R1)
+word:		LW R4, 0x0008(R1)
       		ADD R3, R3, R4
       		SUBI R2, R2, 0x0001
       		BEQZ R2, main
