@@ -5,6 +5,7 @@ import {ChipSelect} from './ChipSelect';
  */
 export class Device {
   private _memory: Uint32Array;
+  private static _seed = 1_648_084_197;
 
   protected constructor(
     public name: string,
@@ -16,12 +17,23 @@ export class Device {
       throw new Error('Invalid address for device: ' + name);
     }
 
-    // Round up so ranges not divisible by 4 bytes still allocate the last word.
     size = Math.ceil(size / 4);
 
     this._chipSelects = [];
     this._memory = new Uint32Array(size);
-    this._memory.forEach((_, i) => this._memory[i] = Math.floor(Math.random() * 0x100000000)); // Simulate uninitialized memory with random data
+
+    for (let i = 0; i < this._memory.length; i++) {
+      this._memory[i] = Device._fastRandom();
+    }
+  }
+
+  private static _fastRandom(): number {
+    let x = Device._seed;
+    x ^= x << 13;
+    x ^= x >>> 17;
+    x ^= x << 5;
+    Device._seed = x;
+    return x >>> 0;
   }
 
   private _chipSelects: ChipSelect[];
