@@ -24,10 +24,6 @@ export class Device {
     this._chipSelects = [];
     this._memory = new Uint32Array(size);
     this._initialized = new Uint8Array(Math.ceil(size / 8));
-    /*
-    for (let i = 0; i < this._memory.length; i++) {
-      this._memory[i] = Device._fastRandom();
-    }*/
   }
 
   private isInitialized(index: number): boolean {
