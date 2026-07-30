@@ -31,7 +31,7 @@ export class Eprom extends Device {
     super.store(address, word);
   }
 
-  public override toJSON(): any {
-    return super.toJSON();
+  public override toJSON(shortVersion: boolean = false): any {
+    return super.toJSON(shortVersion);
   }
 }

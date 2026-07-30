@@ -5,6 +5,11 @@ import {MatToolbar} from '@angular/material/toolbar';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatTooltip} from '@angular/material/tooltip';
 import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
+import {ImageDialogComponent} from './dialogs/image-dialog.component';
+import {MatDialog} from '@angular/material/dialog';
+import {CodeService} from './services/code.service';
+import {ReportBugDialogComponent} from './dialogs/report-bug.component';
+import {MemoryService} from './services/memory.service';
 
 @Component({
   selector: 'app-root',
@@ -25,7 +30,10 @@ export class AppComponent implements OnInit {
   protected readonly currentTheme = signal<'light' | 'dark'>('dark');
   protected readonly isSidebarOpened = signal(false);
 
+  private _dialog = inject(MatDialog);
   private _activeMainPage: MainPageComponent = null;
+  private _codeService: CodeService = inject(CodeService);
+  private _memoryService: MemoryService = inject(MemoryService);
 
   constructor() {
     effect(() => {
@@ -55,6 +63,15 @@ export class AppComponent implements OnInit {
   protected toggleSidenav() {
     this.isSidebarOpened.update(val => !val);
     this._activeMainPage?.toggleSidenav();
+  }
+
+  protected openReportDialog() {
+    this._dialog.open(ReportBugDialogComponent, {
+      data: {
+        code: this._codeService.content(),
+        memory: this._memoryService.getMemoryJSON(true)
+      }
+    });
   }
 
   protected toggleTheme() {

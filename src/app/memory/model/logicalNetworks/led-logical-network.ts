@@ -111,8 +111,8 @@ export class LedLogicalNetwork extends LogicalNetwork {
     }
   };
 
-  public toJSON(): any {
-    const json = super.toJSON();
+  public toJSON(shortVersion: boolean = false): any {
+    const json = super.toJSON(shortVersion);
     json.led = this._led;
     return json;
   }

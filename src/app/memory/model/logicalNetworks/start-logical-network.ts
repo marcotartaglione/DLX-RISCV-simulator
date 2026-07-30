@@ -114,8 +114,8 @@ export class StartLogicalNetwork extends LogicalNetwork {
     super.store(this.chipSelects.find(el => el.id === 'CS_READ_STARTUP').address, this.ffd ? 1 : 0);
   }
 
-  public toJSON(): any {
-    const json = super.toJSON();
+  public toJSON(shortVersion: boolean = false): any {
+    const json = super.toJSON(shortVersion);
     json.startUp = this._startup;
     return json;
   }

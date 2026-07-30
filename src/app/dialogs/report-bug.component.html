@@ -1,0 +1,29 @@
+<h2 mat-dialog-title>Segnala un bug</h2>
+
+<mat-dialog-content>
+  <p>Descrivi l'errore che hai riscontrato</p>
+
+  <mat-form-field appearance="outline" [style.width]="'100%'">
+    <mat-label>Descrizione</mat-label>
+    <textarea matInput
+              [formControl]="messageControl"
+              rows="5"
+              [maxlength]="MAX_MESSAGE_LENGTH"
+              placeholder="Cosa stavi facendo quando si è verificato l'errore?"></textarea>
+    <mat-hint align="end">{{ messageControl.value.length }} / {{ MAX_MESSAGE_LENGTH }}</mat-hint>
+    @if (messageControl.hasError('required')) {
+      <mat-error>Il messaggio è obbligatorio</mat-error>
+    }
+  </mat-form-field>
+
+  <p style="font-size: 0.85rem; opacity: 0.8; margin-top: 8px;">
+    Cliccando su "Invia", verrà scaricato un file contenente codice e memoria attuale da allegare alla mail.
+  </p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="false">Annulla</button>
+  <button mat-flat-button color="primary" [disabled]="messageControl.invalid" (click)="sendEmail()">
+    Scarica Log & Invia Mail
+  </button>
+</mat-dialog-actions>

@@ -92,14 +92,20 @@ export class MemoryService {
   }
 
   /**
+   * Converts the current memory configuration in json format
+   */
+  public getMemoryJSON(shortVersion: boolean = false): string {
+    return JSON.stringify(this._memory.devices.map(dev => {
+      return dev.toJSON(shortVersion);
+    }));
+  }
+
+  /**
    * Stores the current memory configuration in localStorage, allowing it to be persisted across page reloads and browser sessions.
    * The memory configuration is serialized to JSON format before being stored.
    */
   public storeInLocalStorage() {
-    const json = this._memory.devices.map(dev => {
-      return dev.toJSON();
-    });
-    window.localStorage.setItem('memory', JSON.stringify(json));
+    window.localStorage.setItem('memory', this.getMemoryJSON());
   }
 
   /**

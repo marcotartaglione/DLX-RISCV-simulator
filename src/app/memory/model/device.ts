@@ -11,8 +11,8 @@ export class Device {
 
   protected constructor(
     public name: string,
-    private _minAddress: number,
-    private _maxAddress: number,
+    protected _minAddress: number,
+    protected _maxAddress: number,
   ) {
     let size = (_maxAddress - _minAddress + 1);
     if (size < 0) {
@@ -21,7 +21,6 @@ export class Device {
 
     size = Math.ceil(size / 4);
 
-    this._chipSelects = [];
     this._memory = new Uint32Array(size);
     this._initialized = new Uint8Array(Math.ceil(size / 8));
   }
@@ -43,16 +42,12 @@ export class Device {
     return x >>> 0;
   }
 
-  private _chipSelects: ChipSelect[];
-
-  // TODO: spostare i chipselect in LogicalNetwork
-
-  public get chipSelects(): ChipSelect[] {
-    return this._chipSelects;
-  }
-
   public get minAddress(): number {
     return this._minAddress;
+  }
+
+  public get maxAddress(): number {
+    return this._maxAddress;
   }
 
   /**
@@ -62,13 +57,8 @@ export class Device {
    *  @param value A number or a hexadecimal string representing the new minimum address for the device.
    */
   public set minAddress(value: number) {
-    const lastMinAddress = this._minAddress;
     this._minAddress = value;
-    this.updateChipSelectMin(lastMinAddress);
-  }
-
-  public get maxAddress(): number {
-    return this._maxAddress;
+    this.reallocateMemory();
   }
 
   /**
@@ -78,9 +68,22 @@ export class Device {
    * @param value A number or a hexadecimal string representing the new maximum address for the device.
    */
   public set maxAddress(value: number) {
-    const lastMaxAddress = this._maxAddress;
     this._maxAddress = value;
-    this.updateChipSelectMax(lastMaxAddress);
+    this.reallocateMemory();
+  }
+
+  private reallocateMemory() {
+    let size = this._maxAddress - this._minAddress + 1;
+    if (size < 0) return;
+
+    size = Math.ceil(size / 4);
+    const newMemory = new Uint32Array(size);
+    newMemory.set(this._memory.subarray(0, size));
+    this._memory = newMemory;
+
+    const newInitialized = new Uint8Array(Math.ceil(size / 8));
+    newInitialized.set(this._initialized.subarray(0, newInitialized.length));
+    this._initialized = newInitialized;
   }
 
   /**
@@ -91,9 +94,6 @@ export class Device {
     this.name = other.name;
     this._minAddress = other._minAddress;
     this._maxAddress = other._maxAddress;
-
-    // Deep copy
-    this._chipSelects = other.chipSelects.map((cs: any) => ChipSelect.fromJSON(cs.toJSON()));
 
     // Deep copy
     if (this._memory.length !== other._memory.length) {
@@ -121,47 +121,6 @@ export class Device {
       default:
         throw new Error('Invalid unit for size: ' + unit);
     }
-  }
-
-  /**
-   * Sets a chip select with the given name, address, and value. If a chip select with the same name already exists,
-   * it updates its address and hexAddress. Otherwise, it creates a new chip select and adds it to the list.
-   * Finally, it stores the value at the given address.
-   *
-   * @param chipSelect The chip select object containing the id and address to be set or updated.
-   * @param value The value to be stored at the chip selects address after setting or updating it.
-   */
-  public setChipSelect = (chipSelect: ChipSelect, value: number | boolean) => {
-    const existingChipSelect = this.getChipSelect(chipSelect.id);
-
-    if (existingChipSelect) {
-      existingChipSelect.address = chipSelect.address;
-    } else {
-      this._chipSelects.push(chipSelect);
-    }
-
-    if (typeof value === 'boolean') {
-      value = value ? 1 : 0;
-    }
-
-    // === IMPORTART ===
-    // Can't just use this.store because it would call the overridden method in the child class,
-    // which may have different logic for handling chip selects
-    // =================
-    Device.prototype.store.call(this, chipSelect.address, value);
-  };
-
-  /**
-   * Retrieves a chip select based on the provided value, which can be either a string (id) or a number (address).
-   *
-   * @param value The value used to search for the chip select. It can be either a string representing the chip select
-   * id or a number representing its address.
-   */
-  public getChipSelect(value: string | number): ChipSelect | undefined {
-    if (typeof value === 'number') {
-      return this._chipSelects.find(el => el.address === value);
-    }
-    return this._chipSelects.find(el => el.id === value);
   }
 
   /**
@@ -211,7 +170,7 @@ export class Device {
   /**
    * Converts the device instance into a JSON object representation.
    */
-  public toJSON(): any {
+  public toJSON(shortVersion: boolean = false): any {
     const ctor = this.constructor as { name: string; proto?: string };
 
     return {
@@ -219,7 +178,6 @@ export class Device {
       name: this.name,
       minAddress: this._minAddress,
       maxAddress: this._maxAddress,
-      chipSelects: this._chipSelects.map(cs => cs.toJSON()),
     };
   }
 
@@ -232,38 +190,5 @@ export class Device {
     this.name = json.name;
     this._minAddress = json.minAddress;
     this._maxAddress = json.maxAddress;
-    this._chipSelects = json.chipSelects.map((cs: any) => ChipSelect.fromJSON(cs));
-  }
-
-  /**
-   * Updates the addresses of chip selects that are above the new maximum address.
-   * For each chip select with an address greater than the new maximum,
-   * it adjusts the address by subtracting the difference between the old maximum and the new maximum from it,
-   * effectively shifting it down to be within the new valid range.
-   *
-   * @param lastMax The previous maximum address before the update. This is used to calculate how much to shift the chip select addresses.
-   */
-  private updateChipSelectMax(lastMax: number) {
-    this._chipSelects.forEach(el => {
-      if (el.address > this.maxAddress) {
-        el.address = this._minAddress - (lastMax - el.address);
-      }
-    });
-  }
-
-  /**
-   * Updates the addresses of chip selects that are below the new minimum address.
-   * For each chip select with an address less than the new minimum,
-   * it adjusts the address by adding the difference between the new minimum and the old minimum to it,
-   * effectively shifting it up to be within the new valid range.
-   *
-   * @param lastMin The previous minimum address before the update. This is used to calculate how much to shift the chip select addresses.
-   */
-  private updateChipSelectMin(lastMin: number) {
-    this._chipSelects.forEach(el => {
-      if (el.address < this.minAddress) {
-        el.address = this._minAddress + (el.address - lastMin);
-      }
-    });
   }
 }

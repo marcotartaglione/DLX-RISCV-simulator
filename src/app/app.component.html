@@ -13,6 +13,9 @@
   <span id="title">DLX-RISCV Simulator</span>
   <span class="spacer"></span>
   <a mat-button class="navigation-link" routerLink="/about" routerLinkActive="active" [disableRipple]="true">About</a>
+  <button mat-button matTooltip="Report Bug" (click)="openReportDialog()">
+    <span>Report bug <i class="fas fa-bug"></i></span>
+  </button>
   <button mat-icon-button matTooltip="Theme" (click)="toggleTheme()">
     @if (this.currentTheme() === 'light') {
       <span><i class="fas fa-lightbulb"></i></span>

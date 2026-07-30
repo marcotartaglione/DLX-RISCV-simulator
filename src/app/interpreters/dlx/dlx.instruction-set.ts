@@ -106,7 +106,7 @@ export const instructions: {
   },
   RFE: {
     type: 'ReturnFromException',
-    func: (registers) => registers.specialRegisters['pc'].value = registers.specialRegisters['instructionAddressRegister'].value
+    func: (registers) => registers.specialRegisters['pc'].value = registers.specialRegisters['iar'].value
   },
   SB: {
     type: 'ImmediateStore',
