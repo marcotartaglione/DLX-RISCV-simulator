@@ -197,8 +197,8 @@ export class Counter extends LogicalNetwork {
     }
   }
 
-  public override toJSON(): any {
-    const json = super.toJSON();
+  public override toJSON(shortVersion: boolean = false): any {
+    const json = super.toJSON(shortVersion);
     json.countingBasis = this._countingBasis;
     json.loadValue = this.loadValue;
     json.upCounting = this.upCounting;

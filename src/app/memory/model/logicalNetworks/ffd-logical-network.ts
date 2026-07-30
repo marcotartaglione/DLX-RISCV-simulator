@@ -70,9 +70,8 @@ export class FFDLogicalNetwork extends LogicalNetwork {
     }
   }
 
-  public toJSON(): any {
-    const json = super.toJSON();
-    return json;
+  public toJSON(shortVersion: boolean = false): any {
+    return super.toJSON(shortVersion);
   }
 
   protected hydrate(json) {

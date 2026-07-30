@@ -1,5 +1,5 @@
 import {animate, style, transition, trigger} from '@angular/animations';
-import {Component, effect, inject, signal, Type, untracked} from '@angular/core';
+import {Component, computed, effect, inject, signal, Type, untracked} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {MessageDialogComponent} from '../dialogs/message-dialog.component';
 import {ConfirmDialogComponent} from '../dialogs/confirm-dialog.component';
@@ -71,6 +71,10 @@ export class MemoryComponent {
   protected readonly inputAddr = signal<string>('');
   protected readonly selectedChipSelect = signal<ChipSelect>(null);
   protected readonly selectedDevice = signal<Device>(null);
+  protected readonly selectedLogicalNetwork = computed(() => {
+    const device = this.selectedDevice();
+    return this.isLogicalNetwork(device) ? device : null;
+  })
   protected readonly resetStatus = signal<'idle' | 'working' | 'done'>('idle');
 
   protected readonly MAX_32_BIT_ADDRESS = 0xFFFFFFFF;
@@ -132,6 +136,11 @@ export class MemoryComponent {
   protected onChangeCS(newValue: string, id: string) {
     const devices = this.memoryService.devices;
     const indexSelectedDevice = this.memoryService.devices.indexOf(this.selectedDevice());
+
+    if (!(devices[indexSelectedDevice] instanceof LogicalNetwork)) {
+      return;
+    }
+
     const chipSelect = devices[indexSelectedDevice].chipSelects.find(el => el.id === id);
 
     if (chipSelect === null) {
@@ -246,16 +255,40 @@ export class MemoryComponent {
     return dev instanceof LogicalNetwork;
   }
 
-  protected isLogicalNetworkActive(dev: Device) {
-    if (dev instanceof LogicalNetwork) {
-      return dev.ffd;
-    }
+  protected deviceColor(dev: Device): string {
+    switch (true) {
+      case dev instanceof Eprom:
+        return 'var(--accent-sky)';
 
-    return false;
+      case dev instanceof Ram:
+        return 'var(--accent-teal)';
+
+      case dev instanceof InputPort:
+        return 'var(--accent-amber)';
+
+      case dev instanceof LedLogicalNetwork:
+        return 'var(--accent-rose)';
+
+      case dev instanceof StartLogicalNetwork:
+        return 'var(--accent-violet)';
+
+      case dev instanceof Counter:
+        return 'var(--accent-indigo)';
+
+      case dev instanceof Device:
+      default:
+        return 'red';
+    }
   }
 
   protected isMemory(dev: Device): dev is Ram | Eprom {
     return dev instanceof Ram || dev instanceof Eprom;
+  }
+
+  protected openStartupImage() {
+    this._dialog.open(ImageDialogComponent, {
+      data: {src: 'assets/img/rete-start.png'}
+    });
   }
 
   protected openInterruptImage() {
@@ -361,6 +394,7 @@ export class MemoryComponent {
   protected readonly LedLogicalNetwork = LedLogicalNetwork;
   protected readonly Counter = Counter;
   protected readonly InputPort = InputPort;
+  protected readonly LogicalNetwork = LogicalNetwork;
 }
 
 

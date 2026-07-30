@@ -23,7 +23,7 @@ export class Ram extends Device {
     super.updateFrom(other);
   }
 
-  public override toJSON(): any {
-    return super.toJSON();
+  public override toJSON(shortVersion: boolean = false): any {
+    return super.toJSON(shortVersion);
   }
 }

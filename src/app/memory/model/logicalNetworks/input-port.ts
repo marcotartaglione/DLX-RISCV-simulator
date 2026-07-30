@@ -94,8 +94,8 @@ export class InputPort extends LogicalNetwork {
     return 0;
   }
 
-  public toJSON(): any {
-    const json = super.toJSON();
+  public toJSON(shortVersion: boolean = false): any {
+    const json = super.toJSON(shortVersion);
 
     json.data = this._data;
     json.dataSize = this._dataSize;

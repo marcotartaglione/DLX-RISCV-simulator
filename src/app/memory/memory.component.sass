@@ -65,15 +65,6 @@ $color-value: A200
     height: $mem-height
     @include mat.elevation-transition
 
-    &:nth-child(3n)
-      background-color: var(--accent-sky)
-
-    &:nth-child(3n+1)
-      background-color: var(--accent-rose)
-
-    &:nth-child(3n+2)
-      background-color: var(--accent-violet)
-
     &.selected
       z-index: 3
       box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.4)
