@@ -18,15 +18,16 @@ export class LedLogicalNetwork extends LogicalNetwork {
     clockType: 'MEMWR*' | 'MEMRD*' = 'MEMWR*',
     private _led = false
   ) {
-    super('LED', minAddress, maxAddress, asyncSetSignal, asyncResetSignal,
-      ('assets/img/led/' +
-        (clockType === 'MEMWR*' ? 'memwr' : 'memrd') + '/' + asyncSetSignal + '_' + asyncResetSignal + '.jpg').toLowerCase(),
-      clockType);
+    super('LED', minAddress, maxAddress, asyncSetSignal, asyncResetSignal, clockType);
 
     this.setChipSelect(ChipSelect.of('CS_READ_LED', this.minAddress), this._led);
     this.setChipSelect(ChipSelect.of('CS_SWITCH_LED', this.minAddress + 0x00000001), 1);
     this.setChipSelect(ChipSelect.of('CS_A_RES_LED', this.minAddress + 0x00000002), 0);
     this.setChipSelect(ChipSelect.of('CS_A_SET_LED', this.minAddress + 0x00000003), 0);
+  }
+
+  public get imagePath(): string {
+    return 'assets/img/led/' + (this.clockType === 'MEMWR*' ? 'memwr' : 'memrd') + '/' + this.asyncSetSignal.toLowerCase() + '_' + this.asyncResetSignal.toLowerCase() + '.jpg';
   }
 
   public get led(): boolean {

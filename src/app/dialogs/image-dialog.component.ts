@@ -14,8 +14,7 @@ export interface ImageDialogData {
     MatDialogContent,
     MatDialogActions,
     MatButton,
-    MatDialogClose,
-    NgOptimizedImage
+    MatDialogClose
   ]
 })
 export class ImageDialogComponent {

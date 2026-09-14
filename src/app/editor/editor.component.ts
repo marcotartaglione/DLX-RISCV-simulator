@@ -428,7 +428,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   }
 
   protected clear() {
-    this._memoryService.removeFromMemory();
+    this._memoryService.removeFromLocalStorage();
     this._codeService.removeFromLocalStorage();
     this._memoryService.init();
     this._codeService.load();
@@ -460,7 +460,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   private storeCodeInEprom() {
     this._codeService.interpreter.parseTags(this._codeService.content(), this.startTag());
     for (let i = 0; i < this._codeService.linesCount; i++) {
-      this._memoryService.getEprom().store(i, this._codeService.encode(i));
+      this._memoryService.eprom.store(i, this._codeService.encode(i));
     }
   }
 

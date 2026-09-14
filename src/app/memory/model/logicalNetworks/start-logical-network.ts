@@ -18,15 +18,16 @@ export class StartLogicalNetwork extends LogicalNetwork {
     clockType: 'MEMWR*' | 'MEMRD*' = 'MEMWR*',
     private _startup = false
   ) {
-    super('Start', chipSelectRead, chipSelectWrite, asyncSetSignal, asyncResetSignal,
-      ('assets/img/startup/' +
-        (clockType === 'MEMWR*' ? 'memwr' : 'memrd') + '/' + asyncSetSignal + '_' + asyncResetSignal + '.jpg').toLowerCase(),
-      clockType);
+    super('Start', chipSelectRead, chipSelectWrite, asyncSetSignal, asyncResetSignal, clockType);
 
     this.setChipSelect(ChipSelect.of('CS_READ_STARTUP', this.minAddress), 1);
     this.setChipSelect(ChipSelect.of('CS_WRITE_STARTUP', this.minAddress + 0x00000001), 1);
     this.setChipSelect(ChipSelect.of('CS_A_RES_STARTUP', this.minAddress + 0x00000002), 0);
     this.setChipSelect(ChipSelect.of('CS_A_SET_STARTUP', this.minAddress + 0x00000003), 0);
+  }
+
+  public get imagePath(): string {
+    return 'assets/img/startup/' + (this.clockType === 'MEMWR*' ? 'memwr' : 'memrd') + '/' + this.asyncSetSignal.toLowerCase() + '_' + this.asyncResetSignal.toLowerCase() + '.jpg';
   }
 
   public get startup(): boolean {
