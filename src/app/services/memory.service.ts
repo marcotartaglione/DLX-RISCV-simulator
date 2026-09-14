@@ -16,10 +16,29 @@ import {Ram} from '../memory/model/ram';
   providedIn: 'root'
 })
 export class MemoryService {
-  private _memory: Memory;
-
   constructor() {
     this.init();
+  }
+
+  private _memory: Memory;
+
+  /**
+   * Returns the current memory configuration, which includes all the devices and their respective address ranges.
+   * This allows other components to access and manipulate the memory configuration as needed.
+   */
+  public get memory(): Memory {
+    return this._memory;
+  }
+
+  /**
+   * Returns the list of devices currently stored in the memory configuration.
+   */
+  public get devices(): Device[] {
+    return this._memory.devices;
+  }
+
+  public get eprom(): Eprom {
+    return this._memory.get('EPROM') as Eprom;
   }
 
   /**
@@ -69,32 +88,17 @@ export class MemoryService {
   }
 
   /**
-   * Returns the list of devices currently stored in the memory configuration.
-   */
-  public get devices(): Device[] {
-    return this._memory.devices;
-  }
-
-  /**
-   * Returns the current memory configuration, which includes all the devices and their respective address ranges.
-   * This allows other components to access and manipulate the memory configuration as needed.
-   */
-  public get memory(): Memory {
-    return this._memory;
-  }
-
-  /**
    * Removes the stored memory configuration from localStorage, effectively resetting the memory to its default state on the next
    * initialization.
    */
-  public removeFromMemory = () => {
+  public removeFromLocalStorage() {
     window.localStorage.removeItem('memory');
   }
 
   /**
    * Converts the current memory configuration in json format
    */
-  public getMemoryJSON(shortVersion: boolean = false): string {
+  public memoryAsJson(shortVersion: boolean = false): string {
     return JSON.stringify(this._memory.devices.map(dev => {
       return dev.toJSON(shortVersion);
     }));
@@ -105,7 +109,7 @@ export class MemoryService {
    * The memory configuration is serialized to JSON format before being stored.
    */
   public storeInLocalStorage() {
-    window.localStorage.setItem('memory', this.getMemoryJSON());
+    window.localStorage.setItem('memory', this.memoryAsJson());
   }
 
   /**
@@ -126,13 +130,5 @@ export class MemoryService {
     if (device instanceof InputPort) {
       device.interrupt();
     }
-  }
-
-  getEprom(): Eprom {
-    return this._memory.get('EPROM') as Eprom;
-  }
-
-  getCounter(): Counter {
-    return this._memory.get('COUNTER') as Counter;
   }
 }

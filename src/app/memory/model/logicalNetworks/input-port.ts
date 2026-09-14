@@ -23,8 +23,7 @@ export class InputPort extends LogicalNetwork {
     asyncResetSignal = '0',
     clkType: 'MEMWR*' | 'MEMRD*' = 'MEMRD*',
   ) {
-    super('INPUT_PORT', minAddress, maxAddress, asyncSetSignal, asyncResetSignal,
-      `assets/img/input-port/input_port_bit_${_dataSize}.jpg`, clkType);
+    super('INPUT_PORT', minAddress, maxAddress, asyncSetSignal, asyncResetSignal, clkType);
 
     if (_data === undefined) {
       this._data = Math.floor(Math.random() * (2 ** _dataSize));
@@ -32,6 +31,10 @@ export class InputPort extends LogicalNetwork {
 
     this.setChipSelect(ChipSelect.of('CS_INPUT_PORT', this.minAddress), 0);
     this.setChipSelect(ChipSelect.of('CS_READ_INT_INPUT_PORT', this.minAddress + 0x00000001), 1);
+  }
+
+  public get imagePath(): string {
+    return 'assets/img/input-port/input_port_bit_' + this._dataSize + '.jpg';
   }
 
   public get data(): number {
@@ -48,7 +51,6 @@ export class InputPort extends LogicalNetwork {
 
   public set dataSize(value: InputPortSize) {
     this._dataSize = value;
-    this.imagePath = 'assets/img/input-port/input_port_bit_' + this._dataSize + '.jpg';
   }
 
   public static fromJSON(json: any) {

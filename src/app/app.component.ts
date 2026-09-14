@@ -69,7 +69,7 @@ export class AppComponent implements OnInit {
     this._dialog.open(ReportBugDialogComponent, {
       data: {
         code: this._codeService.content(),
-        memory: this._memoryService.getMemoryJSON(true)
+        memory: this._memoryService.memoryAsJson(true)
       }
     });
   }

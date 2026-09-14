@@ -16,13 +16,16 @@ export class FFDLogicalNetwork extends LogicalNetwork {
     asyncSetSignal = 'RESET',
     asyncResetSignal = '0',
   ) {
-    super('FF-D', chipSelectRead, chipSelectWrite, asyncSetSignal, asyncResetSignal,
-      ('assets/img/counter/network/fcb_ffdr_' + asyncResetSignal + '_ffds_' + asyncSetSignal + '.png').toLowerCase());
+    super('FF-D', chipSelectRead, chipSelectWrite, asyncSetSignal, asyncResetSignal);
 
     this.setChipSelect(ChipSelect.of('cs_read_ff', this.minAddress), 1);
     this.setChipSelect(ChipSelect.of('cs_set_ff', this.minAddress + 0x00000001), 1);
     this.setChipSelect(ChipSelect.of('cs_reset', this.minAddress + 0x00000002), 0);
     this.setChipSelect(ChipSelect.of('cs_set', this.minAddress + 0x00000003), 0);
+  }
+
+  public get imagePath(): string {
+    return 'assets/img/counter/network/fcb_ffdr_' + this.asyncResetSignal + '_ffds_' + this.asyncSetSignal + '.png';
   }
 
   public static fromJSON(json: any) {

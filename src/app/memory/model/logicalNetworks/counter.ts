@@ -22,9 +22,7 @@ export class Counter extends LogicalNetwork {
     public asyncCounterResetSignal: 'CS_A_RES_COUNTER' | 'RESET' = 'CS_A_RES_COUNTER',
     private _currentValue = 0
   ) {
-    super('COUNTER', minAddress, maxAddress, asyncSetSignal, asyncResetSignal,
-      `assets/img/counter/count/count_${clockType === 'MEMWR*' ? 'memwr' : 'memrd'}_${asyncResetSignal}.png`.toLowerCase(),
-      clockType);
+    super('COUNTER', minAddress, maxAddress, asyncSetSignal, asyncResetSignal, clockType);
 
     this.setChipSelect(ChipSelect.of('CS_READ_VALUE_COUNTER', this.minAddress), this._currentValue);
     this.setChipSelect(ChipSelect.of('CS_A_RES_COUNTER', this.minAddress + 0x00000001), 0);
@@ -32,6 +30,10 @@ export class Counter extends LogicalNetwork {
     this.setChipSelect(ChipSelect.of('CS_ENABLE_COUNTER', this.minAddress + 0x00000003), 1);
     this.setChipSelect(ChipSelect.of('CS_UP_DOWN_COUNTER', this.minAddress + 0x00000004), 1);
     this.setChipSelect(ChipSelect.of('CS_LOAD_VALUE_COUNTER', this.minAddress + 0x00000005), 0);
+  }
+
+  public get imagePath(): string {
+    return `assets/img/counter/count/count_${this.clockType === 'MEMWR*' ? 'memwr' : 'memrd'}_${this.asyncCounterResetSignal}.png`.toLowerCase();
   }
 
   public get currentValue(): number {

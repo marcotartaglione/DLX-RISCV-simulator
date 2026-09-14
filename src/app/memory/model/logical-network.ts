@@ -1,6 +1,5 @@
 import {Device} from './device';
 import {DeviceModel} from './device-registry';
-import {IVisualizable} from './IVisualizable';
 import {ChipSelect} from './ChipSelect';
 
 /**
@@ -8,7 +7,7 @@ import {ChipSelect} from './ChipSelect';
  * Represents a hardware network with TRI-STATE buffers and Flip-Flops (FFD).
  */
 @DeviceModel()
-export class LogicalNetwork extends Device implements IVisualizable {
+export class LogicalNetwork extends Device {
   public static proto = 'LogicalNetwork';
 
   private _chipSelects: ChipSelect[];
@@ -19,7 +18,6 @@ export class LogicalNetwork extends Device implements IVisualizable {
     maxAddress: number,
     public asyncSetSignal = 'RESET',
     public asyncResetSignal = '0',
-    public imagePath = 'assets/img/logical-network/logical_network.jpg',
     public clockType: 'MEMWR*' | 'MEMRD*' = 'MEMWR*',
   ) {
     super(name, minAddress, maxAddress);
@@ -27,6 +25,10 @@ export class LogicalNetwork extends Device implements IVisualizable {
   }
 
   public _ffd = false;
+
+  public get imagePath(): string {
+    return "assets/img/error-img.png";
+  }
 
   public get ffd(): boolean {
     return this._ffd;
@@ -43,7 +45,6 @@ export class LogicalNetwork extends Device implements IVisualizable {
       json.maxAddress,
       json.asyncSetSignal,
       json.asyncResetSignal,
-      json.imagePath,
       json.clockType
     );
 
@@ -64,7 +65,6 @@ export class LogicalNetwork extends Device implements IVisualizable {
 
     this.asyncSetSignal = other.asyncSetSignal;
     this.asyncResetSignal = other.asyncResetSignal;
-    this.imagePath = other.imagePath;
     this.clockType = other.clockType;
   }
 
@@ -196,7 +196,6 @@ export class LogicalNetwork extends Device implements IVisualizable {
     super.hydrate(json);
     this.asyncSetSignal = json.asyncSetSignal;
     this.asyncResetSignal = json.asyncResetSignal;
-    this.imagePath = json.imagePath;
     this.clockType = json.clockType;
     this._ffd = json.ffd;
     this._chipSelects = json.chipSelects.map((cs: any) => ChipSelect.fromJSON(cs));

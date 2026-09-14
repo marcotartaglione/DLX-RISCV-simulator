@@ -35,10 +35,10 @@ export class LogicalNetworkDialogComponent {
   constructor() {
 
     if (this.isLedLogicalNetwork(this.originalDevice.network)) {
-      this.cloneDevice = new LedLogicalNetwork(0, 1);
+      this.cloneDevice = new LedLogicalNetwork(0, 4);
     }
     else if (this.isStartLogicalNetwork(this.originalDevice.network)) {
-      this.cloneDevice = new StartLogicalNetwork(0, 1);
+      this.cloneDevice = new StartLogicalNetwork(0, 4);
     }
     else {
       this.cloneDevice = new LogicalNetwork( "", 0, 1);

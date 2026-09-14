@@ -23,7 +23,6 @@ import {MatIcon} from '@angular/material/icon';
     MatSidenav,
     DocumentationComponent,
     EditorComponent,
-    MatButton,
     MemoryComponent,
     DiagramComponent,
     RegistersComponent,

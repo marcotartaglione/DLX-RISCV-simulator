@@ -1,6 +1,6 @@
 import {Device} from './device';
 import {InputPort} from './logicalNetworks/input-port';
-import {DeviceFactory} from './DeviceFactoryImpl';
+import {DeviceFactory} from './DeviceFactory';
 import {LogicalNetwork} from './logical-network';
 
 export class Memory {
@@ -15,7 +15,7 @@ export class Memory {
     rawDevices.forEach(d => this.add(DeviceFactory.create(d)))
   }
 
-  public firstFreeAddr(startAddr): number {
+  public firstFreeAddr(startAddr: number): number {
     for (let i = 0; i < this.devices.length - 1; i++) {
       if (
         this.devices[i + 1].minAddress - this.devices[i].maxAddress >=
@@ -82,10 +82,6 @@ export class Memory {
     }
 
     return word;
-  }
-
-  public removePort(dev: Device) {
-    this.inputPorts = this.inputPorts.filter(el => el !== dev);
   }
 
   public setNameExt(num: number): string {
