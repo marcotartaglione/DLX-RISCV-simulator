@@ -17,7 +17,7 @@
       @for (r of this.registers().getSpecialRegisters(); track i; let i = $index) {
         @if (r.isVisible) {
           <div [class.changed]="isChanged(`specialRegisters[${r.key}]`)" class="register">
-            <div class="index" matTooltip="{{ r.tooltip }}">{{ r.label }}</div>
+            <div class="index" matTooltip="{{ r.tooltip }}" matTooltipHideDelay="1000000000">{{ r.label }}</div>
             <div [ngClass]="fType()" [style.max-width]="tempName()" class="value">
               {{ r.value | format: fType() }}
             </div>
