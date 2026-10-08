@@ -10,7 +10,8 @@ import {MatDialog} from '@angular/material/dialog';
 import {CodeService} from './services/code.service';
 import {ReportBugDialogComponent} from './dialogs/report-bug.component';
 import {MemoryService} from './services/memory.service';
-import {APP_VERSION} from './environments/version';
+import {APP_VERSION} from '../environments/version';
+import {BUILD_INFO} from '../environments/build-info';
 
 @Component({
   selector: 'app-root',
@@ -32,6 +33,12 @@ export class AppComponent implements OnInit {
   protected readonly isSidebarOpened = signal(false);
 
   readonly version = APP_VERSION;
+  readonly sha = BUILD_INFO.sha;
+  readonly buildDate = BUILD_INFO.date;
+  readonly commitUrl =
+    BUILD_INFO.sha === 'dev'
+      ? null
+      : `https://github.com/marcotartaglione/DLX-RISCV-simulator/commit/${BUILD_INFO.sha}`;
 
   private _dialog = inject(MatDialog);
   private _activeMainPage: MainPageComponent = null;

@@ -28,6 +28,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Genera build info
+        run: |
+          cat > src/environments/build-info.ts <<EOF
+          export const BUILD_INFO = {
+            sha: '${GITHUB_SHA::7}',
+            date: '$(date -u +%Y-%m-%d)',
+          };
+          EOF
+
       - name: Build
         run: npx ng build --base-href=/simulator/ --configuration production
 
