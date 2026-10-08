@@ -34,7 +34,7 @@ export class InputPort extends LogicalNetwork {
   }
 
   public get imagePath(): string {
-    return 'assets/img/input-port/input_port_bit_' + this._dataSize + '.jpg';
+    return 'assets/img/input-port/input_port_bit_' + this._dataSize + '.png';
   }
 
   public get data(): number {
