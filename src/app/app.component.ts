@@ -10,6 +10,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {CodeService} from './services/code.service';
 import {ReportBugDialogComponent} from './dialogs/report-bug.component';
 import {MemoryService} from './services/memory.service';
+import {APP_VERSION} from './environments/version';
 
 @Component({
   selector: 'app-root',
@@ -29,6 +30,8 @@ import {MemoryService} from './services/memory.service';
 export class AppComponent implements OnInit {
   protected readonly currentTheme = signal<'light' | 'dark'>('dark');
   protected readonly isSidebarOpened = signal(false);
+
+  readonly version = APP_VERSION;
 
   private _dialog = inject(MatDialog);
   private _activeMainPage: MainPageComponent = null;
