@@ -8,6 +8,7 @@ Il simulatore permette di vedere e usare i registri della CPU, eseguire le istru
 ## 📋 Indice
 - [Informazioni sul Progetto](#-informazioni-sul-progetto)
 - [Installazione e Avvio](#-installazione-e-avvio)
+- [Deploy e Infrastruttura](#-deploy-e-infrastruttura)
 - [Autori e Riconoscimenti](#-autori-e-riconoscimenti)
 
 ---
@@ -47,10 +48,26 @@ Il simulatore è stato sviluppato in Angular con TypeScript e può essere esegui
 
 ---
 
+## 🚀 Deploy e Infrastruttura
+
+Ad ogni push su `master` GitHub Actions compila il simulatore e lo pubblica automaticamente su `https://dlx-simulator.disi.unibo.it/simulator/`.
+
+- [`docs/DEPLOY.md`](docs/DEPLOY.md): funzionamento, setup del server da zero, secret, release, rollback e risoluzione dei problemi
+- [`infra/`](infra/): copie di riferimento della configurazione del server
+
+Per rilasciare una nuova versione (mostrata nella barra di navigazione):
+
+```bash
+npm version patch   # oppure minor / major
+git push --follow-tags
+```
+
+---
+
 ## 🧑‍💻 Autori e Riconoscimenti
 
 Il progetto è stato sviluppato con la supervisione del **Prof. [Stefano Mattoccia](https://github.com/stefanomattoccia)** dell'**Università di Bologna**.
-per il corso di Reti di Calcolatori della facoltà di Ingegneria Informatica. Per altre informazioni o per partecipare al progetto, contatta il team di 
+per il corso di Architetture di Calcolatori della facoltà di Ingegneria Informatica. Per altre informazioni o per partecipare al progetto, contatta il team di 
 sviluppo usando il repository GitHub.
 
 Autori principali:

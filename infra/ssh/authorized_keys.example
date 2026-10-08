@@ -1,0 +1,11 @@
+# Fonte di riferimento: repository DLX-RISCV-simulator, infra/ssh/authorized_keys.example
+# File reale sul server: /home/deploy/.ssh/authorized_keys  (permessi 600, proprietario deploy)
+#
+# ATTENZIONE: qui c'e' solo un ESEMPIO con una chiave segnaposto.
+# Non committare mai chiavi private. La chiave pubblica reale va sostituita al segnaposto.
+#
+# restrict       -> disabilita PTY, port forwarding, agent forwarding, X11
+# command="..."  -> qualunque connessione con questa chiave esegue SOLO il wrapper,
+#                   che a sua volta accetta soltanto "rsync --server ..." (verso incoming/)
+#                   e il comando "deploy".
+restrict,command="/usr/local/bin/deploy-wrapper.sh" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIESEMPIOSEGNAPOSTOxxxxxxxxxxxxxxxxxxxxxxxx github-actions-dlx
