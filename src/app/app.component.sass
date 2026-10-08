@@ -1,24 +1,31 @@
 $navbar-height: 50px
 
 #navbar
-    background-color: var(--bg-panel)
-    position: fixed
-    top: 0
-    right: 0
-    left: 0
-    height: $navbar-height
-    padding: 16px 8px
-    z-index: 10
-    box-shadow: 0 2px 5px 0 rgba(0,0,0,.3)
+  background-color: var(--bg-panel)
+  position: fixed
+  top: 0
+  right: 0
+  left: 0
+  height: $navbar-height
+  padding: 16px 8px
+  z-index: 10
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .3)
 
-    #title
-        margin-left: .5rem
-    .spacer
-        flex: 1 1 auto
+  #title
+    margin-left: .5rem
+
+  .spacer
+    flex: 1 1 auto
 
 .basic-container
-    position: relative
-    top: $navbar-height
-    display: block
-    min-height: calc( 100% - #{$navbar-height} )
-    min-width: 100%
+  position: relative
+  top: $navbar-height
+  display: block
+  min-height: calc(100% - #{$navbar-height})
+  min-width: 100%
+
+.app-version
+  font-size: .8rem
+  opacity: 0.7
+  margin-right: 8px
+  align-self: center
