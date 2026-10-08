@@ -1,23 +1,30 @@
-<mat-toolbar id="navbar" color="primary">
-  <button mat-icon-button matTooltip="Documentation" (click)="toggleSidenav()">
+<mat-toolbar color="primary" id="navbar">
+  <button (click)="toggleSidenav()" mat-icon-button matTooltip="Documentation">
     @if (!this.isSidebarOpened()) {
       <span><i class="fas fa-book"></i></span>
     } @else {
       <span><i class="fas fa-book-open"></i></span>
     }
   </button>
-  <a mat-button class="navigation-link" routerLink="/dlx" routerLinkActive="active">DLX</a>
-  <a mat-button class="navigation-link" routerLink="/rv32i" routerLinkActive="active">RV32I</a>
+  <a class="navigation-link" mat-button routerLink="/dlx" routerLinkActive="active">DLX</a>
+  <a class="navigation-link" mat-button routerLink="/rv32i" routerLinkActive="active">RV32I</a>
   <span class="spacer"></span>
-  <span class="app-version">v{{ version }}</span>
+  @if (commitUrl) {
+    <a [href]="commitUrl" class="app-version" rel="noopener" target="_blank"
+          [matTooltip]="'Build ' + sha + (buildDate ? ' · ' + buildDate : '')">
+      v{{ version }}
+    </a>
+  } @else {
+    <span class="app-version">v{{ version }} (dev)</span>
+  }
   <span><i class="fas fa-microchip"></i></span>
   <span id="title">DLX-RISCV Simulator</span>
   <span class="spacer"></span>
-  <a mat-button class="navigation-link" routerLink="/about" routerLinkActive="active" [disableRipple]="true">About</a>
-  <button mat-button matTooltip="Report Bug" (click)="openReportDialog()">
+  <a [disableRipple]="true" class="navigation-link" mat-button routerLink="/about" routerLinkActive="active">About</a>
+  <button (click)="openReportDialog()" mat-button matTooltip="Report Bug">
     <span>Report bug <i class="fas fa-bug"></i></span>
   </button>
-  <button mat-icon-button matTooltip="Theme" (click)="toggleTheme()">
+  <button (click)="toggleTheme()" mat-icon-button matTooltip="Theme">
     @if (this.currentTheme() === 'light') {
       <span><i class="fas fa-lightbulb"></i></span>
     } @else {
