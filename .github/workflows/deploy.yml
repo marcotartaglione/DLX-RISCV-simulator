@@ -1,0 +1,63 @@
+name: Deploy DLX Simulator
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npx ng build --base-href=/simulator/ --configuration production
+
+      - name: Individua cartella output
+        id: out
+        run: |
+          if [ -d dist/*/browser ]; then
+            echo "dir=$(echo dist/*/browser)" >> "$GITHUB_OUTPUT"
+          else
+            echo "dir=$(echo dist/*)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Configura SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Upload build
+        run: |
+          rsync -az --delete \
+            -e "ssh -p ${{ secrets.SSH_PORT }} -i ~/.ssh/id_ed25519" \
+            "${{ steps.out.outputs.dir }}"/ \
+            ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:./
+
+      - name: Esegui deploy
+        run: |
+          ssh -p ${{ secrets.SSH_PORT }} -i ~/.ssh/id_ed25519 \
+            ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} deploy
