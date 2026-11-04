@@ -92,8 +92,14 @@
       </button>
 
       <mat-menu #menu="matMenu">
-        <button mat-menu-item (click)="save(true)">Download</button>
-        <button mat-menu-item (click)="save(false)">Save in storage</button>
+        <button mat-menu-item (click)="save(true)">
+          <mat-icon>download</mat-icon>
+          <span>Download</span>
+        </button>
+        <button mat-menu-item (click)="save(false)">
+          <mat-icon>save</mat-icon>
+          <span>Save in storage</span>
+        </button>
       </mat-menu>
 
       <button mat-raised-button class="mr" color="primary" (click)="clear()">

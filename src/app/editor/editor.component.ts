@@ -40,6 +40,7 @@ import {DLX_INSTRUCTIONS} from '../interpreters/dlx/dlx.instructions';
 import {Device} from '../memory/model/device';
 import {LedLogicalNetwork} from '../memory/model/logicalNetworks/led-logical-network';
 import {clearRegistersChangeLog} from '../registers/register-change.store';
+import {MatIcon} from '@angular/material/icon';
 
 @Component({
   selector: 'app-editor',
@@ -80,7 +81,8 @@ import {clearRegistersChangeLog} from '../registers/register-change.store';
     MatLabel,
     MatSelect,
     MatOption,
-    MatTooltip
+    MatTooltip,
+    MatIcon
   ]
 })
 export class EditorComponent implements AfterViewInit, OnDestroy {
