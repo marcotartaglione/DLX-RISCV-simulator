@@ -1,11 +1,9 @@
-import {Component, DestroyRef, effect, inject, OnDestroy, OnInit, signal} from '@angular/core';
-import {Subscription} from 'rxjs';
+import {Component, effect, inject, OnInit, signal} from '@angular/core';
 import {MainPageComponent} from './main-page/main-page.component';
 import {MatToolbar} from '@angular/material/toolbar';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatTooltip} from '@angular/material/tooltip';
 import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
-import {ImageDialogComponent} from './dialogs/image-dialog.component';
 import {MatDialog} from '@angular/material/dialog';
 import {CodeService} from './services/code.service';
 import {ReportBugDialogComponent} from './dialogs/report-bug.component';
@@ -29,9 +27,6 @@ import {BUILD_INFO} from '../environments/build-info';
   ]
 })
 export class AppComponent implements OnInit {
-  protected readonly currentTheme = signal<'light' | 'dark'>('dark');
-  protected readonly isSidebarOpened = signal(false);
-
   readonly version = APP_VERSION;
   readonly sha = BUILD_INFO.sha;
   readonly buildDate = BUILD_INFO.date;
@@ -40,6 +35,8 @@ export class AppComponent implements OnInit {
       ? null
       : `https://github.com/marcotartaglione/DLX-RISCV-simulator/commit/${BUILD_INFO.sha}`;
 
+  protected readonly currentTheme = signal<'light' | 'dark'>('dark');
+  protected readonly isSidebarOpened = signal(false);
   private _dialog = inject(MatDialog);
   private _activeMainPage: MainPageComponent = null;
   private _codeService: CodeService = inject(CodeService);
@@ -63,7 +60,7 @@ export class AppComponent implements OnInit {
 
       component.sidebarOpened.subscribe(val => {
         this.isSidebarOpened.set(val);
-      })
+      });
     } else {
       this._activeMainPage = null;
       throw new Error('Activated component is not an instance of MainPageComponent');

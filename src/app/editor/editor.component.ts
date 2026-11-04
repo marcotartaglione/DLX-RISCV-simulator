@@ -168,7 +168,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   }
 
   public get inputPorts() {
-    return this._memoryService.memory.inputPorts;
+    return this._memoryService.inputPorts;
   }
 
   public get options(): CodeMirror.EditorConfiguration {
