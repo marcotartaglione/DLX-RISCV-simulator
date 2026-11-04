@@ -122,7 +122,7 @@ export class MemoryComponent {
   }
 
   protected onAdd(type: Type<Device>) {
-    const firstAdd = this.memoryService.firstFreeAddr() + 1;
+    const firstAdd = this.memoryService.firstFreeAddr(0) + 1;
     this.memoryService.add(new type(firstAdd, firstAdd + 0x01FFFFFF));
     this.memoryService.storeInLocalStorage();
   }
@@ -287,7 +287,7 @@ export class MemoryComponent {
 
   protected openStartupImage() {
     this._dialog.open(ImageDialogComponent, {
-      data: {src: 'assets/img/rete-start.png'}
+      data: {src: this.memoryService.startup?.imagePath}
     });
   }
 
@@ -372,7 +372,7 @@ export class MemoryComponent {
         'assets/img/led_off.png';
     }
     else if (device instanceof Counter) {
-      return 'assets/img/counter/counter.png';
+      return 'assets/img/counter.png';
     }
     else if (device instanceof InputPort) {
       return 'assets/img/icon_port.png';

@@ -47,7 +47,7 @@ export class MemoryAddressDialogComponent {
 
     for (let i = 0; i < numWords; i++) {
       const wordAddr = start + (i * 4);
-      const word = this._memoryService.memory.load(wordAddr) ?? 0;
+      const word = this._memoryService.load(wordAddr) ?? 0;
 
       for (let j = 0; j < 4; j++) {
         const byteAddr = wordAddr + j;
@@ -106,7 +106,7 @@ export class MemoryAddressDialogComponent {
 
       const wordAddr = this.memoryValues[i].address;
 
-      this._memoryService.memory.store(wordAddr, word);
+      this._memoryService.store(wordAddr, word);
     }
 
     this._dialogRef.close();

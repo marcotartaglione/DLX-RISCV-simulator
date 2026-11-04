@@ -16,11 +16,14 @@ import {Ram} from '../memory/model/ram';
   providedIn: 'root'
 })
 export class MemoryService {
+
+  private static STORAGE_KEY = 'memory';
+
   constructor() {
     this.init();
   }
 
-  private _memory: Memory;
+  private _memory!: Memory;
 
   /**
    * Returns the current memory configuration, which includes all the devices and their respective address ranges.
@@ -31,14 +34,52 @@ export class MemoryService {
   }
 
   /**
+   * Loads a value from the memory at the specified address.
+   */
+  public load(...args: Parameters<typeof this._memory.load>): ReturnType<typeof this._memory.load> {
+    return this._memory.load(...args);
+  }
+
+  /**
+   * Stores a value in the memory at the specified address.
+   */
+  public store(...args: Parameters<typeof this._memory.store>): ReturnType<typeof this._memory.store> {
+    return this._memory.store(...args);
+  }
+
+  /**
    * Returns the list of devices currently stored in the memory configuration.
    */
-  public get devices(): Device[] {
+  public get devices(): Memory['devices'] {
     return this._memory.devices;
   }
 
-  public get eprom(): Eprom {
-    return this._memory.get('EPROM') as Eprom;
+  /**
+   * Returns the Eprom device from the memory configuration. If there is no Eprom device, it returns undefined.
+   */
+  public get eprom(): Eprom | undefined {
+    return this._memory.devices.find((dev): dev is Eprom => dev instanceof Eprom);
+  }
+
+  /**
+   * Returns the StartLogicalNetwork device from the memory configuration. If there is no StartLogicalNetwork device, it returns undefined.
+   */
+  public get startup(): StartLogicalNetwork | undefined {
+    return this._memory.devices.find((dev): dev is StartLogicalNetwork => dev instanceof StartLogicalNetwork);
+  }
+
+  /**
+   * Returns the list of InputPort devices currently stored in the memory configuration.
+   */
+  public get inputPorts(): InputPort[] {
+    return this._memory.inputPorts as InputPort[];
+  }
+
+  /**
+   * Returns the list of LedLogicalNetwork devices currently stored in the memory configuration. If there are no LedLogicalNetwork devices, it returns an empty array.
+   */
+  public get ledNetworks(): LedLogicalNetwork[] | undefined {
+    return this._memory.devices.filter((dev): dev is LedLogicalNetwork => dev instanceof LedLogicalNetwork);
   }
 
   /**
@@ -46,7 +87,7 @@ export class MemoryService {
    * from it. Otherwise, it creates a default memory configuration.
    */
   public init() {
-    const storedMemory = window.localStorage.getItem('memory');
+    const storedMemory = window.localStorage.getItem(MemoryService.STORAGE_KEY);
 
     if (storedMemory) {
       this._memory = new Memory(storedMemory);
@@ -71,20 +112,16 @@ export class MemoryService {
 
   /**
    * Adds a new device to the memory configuration.
-   *
-   * @param device The device to be added to the memory.
    */
-  public add(device: Device): void {
-    this._memory.add(device);
+  public add(...args: Parameters<typeof this._memory.add>): ReturnType<typeof this._memory.add> {
+    return this._memory.add(...args);
   }
 
   /**
    * Removes a device from the memory configuration.
-   *
-   * @param device The device to be removed from the memory.
    */
-  public remove(device: Device): void {
-    this._memory.remove(device);
+  public remove(...args: Parameters<typeof this._memory.remove>): ReturnType<typeof this._memory.remove> {
+    return this._memory.remove(...args);
   }
 
   /**
@@ -92,7 +129,7 @@ export class MemoryService {
    * initialization.
    */
   public removeFromLocalStorage() {
-    window.localStorage.removeItem('memory');
+    window.localStorage.removeItem(MemoryService.STORAGE_KEY);
   }
 
   /**
@@ -109,16 +146,14 @@ export class MemoryService {
    * The memory configuration is serialized to JSON format before being stored.
    */
   public storeInLocalStorage() {
-    window.localStorage.setItem('memory', this.memoryAsJson());
+    window.localStorage.setItem(MemoryService.STORAGE_KEY, this.memoryAsJson());
   }
 
   /**
    * Finds the first free address in the memory configuration starting from a given address.
-   *
-   * @param startAddress The address from which to start searching for a free address.
    */
-  public firstFreeAddr(startAddress: number = 0): number {
-    return this._memory.firstFreeAddr(startAddress);
+  public firstFreeAddr(...args: Parameters<typeof this._memory.firstFreeAddr>): ReturnType<typeof this._memory.firstFreeAddr> {
+    return this._memory.firstFreeAddr(...args);
   }
 
   /**
@@ -131,4 +166,6 @@ export class MemoryService {
       device.interrupt();
     }
   }
+
+
 }
