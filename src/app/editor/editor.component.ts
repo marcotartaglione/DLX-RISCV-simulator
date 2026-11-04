@@ -433,7 +433,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     this._memoryService.removeFromLocalStorage();
     this._codeService.removeFromLocalStorage();
     this._memoryService.init();
-    this._codeService.load();
+    this._codeService.load(this.selectedScript());
     this.storeCodeInEprom();
 
     this.registers().specialRegisters['pc'].value = 0;
