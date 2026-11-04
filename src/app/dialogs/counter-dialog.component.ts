@@ -8,6 +8,7 @@ import {MatSelect} from '@angular/material/select';
 import {MatOption} from '@angular/material/core';
 import {MatButton} from '@angular/material/button';
 import {FormatPipe} from '../pipes/format.pipe';
+import {MatIcon} from '@angular/material/icon';
 
 export interface CounterDialogData {
   network: Counter;
@@ -15,6 +16,35 @@ export interface CounterDialogData {
 
 @Component({
   templateUrl: './counter-dialog.component.html',
+  styles: [`
+    .image-container {
+      position: relative;
+      display: inline-block;
+    }
+    .image-container .download-btn {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+      background: rgba(0, 0, 0, 0.65);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+    }
+    .image-container .download-btn:hover {
+      background: rgba(0, 0, 0, 0.85);
+    }
+    .image-container:hover .download-btn {
+      opacity: 1;
+    }
+  `],
   standalone: true,
   providers: [FormatPipe],
   imports: [
@@ -28,7 +58,8 @@ export interface CounterDialogData {
     MatButton,
     MatDialogClose,
     FormatPipe,
-    MatLabel
+    MatLabel,
+    MatIcon
   ]
 })
 export class CounterDialogComponent implements OnInit {
@@ -101,5 +132,14 @@ export class CounterDialogComponent implements OnInit {
 
     this.cloneDevice.countingBasis = this.countingBasis();
     this.cloneDevice.asyncReset();
+  }
+
+  protected downloadImage() {
+    const link = document.createElement('a');
+    link.href = this.cloneDevice.imagePath;
+    link.download = `${this.cloneDevice.name || 'counter'}-schema.svg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 }

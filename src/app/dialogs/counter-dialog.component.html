@@ -1,17 +1,10 @@
-<div mat-dialog-content>
-  <div>
-    <div style="display:inline-block;">
-      <img alt="" height="260px"
-           src="assets/img/counter/network/fcb_ffdr_{{this.cloneDevice.asyncResetSignal.toLowerCase()}}_ffds_{{this.cloneDevice.asyncSetSignal.toLowerCase()}}.png"
-           style="background-color:white ; display: block; margin:0 auto;"
-           width="450px"/>
-    </div>
-    <div style="display:inline-block;">
-      <img alt="" height="260px"
-           src="{{cloneDevice.imagePath}}"
-           style="background-color:white ; display: block; margin:0 auto;"
-           width="450px"/>
-    </div>
+<mat-dialog-content>
+  <div class="image-container">
+    <img alt="" src="{{cloneDevice.imagePath}}" style="background-color:white; display: block;" width="850px"/>
+    <button (click)="downloadImage()" class="download-btn" title="Scarica schema SVG">
+      <mat-icon>download</mat-icon>
+      Download
+    </button>
   </div>
   <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 20px;">
     <mat-form-field appearance="outline">
@@ -92,7 +85,7 @@
     }
   </div>
   <br/>
-</div>
+</mat-dialog-content>
 <div align="end" mat-dialog-actions>
   <button mat-button mat-dialog-close>Cancel</button>
   <button [mat-dialog-close]="cloneDevice" color="primary" mat-button>Confirm</button>

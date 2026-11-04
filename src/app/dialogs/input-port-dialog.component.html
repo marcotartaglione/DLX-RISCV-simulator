@@ -1,17 +1,18 @@
-<div mat-dialog-content>
-  <div>
-    <div style="display:inline-block;">
-      <img alt="" height="500px" src="{{urlImage}}"
-           style="background-color:white ; display: block; margin:0 auto;" width="730px"/>
-    </div>
+<mat-dialog-content>
+  <div class="image-container">
+    <img alt="" src="{{cloneDevice.imagePath}}" style="background-color:white; display: block;" width="850px"/>
+    <button (click)="downloadImage()" class="download-btn" title="Scarica schema SVG">
+      <mat-icon>download</mat-icon>
+      Download
+    </button>
   </div>
   <br>
   <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
     <mat-form-field appearance="outline">
       <mat-label>Current Value</mat-label>
-      <input [(ngModel)]="hexDisplayValue"
+      <input (blur)="applyPadding()"
              (ngModelChange)="onDataChange($event)"
-             (blur)="applyPadding()"
+             [(ngModel)]="hexDisplayValue"
              [maxLength]="cloneDevice.dataSize / 4 + 2"
              matInput
              name="currentVal"
@@ -53,9 +54,9 @@
     </div>
   }
   <br/>
+</mat-dialog-content>
 
-</div>
 <div align="end" mat-dialog-actions>
   <button mat-button mat-dialog-close>Cancel</button>
-  <button mat-button [mat-dialog-close]="cloneDevice" color="primary">Confirm</button>
+  <button [mat-dialog-close]="cloneDevice" color="primary" mat-button>Confirm</button>
 </div>

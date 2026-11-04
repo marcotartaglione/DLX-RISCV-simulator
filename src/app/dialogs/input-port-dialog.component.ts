@@ -8,6 +8,7 @@ import {FormatPipe} from '../pipes/format.pipe';
 import {MatButton} from '@angular/material/button';
 import {MatOption} from '@angular/material/core';
 import {MatSelect} from '@angular/material/select';
+import {MatIcon} from '@angular/material/icon';
 
 export interface InputPortDialogData {
   network: InputPort;
@@ -15,6 +16,35 @@ export interface InputPortDialogData {
 
 @Component({
   templateUrl: './input-port-dialog.component.html',
+  styles: [`
+    .image-container {
+      position: relative;
+      display: inline-block;
+    }
+    .image-container .download-btn {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+      background: rgba(0, 0, 0, 0.65);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+    }
+    .image-container .download-btn:hover {
+      background: rgba(0, 0, 0, 0.85);
+    }
+    .image-container:hover .download-btn {
+      opacity: 1;
+    }
+  `],
   standalone: true,
   providers: [FormatPipe],
   imports: [
@@ -28,7 +58,8 @@ export interface InputPortDialogData {
     MatDialogClose,
     MatLabel,
     MatOption,
-    MatSelect
+    MatSelect,
+    MatIcon
   ]
 })
 export class InputPortDialogComponent implements OnInit {
@@ -46,7 +77,7 @@ export class InputPortDialogComponent implements OnInit {
   }
 
   protected get urlImage(): string {
-    return 'assets/img/input-port/input_port_bit_' + this.cloneDevice.dataSize + '.png';
+    return this.cloneDevice.imagePath;
   }
 
   ngOnInit() {
@@ -73,5 +104,14 @@ export class InputPortDialogComponent implements OnInit {
       'hex',
       this.cloneDevice.dataSize
     );
+  }
+
+  protected downloadImage() {
+    const link = document.createElement('a');
+    link.href = this.cloneDevice.imagePath;
+    link.download = `${this.cloneDevice.name || 'input_port'}-schema.svg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 }
