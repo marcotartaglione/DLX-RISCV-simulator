@@ -45,6 +45,7 @@ export abstract class Interpreter {
    */
   public reset(registers: Registers): void {
     this.resetArchitectureState(registers);
+    this.tags = {};
   }
 
   /**
